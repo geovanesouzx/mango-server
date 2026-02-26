@@ -1,0 +1,93 @@
+const admin = require('firebase-admin');
+const express = require('express');
+const app = express();
+
+// 1. Inicializa o Firebase usando a chave de ambiente
+// No Render.com, você vai criar uma variável chamada FIREBASE_CONFIG e colar o JSON lá.
+const serviceAccount = JSON.parse(process.env.FIREBASE_CONFIG);
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
+
+const db = admin.firestore();
+const START_TIME = Date.now(); // Para não enviar notificações velhas ao reiniciar
+
+console.log("Servidor do Mango iniciado. Ouvindo novas mensagens...");
+
+// 2. Escuta todas as coleções chamadas "messages"
+db.collectionGroup('messages').onSnapshot(snapshot => {
+    snapshot.docChanges().forEach(async (change) => {
+        // Só queremos saber de mensagens ADICIONADAS
+        if (change.type === 'added') {
+            const msg = change.doc.data();
+
+            // Ignorar mensagens antigas e mensagens apagadas
+            if (msg.timestamp < START_TIME || msg.isDeleted || msg.status === 'read') return;
+
+            try {
+                // Descobrir qual é a sala de chat para ver os participantes
+                const chatRef = change.doc.ref.parent.parent;
+                const chatDoc = await chatRef.get();
+                if (!chatDoc.exists) return;
+
+                const chatData = chatDoc.data();
+                const participants = chatData.participants || [];
+
+                // O remetente da mensagem
+                const senderId = msg.senderId; 
+                
+                // O destinatário (quem vai receber a notificação)
+                const targetParticipant = participants.find(p => p !== senderId);
+                if (!targetParticipant) return;
+
+                const [targetUid, targetProfileId] = targetParticipant.split('|');
+
+                // 3. Buscar o Token (FCM) do celular do destinatário no Firestore
+                const profileDoc = await db.collection('users').doc(targetUid).collection('profiles').doc(targetProfileId).get();
+                if (!profileDoc.exists) return;
+
+                const fcmToken = profileDoc.data().fcmToken;
+                if (!fcmToken) return; // Se não tem token, não tem como notificar
+
+                // Pegar o nome de quem enviou (pode estar personalizado)
+                const senderName = chatData.customNames?.[senderId] || chatData.usersInfos?.[senderId]?.name || "Nova mensagem";
+
+                // Formatar o texto (Mídia ou Texto)
+                let bodyText = msg.text;
+                if (msg.mediaUrl) {
+                    bodyText = msg.mediaType === 'video' ? "🎥 Enviou um vídeo" : "📷 Enviou uma foto";
+                }
+
+                // 4. Montar a notificação
+                const payload = {
+                    token: fcmToken,
+                    notification: {
+                        title: senderName,
+                        body: bodyText
+                    },
+                    data: {
+                        roomId: chatDoc.id // Envia o ID do chat oculto para o celular abrir a tela certa
+                    }
+                };
+
+                // 5. Disparar a notificação via Firebase Admin!
+                await admin.messaging().send(payload);
+                console.log(`Notificação enviada com sucesso para: ${targetParticipant}`);
+
+            } catch (error) {
+                console.error("Erro ao enviar notificação:", error);
+            }
+        }
+    });
+});
+
+// 6. Rota básica (Obrigatório para o Render.com não desligar o servidor achando que deu erro)
+app.get('/', (req, res) => {
+    res.send('Servidor de Notificações do Mango está ON! 🥭');
+});
+
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor web rodando na porta ${PORT}`);
+});
