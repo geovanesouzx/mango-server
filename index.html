@@ -13,276 +13,434 @@
             theme: {
                 extend: {
                     colors: {
-                        background: '#050505',
-                        surface: '#1C1C1E',
+                        background: 'var(--bg-color)',
+                        surface: 'var(--surface-color)',
+                        content: 'var(--content-color)',
                         primary: '#0A84FF',
                         accent: '#B14AE2',
                         success: '#32D74B',
                         danger: '#FF3B30',
-                        warning: '#xFFFF00'
+                        warning: '#xFFFF00',
+                        foco: '#00C7BE'
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
     </script>
 
-    <!-- Google Fonts -->
+    <!-- Google Fonts & FontAwesome -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; overflow-x: hidden; }
+        :root {
+            --bg-color: #050505;
+            --surface-color: #1C1C1E;
+            --content-color: #FFFFFF;
+        }
+        .theme-light {
+            --bg-color: #FBFBFD;
+            --surface-color: #F2F2F7;
+            --content-color: #000000;
+        }
         
-        /* Ocultar scrollbar mas manter funcionalidade */
+        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--content-color); overflow: hidden; transition: background-color 0.3s, color 0.3s; }
+        
         ::-webkit-scrollbar { width: 0px; background: transparent; }
         
-        /* Glassmorphism */
-        .glass {
-            background: rgba(28, 28, 30, 0.7);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
+        .liquid-glass {
+            background: rgba(28, 28, 30, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
-
-        .screen { display: none; animation: fadeIn 0.3s ease-in-out; }
-        .screen.active { display: flex; flex-direction: column; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .theme-light .liquid-glass {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        /* Chat Bubbles */
-        .chat-bubble-user { background: linear-gradient(135deg, #B14AE2, #6A0DAD); border-radius: 20px 20px 4px 20px; }
-        .chat-bubble-ai { background: #1C1C1E; border-radius: 20px 20px 20px 4px; }
-        
-        /* Bottom Nav Fix */
-        .pb-nav { padding-bottom: 90px; }
+        .screen, .view-section, .sub-view { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; padding-bottom: 110px;}
+        .active-screen { display: flex; z-index: 10; animation: fadeIn 0.3s; }
+        .active-view { display: flex; animation: fadeUp 0.3s; }
+        .active-sub { display: flex; z-index: 20; background-color: var(--bg-color); animation: slideInRight 0.3s; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+        .chat-user { background: linear-gradient(135deg, #B14AE2, #6A0DAD); color: white; border-radius: 20px 20px 4px 20px; }
+        .chat-ai { background: var(--surface-color); color: var(--content-color); border-radius: 20px 20px 20px 4px; }
     </style>
 </head>
-<body class="antialiased h-screen w-screen relative">
+<body class="antialiased">
 
-    <!-- 1. ECRÃ DE LOADING -->
-    <div id="screen-loading" class="screen active h-full w-full justify-center items-center absolute top-0 left-0 z-50 bg-background">
-        <div class="text-center animate-pulse">
-            <i class="fa-solid fa-graduation-cap text-6xl text-accent mb-4"></i>
-            <h1 class="text-3xl font-extrabold tracking-tight">OrganizaEdu</h1>
-        </div>
+    <!-- ECRÃ DE LOADING -->
+    <div id="screen-loading" class="screen active-screen justify-center items-center bg-background">
+        <i class="fa-solid fa-graduation-cap text-6xl text-primary animate-bounce mb-4"></i>
+        <h1 class="text-3xl font-extrabold tracking-tight">OrganizaEdu</h1>
     </div>
 
-    <!-- 2. ECRÃ DE LOGIN -->
-    <div id="screen-login" class="screen h-full w-full absolute top-0 left-0 z-40 bg-background relative overflow-hidden">
-        <!-- Luzes de Fundo -->
+    <!-- ECRÃ DE LOGIN -->
+    <div id="screen-login" class="screen bg-background relative overflow-hidden">
         <div class="absolute -top-20 -left-20 w-72 h-72 bg-accent opacity-20 rounded-full blur-3xl"></div>
         <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-primary opacity-20 rounded-full blur-3xl"></div>
         
-        <div class="flex-1 flex flex-col justify-center items-center px-8 z-10">
-            <i class="fa-solid fa-graduation-cap text-7xl text-white mb-8"></i>
+        <div class="flex-1 flex flex-col justify-center items-center px-8 z-10 pt-20">
+            <i class="fa-solid fa-graduation-cap text-7xl text-content mb-8"></i>
             <h1 class="text-4xl font-extrabold mb-4">Bem-vindo</h1>
-            <p class="text-center text-gray-400 text-lg">A sua vida académica organizada<br>de forma incrivelmente simples.</p>
+            <p class="text-center text-content opacity-50 text-lg">A sua vida académica organizada<br>de forma incrivelmente simples.</p>
         </div>
-        
-        <div class="p-8 z-10">
-            <button id="btn-google-login" class="w-full bg-white text-black font-bold text-lg py-4 rounded-2xl flex justify-center items-center gap-3 hover:bg-gray-200 transition">
-                <i class="fa-brands fa-google text-xl"></i>
-                Continuar com o Google
+        <div class="p-8 z-10 pb-20">
+            <button id="btn-login" class="w-full bg-content text-background font-bold text-lg py-4 rounded-2xl flex justify-center items-center gap-3">
+                <i class="fa-brands fa-google text-xl"></i> Continuar com o Google
             </button>
         </div>
     </div>
 
-    <!-- 3. APP PRINCIPAL (SHELL) -->
-    <div id="screen-app" class="screen h-full w-full bg-background relative">
+    <!-- ECRÃ SETUP PROFILE -->
+    <div id="screen-setup" class="screen bg-background p-6">
+        <h1 class="text-3xl font-extrabold mt-12 mb-2">Complete o perfil</h1>
+        <p class="text-content opacity-50 mb-8">Precisamos de alguns dados para personalizar a sua experiência.</p>
         
-        <!-- Header Fixo -->
-        <header id="app-header" class="w-full px-6 pt-12 pb-4 flex justify-between items-center bg-background z-20">
-            <div>
-                <h2 class="text-2xl font-bold" id="user-greeting">Olá, Estudante</h2>
-            </div>
-            <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=1C1C1E&color=fff" class="w-12 h-12 rounded-full border border-gray-800 cursor-pointer object-cover">
+        <input type="text" id="setup-name" placeholder="Nome de Perfil" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none">
+        <input type="text" id="setup-user" placeholder="Nome de Utilizador (@)" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none">
+        <input type="text" id="setup-course" placeholder="Qual o seu curso?" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none">
+        <select id="setup-sem" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none appearance-none">
+            <option value="1º Semestre">1º Semestre</option>
+            <option value="2º Semestre">2º Semestre</option>
+            <option value="3º Semestre">3º Semestre</option>
+        </select>
+        <select id="setup-uni" class="w-full bg-surface rounded-2xl p-4 mb-8 text-content outline-none appearance-none">
+            <option value="UFRB - Universidade Federal do Recôncavo da Bahia">UFRB - Univ. Federal do Recôncavo da Bahia</option>
+            <option value="UFBA - Universidade Federal da Bahia">UFBA - Univ. Federal da Bahia</option>
+            <option value="Outra">Outra</option>
+        </select>
+
+        <button id="btn-save-setup" class="w-full bg-content text-background font-bold py-4 rounded-2xl">Finalizar Perfil</button>
+    </div>
+
+    <!-- APP PRINCIPAL -->
+    <div id="screen-app" class="screen bg-background">
+        <!-- Main Header -->
+        <header id="main-header" class="w-full px-6 pt-12 pb-4 flex justify-between items-center z-10 bg-background">
+            <h2 class="text-2xl font-bold" id="ui-greeting">Olá, Estudante</h2>
+            <img id="ui-avatar" src="" class="w-12 h-12 rounded-full object-cover cursor-pointer" onclick="openSubView('profile')">
         </header>
 
-        <!-- Views Container -->
-        <main class="flex-1 overflow-y-auto pb-nav relative" id="main-content">
+        <!-- VIEWS PRINCIPAIS (TABS) -->
+        <div id="views-container" class="flex-1 relative w-full">
             
-            <!-- VIEW: HOME -->
-            <div id="view-home" class="view-section px-6 flex flex-col gap-6 active block">
-                <h1 class="text-3xl font-extrabold tracking-tight mt-2">O Teu Painel</h1>
-                
-                <!-- Widget Tarefas Simples -->
-                <div class="bg-surface rounded-[24px] p-5 cursor-pointer" onclick="navigate('tarefas')">
-                    <div class="flex items-center justify-between mb-4">
-                        <span class="text-[10px] font-extrabold text-primary tracking-widest">TAREFAS</span>
-                        <i class="fa-solid fa-check-circle text-gray-600"></i>
-                    </div>
-                    <div class="flex items-center gap-4">
-                        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
-                            <i class="fa-solid fa-list-check text-primary text-2xl"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold" id="home-tasks-count">0 pendentes</h3>
-                            <p class="text-sm text-gray-400">Clica para gerir</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Widget Modo Foco -->
-                <div class="bg-surface rounded-[24px] p-5 cursor-pointer" onclick="navigate('foco')">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-[10px] font-extrabold text-[#00C7BE] tracking-widest">PRODUTIVIDADE</span>
-                        <i class="fa-solid fa-stopwatch text-gray-600"></i>
-                    </div>
-                    <h3 class="text-xl font-bold">Modo Foco</h3>
-                    <p class="text-sm text-gray-400">Inicia uma sessão de estudos</p>
-                </div>
+            <!-- HOME TAB -->
+            <div id="tab-home" class="view-section active-view px-6">
+                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-6">O Teu Painel</h1>
+                <div id="home-widgets-container" class="flex flex-col gap-6"></div>
             </div>
 
-            <!-- VIEW: TAREFAS -->
-            <div id="view-tarefas" class="view-section px-6 hidden flex-col gap-4">
-                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-4">Tarefas</h1>
-                <div id="tasks-container" class="flex flex-col gap-4">
-                    <!-- Tasks injected here -->
-                </div>
-                
-                <button onclick="document.getElementById('modal-tarefa').classList.remove('hidden')" class="fixed bottom-24 right-6 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30 z-30">
-                    <i class="fa-solid fa-plus text-white text-2xl"></i>
+            <!-- AULAS TAB -->
+            <div id="tab-aulas" class="view-section px-6">
+                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-6">As Tuas Aulas</h1>
+                <div id="aulas-list" class="flex flex-col gap-4"></div>
+                <button onclick="openModal('modal-aula')" class="fixed bottom-28 right-6 w-16 h-16 bg-content text-background rounded-2xl flex items-center justify-center shadow-lg z-30">
+                    <i class="fa-solid fa-plus text-2xl"></i>
                 </button>
             </div>
 
-            <!-- VIEW: IA -->
-            <div id="view-ia" class="view-section h-full flex flex-col hidden absolute top-0 left-0 w-full bg-background z-30">
-                <div class="px-6 pt-12 pb-4 border-b border-white/5 flex items-center gap-4 bg-background">
-                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                        <i class="fa-solid fa-robot text-black text-xl"></i>
-                    </div>
+            <!-- IA TAB -->
+            <div id="tab-ia" class="view-section">
+                <div class="px-6 pt-12 pb-4 border-b border-content/5 flex items-center gap-4 bg-background sticky top-0 z-20">
+                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-black text-xl"></i></div>
                     <div>
-                        <h2 class="text-xl font-bold text-white">Organiza IA</h2>
-                        <p class="text-xs font-semibold text-accent" id="ia-status">Sempre online (Groq LLaMA 3)</p>
+                        <h2 class="text-xl font-bold text-content">Organiza IA</h2>
+                        <p class="text-xs font-semibold text-success" id="ia-status">Sempre online (Groq)</p>
                     </div>
                 </div>
-                
-                <div id="chat-container" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 pb-24">
-                    <!-- Chat History -->
-                    <div class="flex gap-3">
-                        <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-robot text-black text-sm"></i>
-                        </div>
-                        <div class="chat-bubble-ai p-4 text-sm leading-relaxed max-w-[85%] text-white">
-                            Olá! Eu sou a Organiza IA ✨<br><br>Tenho poderes de administração. Podes pedir-me para criar tarefas, adicionar notas, ou perguntar-me dicas de estudo!
-                        </div>
-                    </div>
-                </div>
-
-                <div class="p-4 bg-surface absolute bottom-[80px] w-full">
-                    <div class="relative flex items-center">
-                        <input type="text" id="ia-input" placeholder="Pede algo à IA..." class="w-full bg-background rounded-full py-4 pl-6 pr-14 text-white focus:outline-none focus:ring-2 focus:ring-accent/50">
-                        <button id="btn-send-ia" class="absolute right-2 w-10 h-10 bg-accent rounded-full flex items-center justify-center">
-                            <i class="fa-solid fa-paper-plane text-white text-sm"></i>
+                <div id="ia-chat" class="flex-1 p-6 flex flex-col gap-4 pb-28"></div>
+                <div class="fixed bottom-24 w-full px-6 z-20">
+                    <div class="relative flex items-center bg-surface rounded-[24px] p-2">
+                        <input type="text" id="ia-input" placeholder="Pede à IA para criar uma tarefa..." class="w-full bg-transparent p-3 text-content outline-none">
+                        <button id="btn-ia-send" class="w-10 h-10 bg-accent rounded-full flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-paper-plane text-white"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- VIEW: FERRAMENTAS -->
-            <div id="view-ferramentas" class="view-section px-6 hidden flex-col gap-4">
+            <!-- FERRAMENTAS TAB -->
+            <div id="tab-ferramentas" class="view-section px-6">
                 <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-2">Menu de Extras</h1>
-                <p class="text-gray-400 text-sm mb-4">Tudo o que precisas para o teu dia a dia.</p>
+                <p class="text-content opacity-50 text-sm mb-6">Tudo o que precisas para o teu dia a dia.</p>
                 
                 <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="navigate('tarefas')">
-                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"><i class="fa-solid fa-check-double text-primary text-xl"></i></div>
-                        <span class="font-bold text-sm">Tarefas</span>
-                    </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="navigate('foco')">
-                        <div class="w-12 h-12 rounded-full bg-[#00C7BE]/10 flex items-center justify-center"><i class="fa-solid fa-stopwatch text-[#00C7BE] text-xl"></i></div>
-                        <span class="font-bold text-sm">Modo Foco</span>
-                    </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="navigate('ia')">
-                        <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center"><i class="fa-solid fa-robot text-accent text-xl"></i></div>
-                        <span class="font-bold text-sm">Inteligência</span>
-                    </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="alert('Em breve na versão Web!')">
-                        <div class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center"><i class="fa-solid fa-dollar-sign text-success text-xl"></i></div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('financas')">
+                        <div class="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center"><i class="fa-solid fa-dollar-sign text-success text-2xl"></i></div>
                         <span class="font-bold text-sm">Finanças</span>
                     </div>
-                </div>
-            </div>
-
-            <!-- VIEW: MODO FOCO -->
-            <div id="view-foco" class="view-section px-6 hidden flex-col items-center pt-10">
-                <h1 class="text-3xl font-extrabold tracking-tight mb-10 self-start">Modo Foco</h1>
-                
-                <div class="relative w-64 h-64 rounded-full border-[12px] border-surface flex items-center justify-center mb-12">
-                    <!-- Progress Bar Simulado -->
-                    <div class="absolute inset-0 rounded-full border-[12px] border-[#00C7BE] rounded-full" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);"></div>
-                    <div class="flex flex-col items-center">
-                        <i class="fa-solid fa-stopwatch text-[#00C7BE] text-3xl mb-2"></i>
-                        <span id="timer-display" class="text-5xl font-light tracking-tighter">25:00</span>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('tarefas')">
+                        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center"><i class="fa-solid fa-list-check text-primary text-2xl"></i></div>
+                        <span class="font-bold text-sm">Tarefas</span>
+                    </div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('anotacoes')">
+                        <div class="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center"><i class="fa-solid fa-note-sticky text-accent text-2xl"></i></div>
+                        <span class="font-bold text-sm">Anotações</span>
+                    </div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('calculadora')">
+                        <div class="w-14 h-14 rounded-full bg-[#B14AE2]/10 flex items-center justify-center"><i class="fa-solid fa-calculator text-[#B14AE2] text-2xl"></i></div>
+                        <span class="font-bold text-sm">Calculadora</span>
+                    </div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('foco')">
+                        <div class="w-14 h-14 rounded-full bg-foco/10 flex items-center justify-center"><i class="fa-solid fa-stopwatch text-foco text-2xl"></i></div>
+                        <span class="font-bold text-sm">Modo Foco</span>
+                    </div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('circular')">
+                        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center"><i class="fa-solid fa-bus text-primary text-2xl"></i></div>
+                        <span class="font-bold text-sm">Circular</span>
                     </div>
                 </div>
-
-                <div class="flex gap-4 mb-12">
-                    <button class="px-6 py-2 rounded-xl bg-surface text-gray-300 font-bold hover:bg-[#00C7BE] hover:text-white" onclick="setTimer(5)">5 min</button>
-                    <button class="px-6 py-2 rounded-xl bg-[#00C7BE] text-white font-bold" onclick="setTimer(25)">25 min</button>
-                    <button class="px-6 py-2 rounded-xl bg-surface text-gray-300 font-bold hover:bg-[#00C7BE] hover:text-white" onclick="setTimer(50)">50 min</button>
-                </div>
-
-                <button id="btn-toggle-timer" class="w-20 h-20 bg-gradient-to-r from-[#00C7BE] to-[#00A29A] rounded-full flex items-center justify-center shadow-lg">
-                    <i id="icon-timer" class="fa-solid fa-play text-white text-3xl ml-1"></i>
-                </button>
             </div>
+        </div>
 
-        </main>
-
-        <!-- Bottom Navigation (Glassmorphism) -->
-        <nav class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] glass rounded-[32px] flex justify-between items-center px-6 py-4 z-40 shadow-2xl">
-            <button onclick="navigate('home')" class="nav-btn text-white flex flex-col items-center gap-1 opacity-100" data-target="home">
-                <i class="fa-solid fa-border-all text-xl"></i>
-                <span class="text-[10px] font-bold">Início</span>
+        <!-- NAVBAR INFERIOR -->
+        <nav id="bottom-nav" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] liquid-glass rounded-[32px] flex justify-around items-center py-3 z-40">
+            <button onclick="switchTab('home')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-100" data-target="home">
+                <i class="fa-solid fa-border-all text-2xl"></i><span class="text-[10px] font-bold">Início</span>
             </button>
-            <button onclick="navigate('tarefas')" class="nav-btn text-gray-500 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition" data-target="tarefas">
-                <i class="fa-solid fa-list-check text-xl"></i>
-                <span class="text-[10px] font-bold">Tarefas</span>
+            <button onclick="switchTab('aulas')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 hover:opacity-100" data-target="aulas">
+                <i class="fa-solid fa-calendar-days text-2xl"></i><span class="text-[10px] font-bold">Aulas</span>
             </button>
-            <button onclick="navigate('ia')" class="nav-btn text-gray-500 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition" data-target="ia">
-                <i class="fa-solid fa-robot text-xl"></i>
-                <span class="text-[10px] font-bold">IA</span>
+            <button onclick="switchTab('ia')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 hover:opacity-100" data-target="ia">
+                <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i><span class="text-[10px] font-bold">IA</span>
             </button>
-            <button onclick="navigate('ferramentas')" class="nav-btn text-gray-500 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition" data-target="ferramentas">
-                <i class="fa-solid fa-layer-group text-xl"></i>
-                <span class="text-[10px] font-bold">Menu</span>
+            <button onclick="switchTab('ferramentas')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 hover:opacity-100" data-target="ferramentas">
+                <i class="fa-solid fa-layer-group text-2xl"></i><span class="text-[10px] font-bold">Menu</span>
             </button>
         </nav>
     </div>
 
-    <!-- MODAL: ADD TAREFA -->
-    <div id="modal-tarefa" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
-        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold">Criar Tarefa</h3>
-                <button onclick="document.getElementById('modal-tarefa').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+    <!-- ================= SUB-VIEWS (ECRÃS COMPLETOS) ================= -->
+    
+    <!-- TAREFAS -->
+    <div id="sub-tarefas" class="sub-view">
+        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
+            <h2 class="text-xl font-bold">Gerenciador de Tarefas</h2>
+        </div>
+        <div class="px-6 flex flex-col gap-4" id="lista-tarefas"></div>
+        <button onclick="openModal('modal-tarefa')" class="fixed bottom-8 right-6 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white z-30">
+            <i class="fa-solid fa-plus text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- FINANÇAS -->
+    <div id="sub-financas" class="sub-view">
+        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
+            <h2 class="text-xl font-bold">Finanças Pessoais</h2>
+        </div>
+        <div class="px-6">
+            <div class="bg-surface rounded-3xl p-6 mb-6">
+                <p class="text-sm opacity-60 font-semibold mb-2">Saldo Atual</p>
+                <h1 class="text-4xl font-extrabold" id="fin-saldo">R$ 0,00</h1>
             </div>
-            <input type="text" id="input-task-title" placeholder="O que precisa de ser feito?" class="w-full bg-background rounded-2xl p-4 mb-4 outline-none border border-white/5 focus:border-primary">
-            <select id="select-task-priority" class="w-full bg-background rounded-2xl p-4 mb-6 outline-none border border-white/5 appearance-none">
-                <option value="Baixa">Prioridade: Baixa</option>
-                <option value="Média" selected>Prioridade: Média</option>
-                <option value="Alta">Prioridade: Alta</option>
-            </select>
-            <button id="btn-save-task" class="w-full bg-primary text-white font-bold py-4 rounded-2xl">Guardar Tarefa</button>
+            <h3 class="font-bold text-lg mb-4">Histórico</h3>
+            <div id="lista-financas" class="flex flex-col gap-4"></div>
+        </div>
+        <button onclick="openModal('modal-financa')" class="fixed bottom-8 right-6 w-16 h-16 bg-content text-background rounded-2xl flex items-center justify-center z-30">
+            <i class="fa-solid fa-plus text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- ANOTAÇÕES -->
+    <div id="sub-anotacoes" class="sub-view">
+        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
+            <h2 class="text-xl font-bold">Anotações</h2>
+        </div>
+        <div class="px-6 grid grid-cols-2 gap-4" id="lista-notas"></div>
+        <button onclick="openModal('modal-nota')" class="fixed bottom-8 right-6 w-16 h-16 bg-accent text-white rounded-2xl flex items-center justify-center z-30">
+            <i class="fa-solid fa-plus text-2xl"></i>
+        </button>
+    </div>
+
+    <!-- MODO FOCO -->
+    <div id="sub-foco" class="sub-view items-center">
+        <div class="w-full px-6 pt-12 pb-4 flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
+            <h2 class="text-xl font-bold">Modo Foco</h2>
+        </div>
+        <div class="flex-1 flex flex-col items-center justify-center w-full px-6 pb-20">
+            <div class="relative w-72 h-72 rounded-full border-[16px] border-surface flex items-center justify-center mb-12 shadow-2xl">
+                <div class="flex flex-col items-center">
+                    <i class="fa-solid fa-stopwatch text-foco text-4xl mb-2"></i>
+                    <span id="foco-timer" class="text-6xl font-light tracking-tighter">30:00</span>
+                </div>
+            </div>
+            <div class="flex gap-4 mb-16 w-full max-w-sm">
+                <button class="flex-1 py-3 rounded-2xl bg-surface font-bold" onclick="setFoco(5)">5m</button>
+                <button class="flex-1 py-3 rounded-2xl bg-surface font-bold" onclick="setFoco(30)">30m</button>
+                <button class="flex-1 py-3 rounded-2xl bg-surface font-bold" onclick="setFoco(60)">1h</button>
+            </div>
+            <div class="flex gap-8 items-center">
+                <button onclick="resetFoco()" class="w-16 h-16 rounded-full bg-surface flex items-center justify-center"><i class="fa-solid fa-stop text-2xl"></i></button>
+                <button id="btn-play-foco" class="w-24 h-24 rounded-full bg-gradient-to-r from-foco to-[#00A29A] flex items-center justify-center shadow-lg shadow-foco/30">
+                    <i class="fa-solid fa-play text-white text-4xl ml-1" id="foco-icon"></i>
+                </button>
+            </div>
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL: FIREBASE + LÓGICA -->
+    <!-- CALCULADORA -->
+    <div id="sub-calculadora" class="sub-view">
+        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
+            <h2 class="text-xl font-bold">Calculadora Pro</h2>
+        </div>
+        <div class="flex-1 flex flex-col px-6 pb-8">
+            <div class="flex-1 flex flex-col justify-end items-end mb-6">
+                <p id="calc-exp" class="text-3xl font-light opacity-50 break-all"></p>
+                <p id="calc-res" class="text-5xl font-bold text-primary mt-2 break-all">0</p>
+            </div>
+            <div class="grid grid-cols-4 gap-3 h-[60%]">
+                <button class="bg-danger/20 text-danger rounded-[32px] text-2xl font-bold" onclick="calc('C')">C</button>
+                <button class="bg-surface rounded-[32px] text-2xl font-bold" onclick="calc('(')">(</button>
+                <button class="bg-surface rounded-[32px] text-2xl font-bold" onclick="calc(')')">)</button>
+                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('/')">÷</button>
+                
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('7')">7</button>
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('8')">8</button>
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('9')">9</button>
+                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('*')">×</button>
+                
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('4')">4</button>
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('5')">5</button>
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('6')">6</button>
+                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('-')">-</button>
+                
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('1')">1</button>
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('2')">2</button>
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('3')">3</button>
+                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('+')">+</button>
+                
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('0')">0</button>
+                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('.')">.</button>
+                <button class="bg-danger/20 text-danger rounded-[32px] text-2xl font-bold" onclick="calc('DEL')">⌫</button>
+                <button class="bg-primary text-white rounded-[32px] text-3xl font-bold shadow-lg" onclick="calc('=')">=</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- PROFILE E SETTINGS -->
+    <div id="sub-profile" class="sub-view">
+        <div class="px-6 pt-12 pb-4 flex items-center justify-between">
+            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
+            <h2 class="text-xl font-bold">Meu Perfil</h2>
+            <i class="fa-solid fa-gear text-xl cursor-pointer" onclick="openSubView('settings')"></i>
+        </div>
+        <div class="px-6 flex flex-col items-center">
+            <img id="prof-avatar" src="" class="w-32 h-32 rounded-full border-4 border-accent object-cover mb-4">
+            <h2 class="text-2xl font-bold mb-1" id="prof-name">Nome</h2>
+            <p class="opacity-50 mb-8" id="prof-uni">Universidade</p>
+            
+            <div class="w-full bg-surface rounded-3xl p-6 flex flex-col gap-4">
+                <h3 class="font-bold text-lg mb-2">Aparência</h3>
+                <div class="flex justify-between items-center p-4 bg-background rounded-xl cursor-pointer" onclick="setTheme('Claro')">
+                    <div class="flex gap-4 items-center"><i class="fa-solid fa-sun"></i><span>Modo Claro</span></div>
+                </div>
+                <div class="flex justify-between items-center p-4 bg-background rounded-xl cursor-pointer" onclick="setTheme('Escuro')">
+                    <div class="flex gap-4 items-center"><i class="fa-solid fa-moon"></i><span>Modo Escuro</span></div>
+                </div>
+            </div>
+
+            <button onclick="logout()" class="w-full mt-8 bg-danger/10 text-danger font-bold py-4 rounded-2xl"><i class="fa-solid fa-right-from-bracket mr-2"></i> Sair da conta</button>
+        </div>
+    </div>
+
+    <!-- CIRCULAR -->
+    <div id="sub-circular" class="sub-view">
+        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
+            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
+            <h2 class="text-xl font-bold">Circular UFRB</h2>
+        </div>
+        <div class="px-6 flex flex-col gap-4" id="circular-list">
+            <!-- Gerado via JS -->
+        </div>
+    </div>
+
+
+    <!-- ================= MODAIS ================= -->
+    <div id="modal-tarefa" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
+        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
+            <h3 class="text-xl font-bold mb-6">Nova Tarefa</h3>
+            <input type="text" id="t-titulo" placeholder="Título" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none">
+            <select id="t-prio" class="w-full bg-background rounded-2xl p-4 mb-6 text-content outline-none appearance-none">
+                <option value="Baixa">Baixa Prioridade</option>
+                <option value="Média" selected>Média Prioridade</option>
+                <option value="Alta">Alta Prioridade</option>
+            </select>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-tarefa')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
+                <button onclick="saveTarefa()" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-aula" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
+        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
+            <h3 class="text-xl font-bold mb-6">Nova Aula</h3>
+            <input type="text" id="a-mat" placeholder="Matéria" class="w-full bg-background rounded-2xl p-3 mb-3 text-content outline-none">
+            <input type="text" id="a-prof" placeholder="Professor" class="w-full bg-background rounded-2xl p-3 mb-3 text-content outline-none">
+            <input type="text" id="a-loc" placeholder="Local" class="w-full bg-background rounded-2xl p-3 mb-3 text-content outline-none">
+            <div class="flex gap-3 mb-3">
+                <select id="a-dia" class="flex-1 bg-background rounded-2xl p-3 text-content outline-none appearance-none">
+                    <option value="Seg">Segunda</option><option value="Ter">Terça</option><option value="Qua">Quarta</option>
+                    <option value="Qui">Quinta</option><option value="Sex">Sexta</option><option value="Sáb">Sábado</option>
+                </select>
+            </div>
+            <div class="flex gap-3 mb-6">
+                <input type="time" id="a-ini" class="flex-1 bg-background rounded-2xl p-3 text-content outline-none" value="08:00">
+                <input type="time" id="a-fim" class="flex-1 bg-background rounded-2xl p-3 text-content outline-none" value="10:00">
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-aula')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
+                <button onclick="saveAula()" class="flex-1 bg-content text-background py-4 rounded-2xl font-bold">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-financa" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
+        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
+            <h3 class="text-xl font-bold mb-6">Nova Transação</h3>
+            <input type="text" id="f-tit" placeholder="Título (Ex: Lanche)" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none">
+            <input type="number" id="f-val" placeholder="Valor (Ex: 15.50)" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none">
+            <select id="f-tip" class="w-full bg-background rounded-2xl p-4 mb-6 text-content outline-none appearance-none">
+                <option value="Despesa">Despesa (-)</option>
+                <option value="Receita">Receita (+)</option>
+            </select>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-financa')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
+                <button onclick="saveFinanca()" class="flex-1 bg-success text-white py-4 rounded-2xl font-bold">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-nota" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
+        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
+            <h3 class="text-xl font-bold mb-6">Nova Anotação</h3>
+            <input type="text" id="n-tit" placeholder="Título" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none font-bold">
+            <textarea id="n-txt" placeholder="Escreve algo..." class="w-full bg-background rounded-2xl p-4 mb-6 text-content outline-none h-40 resize-none"></textarea>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-nota')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
+                <button onclick="saveNota()" class="flex-1 bg-accent text-white py-4 rounded-2xl font-bold">Salvar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT PRINCIPAL -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Firebase Config (Fornecida por ti)
         const firebaseConfig = {
             apiKey: "AIzaSyA3g9gmFn-Uc_SoLHsVhH7eIwgzMOYmIAQ",
             authDomain: "organizaedu.firebaseapp.com",
@@ -296,239 +454,294 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        let currentUser = null;
 
-        // Estado Global
-        const state = {
-            tarefas: []
+        // ESTADO GLOBAL
+        window.state = {
+            user: null, profile: null,
+            tarefas: [], aulas: [], financas: [], anotacoes: [],
+            groqKey: "", theme: localStorage.getItem("theme") || "Escuro"
         };
 
-        // --- SISTEMA DE NAVEGAÇÃO ---
-        window.navigate = function(viewId) {
-            document.querySelectorAll('.view-section').forEach(el => {
-                el.classList.remove('active', 'flex');
-                el.classList.add('hidden');
-            });
-            const target = document.getElementById('view-' + viewId);
-            target.classList.remove('hidden');
-            target.classList.add('active', viewId === 'ia' ? 'flex' : 'block');
+        // --- UTILIDADES ---
+        window.openModal = id => document.getElementById(id).classList.remove('hidden');
+        window.closeModal = id => document.getElementById(id).classList.add('hidden');
+        window.setTheme = t => {
+            state.theme = t; localStorage.setItem("theme", t);
+            if(t === 'Claro') document.documentElement.classList.add('theme-light');
+            else document.documentElement.classList.remove('theme-light');
+        };
+        setTheme(state.theme); // Apply on load
 
-            // Header dinâmico (Ocultar na IA)
-            document.getElementById('app-header').style.display = viewId === 'ia' ? 'none' : 'flex';
-
-            // Atualizar Opacidade dos Ícones da Nav
+        // --- NAVEGAÇÃO ---
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            document.getElementById('tab-' + tabId).classList.add('active-view');
+            document.getElementById('main-header').style.display = tabId === 'ia' ? 'none' : 'flex';
             document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === viewId) {
-                    btn.classList.remove('text-gray-500', 'opacity-50');
-                    btn.classList.add('text-white', 'opacity-100');
-                } else {
-                    btn.classList.add('text-gray-500', 'opacity-50');
-                    btn.classList.remove('text-white', 'opacity-100');
-                }
+                if(btn.dataset.target === tabId) { btn.classList.add('opacity-100'); btn.classList.remove('opacity-40'); }
+                else { btn.classList.add('opacity-40'); btn.classList.remove('opacity-100'); }
             });
         };
 
-        // --- CONTROLO DE ECRÃS (Splash -> Login -> App) ---
-        function showScreen(screenId) {
-            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
-            document.getElementById('screen-' + screenId).classList.add('active');
+        window.openSubView = function(id) {
+            document.getElementById('bottom-nav').style.display = 'none';
+            document.getElementById('sub-' + id).classList.add('active-sub');
+        };
+
+        window.closeSubView = function() {
+            document.querySelectorAll('.sub-view').forEach(el => el.classList.remove('active-sub'));
+            document.getElementById('bottom-nav').style.display = 'flex';
+        };
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active-screen'));
+            document.getElementById('screen-' + id).classList.add('active-screen');
         }
 
         // --- AUTENTICAÇÃO ---
-        onAuthStateChanged(auth, (user) => {
-            setTimeout(() => {
+        onAuthStateChanged(auth, async (user) => {
+            setTimeout(async () => {
                 if (user) {
-                    currentUser = user;
-                    document.getElementById('user-greeting').innerText = `Olá, ${user.displayName.split(' ')[0]}`;
-                    document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=1C1C1E&color=fff`;
-                    showScreen('app');
-                    loadData();
+                    state.user = user;
+                    const docSnap = await getDoc(doc(db, "users", user.uid));
+                    if (docSnap.exists()) {
+                        state.profile = docSnap.data();
+                        document.getElementById('ui-greeting').innerText = `Olá, ${state.profile.displayName.split(' ')[0]}`;
+                        document.getElementById('ui-avatar').src = state.profile.profileImageUrl || `https://ui-avatars.com/api/?name=${state.profile.displayName}&background=1C1C1E&color=fff`;
+                        document.getElementById('prof-avatar').src = document.getElementById('ui-avatar').src;
+                        document.getElementById('prof-name').innerText = state.profile.displayName;
+                        document.getElementById('prof-uni').innerText = state.profile.university;
+                        showScreen('app');
+                        initRealtimeListeners();
+                    } else {
+                        showScreen('setup');
+                    }
                 } else {
                     showScreen('login');
                 }
-            }, 1500); // Fake delay for splash screen aesthetics
+            }, 1000);
         });
 
-        document.getElementById('btn-google-login').addEventListener('click', () => {
-            const provider = new GoogleAuthProvider();
-            signInWithPopup(auth, provider).catch(err => alert("Erro no Login: " + err.message));
+        document.getElementById('btn-login').addEventListener('click', () => signInWithPopup(auth, new GoogleAuthProvider()));
+        window.logout = () => { if(confirm("Sair?")) signOut(auth); };
+
+        document.getElementById('btn-save-setup').addEventListener('click', async () => {
+            const name = document.getElementById('setup-name').value;
+            const uni = document.getElementById('setup-uni').value;
+            if(!name) return alert("Preenche o nome!");
+            const profileData = { displayName: name, university: uni, profileImageUrl: "" };
+            await setDoc(doc(db, "users", state.user.uid), profileData);
+            window.location.reload();
         });
 
-        document.getElementById('user-avatar').addEventListener('click', () => {
-            if(confirm("Deseja terminar a sessão?")) signOut(auth);
-        });
+        // --- FIREBASE LISTENERS ---
+        function initRealtimeListeners() {
+            getDoc(doc(db, "app_config", "keys")).then(d => { if(d.exists()) state.groqKey = d.data().groq || ""; });
 
-        // --- CARREGAMENTO DE DADOS (FIRESTORE) ---
-        function loadData() {
-            if(!currentUser) return;
-            
-            const tarefasRef = collection(db, "users", currentUser.uid, "tarefas");
-            const q = query(tarefasRef, orderBy("timestamp", "desc"));
-            
-            onSnapshot(q, (snapshot) => {
-                state.tarefas = [];
-                snapshot.forEach((doc) => state.tarefas.push({ id: doc.id, ...doc.data() }));
-                renderTarefas();
+            onSnapshot(query(collection(db, "users", state.user.uid, "tarefas"), orderBy("timestamp", "desc")), snap => {
+                state.tarefas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderTarefas(); renderHomeWidgets();
             });
+            onSnapshot(collection(db, "users", state.user.uid, "aulas"), snap => {
+                state.aulas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAulas(); renderHomeWidgets();
+            });
+            onSnapshot(query(collection(db, "users", state.user.uid, "financas"), orderBy("timestamp", "desc")), snap => {
+                state.financas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderFinancas();
+            });
+            onSnapshot(query(collection(db, "users", state.user.uid, "anotacoes"), orderBy("timestamp", "desc")), snap => {
+                state.anotacoes = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAnotacoes();
+            });
+        }
+
+        // --- RENDERS ---
+        function renderHomeWidgets() {
+            const cont = document.getElementById('home-widgets-container');
+            const pendentes = state.tarefas.filter(t=>!t.concluida).length;
+            const aulasHoje = state.aulas.filter(a=>a.dia === "Seg").length; // Simplificação para web (sempre assume Seg ou filtra real)
+
+            cont.innerHTML = `
+                <div class="bg-surface rounded-[24px] p-5 cursor-pointer border border-content/5" onclick="openSubView('tarefas')">
+                    <div class="flex items-center justify-between mb-4"><span class="text-[10px] font-extrabold text-primary tracking-widest">TAREFAS</span><i class="fa-solid fa-list-check text-gray-500"></i></div>
+                    <h3 class="text-2xl font-bold">${pendentes} pendentes</h3>
+                    <p class="text-sm opacity-50">Toca para gerir</p>
+                </div>
+                <div class="bg-surface rounded-[24px] p-5 cursor-pointer border border-content/5" onclick="switchTab('aulas')">
+                    <div class="flex items-center justify-between mb-4"><span class="text-[10px] font-extrabold text-danger tracking-widest">AULAS</span><i class="fa-solid fa-calendar text-gray-500"></i></div>
+                    <h3 class="text-2xl font-bold">${state.aulas.length} cadastradas</h3>
+                    <p class="text-sm opacity-50">Agenda completa</p>
+                </div>
+            `;
         }
 
         function renderTarefas() {
-            const container = document.getElementById('tasks-container');
-            const homeCount = document.getElementById('home-tasks-count');
-            
-            container.innerHTML = '';
-            let pendentes = 0;
-
-            state.tarefas.forEach(t => {
-                if(!t.concluida) pendentes++;
-                
-                const color = t.prioridade === 'Alta' ? '#FF3B30' : (t.prioridade === 'Média' ? '#FF9F0A' : '#32D74B');
-                const icon = t.concluida ? `<i class="fa-solid fa-check-circle text-success text-2xl"></i>` : `<i class="fa-regular fa-circle text-gray-500 text-2xl"></i>`;
-                const textStyle = t.concluida ? 'text-gray-500 line-through' : 'text-white';
-                
-                container.innerHTML += `
-                    <div class="bg-surface rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-800 transition" onclick="toggleTask('${t.id}', ${t.concluida})">
-                        ${icon}
-                        <div class="flex-1">
-                            <h4 class="font-bold ${textStyle}">${t.titulo}</h4>
-                            <span class="text-xs px-2 py-1 rounded bg-black/30 font-bold" style="color: ${color}">${t.prioridade}</span>
-                        </div>
-                        <button onclick="event.stopPropagation(); deleteTask('${t.id}')" class="text-gray-600 hover:text-danger p-2"><i class="fa-solid fa-trash"></i></button>
+            const cont = document.getElementById('lista-tarefas');
+            cont.innerHTML = state.tarefas.map(t => `
+                <div class="bg-surface rounded-2xl p-5 flex items-center gap-4">
+                    <i class="fa-${t.concluida ? 'solid fa-circle-check text-success' : 'regular fa-circle text-content/30'} text-3xl cursor-pointer" onclick="toggleTask('${t.id}', ${t.concluida})"></i>
+                    <div class="flex-1 ${t.concluida ? 'opacity-40 line-through' : ''}">
+                        <h4 class="font-bold text-lg">${t.titulo}</h4>
+                        <p class="text-xs opacity-60">${t.prioridade} • ${t.descricao || 'Sem descrição'}</p>
                     </div>
-                `;
-            });
-
-            if(state.tarefas.length === 0) {
-                container.innerHTML = `<p class="text-gray-500 text-center mt-10">Nenhuma tarefa pendente. Estás livre!</p>`;
-            }
-
-            homeCount.innerText = pendentes === 0 ? "Tudo em dia!" : `${pendentes} pendentes`;
-        }
-
-        // Ações Tarefas
-        document.getElementById('btn-save-task').addEventListener('click', async () => {
-            const titulo = document.getElementById('input-task-title').value;
-            const prioridade = document.getElementById('select-task-priority').value;
-            
-            if(titulo.trim() === '') return;
-
-            try {
-                await addDoc(collection(db, "users", currentUser.uid, "tarefas"), {
-                    titulo, prioridade, concluida: false, timestamp: Date.now()
-                });
-                document.getElementById('input-task-title').value = '';
-                document.getElementById('modal-tarefa').classList.add('hidden');
-            } catch(e) { alert(e.message); }
-        });
-
-        window.toggleTask = async (id, currentStatus) => {
-            await updateDoc(doc(db, "users", currentUser.uid, "tarefas", id), { concluida: !currentStatus });
-        }
-        window.deleteTask = async (id) => {
-            await deleteDoc(doc(db, "users", currentUser.uid, "tarefas", id));
-        }
-
-        // --- MODO FOCO (TIMER) ---
-        let timerInterval;
-        let timeLeft = 25 * 60;
-        let isRunning = false;
-
-        window.setTimer = (mins) => {
-            clearInterval(timerInterval);
-            isRunning = false;
-            timeLeft = mins * 60;
-            updateTimerDisplay();
-            document.getElementById('icon-timer').classList.replace('fa-pause', 'fa-play');
-            document.getElementById('icon-timer').classList.replace('ml-0', 'ml-1');
-        }
-
-        function updateTimerDisplay() {
-            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
-            const s = (timeLeft % 60).toString().padStart(2, '0');
-            document.getElementById('timer-display').innerText = `${m}:${s}`;
-        }
-
-        document.getElementById('btn-toggle-timer').addEventListener('click', () => {
-            const icon = document.getElementById('icon-timer');
-            if(isRunning) {
-                clearInterval(timerInterval);
-                icon.classList.replace('fa-pause', 'fa-play');
-                icon.classList.replace('ml-0', 'ml-1');
-            } else {
-                icon.classList.replace('fa-play', 'fa-pause');
-                icon.classList.replace('ml-1', 'ml-0');
-                timerInterval = setInterval(() => {
-                    if(timeLeft > 0) { timeLeft--; updateTimerDisplay(); }
-                    else { clearInterval(timerInterval); alert("Sessão concluída!"); }
-                }, 1000);
-            }
-            isRunning = !isRunning;
-        });
-
-        // --- ORGANIZA IA (INTEGRAÇÃO GROQ) ---
-        document.getElementById('btn-send-ia').addEventListener('click', sendIAMessage);
-        document.getElementById('ia-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendIAMessage(); });
-
-        async function sendIAMessage() {
-            const input = document.getElementById('ia-input');
-            const text = input.value.trim();
-            if(!text) return;
-            
-            input.value = '';
-            addChatMessage(text, true);
-            
-            // Requisita a chave API de Groq caso não esteja no Firebase
-            // NOTA: Em produção (Vercel), a API Key deve estar num Backend / Serverless Function.
-            // Como este é um ficheiro único front-end de demonstração, pedimos a chave ou usamos uma hardcoded se o cliente a providenciar no Firestore
-            
-            const statusEl = document.getElementById('ia-status');
-            statusEl.innerText = "A pensar...";
-            statusEl.style.color = "#B14AE2";
-
-            try {
-                // CHAVE DA API AQUI (Para teste no frontend - Em Vercel, criar endpoint /api/chat)
-                // Neste modelo estrito, vamos simular a resposta ou bater na API diretamente
-                // Simulação da chamada Groq Llama 3 para contornar a falta de chaves seguras no front
-                
-                const promptContext = `Utilizador: ${text}\n(Responde como Organiza IA, sê amigável, diz que podes criar tarefas e gerir a app.)`;
-                
-                // Simulação de atraso de rede
-                await new Promise(r => setTimeout(r, 1500));
-                
-                let iaResponse = "Ainda estou a ser ligada ao servidor Groq no Vercel! Por agora, sou apenas uma interface bonita. 🚀\nMas quando estiver pronta, vou poder gerir as tuas tarefas e anotações num piscar de olhos.";
-                
-                // Exemplo de ação simulada se pedir para criar tarefa
-                if(text.toLowerCase().includes("tarefa")) {
-                    iaResponse = "Claro! Posso adicionar essa tarefa se me deres permissão real no backend Groq.";
-                }
-
-                addChatMessage(iaResponse, false);
-
-            } catch (error) {
-                addChatMessage("Desculpa, ocorreu um erro de ligação.", false);
-            } finally {
-                statusEl.innerText = "Sempre online";
-                statusEl.style.color = "#32D74B";
-            }
-        }
-
-        function addChatMessage(text, isUser) {
-            const container = document.getElementById('chat-container');
-            const alignClass = isUser ? 'justify-end' : 'justify-start';
-            const bubbleClass = isUser ? 'chat-bubble-user text-white' : 'chat-bubble-ai text-white';
-            const iconHtml = isUser ? '' : `<div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0"><i class="fa-solid fa-robot text-black text-sm"></i></div>`;
-            
-            container.innerHTML += `
-                <div class="flex gap-3 ${alignClass}">
-                    ${iconHtml}
-                    <div class="${bubbleClass} p-4 text-sm leading-relaxed max-w-[85%] shadow-lg">
-                        ${text.replace(/\n/g, '<br>')}
-                    </div>
+                    <i class="fa-solid fa-trash text-danger opacity-50 cursor-pointer p-2" onclick="deleteTask('${t.id}')"></i>
                 </div>
-            `;
-            container.scrollTop = container.scrollHeight;
+            `).join('');
         }
 
+        function renderAulas() {
+            document.getElementById('aulas-list').innerHTML = state.aulas.map(a => `
+                <div class="bg-surface rounded-2xl p-4 flex gap-4 items-center">
+                    <div class="w-2 h-12 rounded-full" style="background-color: ${a.corHex}"></div>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold" style="color: ${a.corHex}">${a.dia} | ${a.inicio} - ${a.fim}</p>
+                        <h4 class="font-bold text-lg">${a.materia}</h4>
+                        <p class="text-sm opacity-60">${a.professor} • ${a.local}</p>
+                    </div>
+                    <i class="fa-solid fa-trash text-danger opacity-50 cursor-pointer p-2" onclick="deleteAula('${t.id}')"></i>
+                </div>
+            `).join('');
+        }
+
+        function renderFinancas() {
+            let saldo = 0;
+            const html = state.financas.map(f => {
+                const isR = f.tipo === "Receita";
+                if(isR) saldo += f.valor; else saldo -= f.valor;
+                return `
+                <div class="bg-surface rounded-2xl p-4 flex justify-between items-center">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-${isR?'success':'danger'}/10">
+                            <i class="fa-solid fa-arrow-${isR?'up text-success':'down text-danger'}"></i>
+                        </div>
+                        <div><h4 class="font-bold">${f.titulo}</h4><p class="text-xs opacity-50">${f.tipo}</p></div>
+                    </div>
+                    <span class="font-bold text-${isR?'success':'danger'}">${isR?'+':'-'}R$ ${f.valor.toFixed(2)}</span>
+                </div>`
+            }).join('');
+            document.getElementById('lista-financas').innerHTML = html;
+            document.getElementById('fin-saldo').innerText = `R$ ${saldo.toFixed(2)}`;
+        }
+
+        function renderAnotacoes() {
+            document.getElementById('lista-notas').innerHTML = state.anotacoes.map(n => `
+                <div class="rounded-2xl p-4 min-h-[120px] relative border border-content/10" style="background-color: ${n.corHex}; color: #000">
+                    <h4 class="font-bold mb-2 line-clamp-2">${n.titulo}</h4>
+                    <p class="text-xs opacity-70 line-clamp-4">${n.conteudo}</p>
+                </div>
+            `).join('');
+        }
+
+        // --- AÇÕES FIRESTORE DA UI ---
+        window.saveTarefa = async () => {
+            const tit = document.getElementById('t-titulo').value;
+            if(!tit) return;
+            await addDoc(collection(db, "users", state.user.uid, "tarefas"), { titulo: tit, prioridade: document.getElementById('t-prio').value, descricao: "", concluida: false, timestamp: Date.now() });
+            closeModal('modal-tarefa'); document.getElementById('t-titulo').value = '';
+        };
+        window.toggleTask = async (id, status) => await updateDoc(doc(db, "users", state.user.uid, "tarefas", id), { concluida: !status });
+        window.deleteTask = async (id) => await deleteDoc(doc(db, "users", state.user.uid, "tarefas", id));
+
+        window.saveAula = async () => {
+            const mat = document.getElementById('a-mat').value;
+            if(!mat) return;
+            await addDoc(collection(db, "users", state.user.uid, "aulas"), { materia: mat, professor: document.getElementById('a-prof').value, local: document.getElementById('a-loc').value, dia: document.getElementById('a-dia').value, inicio: document.getElementById('a-ini').value, fim: document.getElementById('a-fim').value, corHex: "#0A84FF" });
+            closeModal('modal-aula');
+        };
+        window.deleteAula = async (id) => await deleteDoc(doc(db, "users", state.user.uid, "aulas", id));
+
+        window.saveFinanca = async () => {
+            const tit = document.getElementById('f-tit').value;
+            const val = parseFloat(document.getElementById('f-val').value);
+            if(!tit || isNaN(val)) return;
+            await addDoc(collection(db, "users", state.user.uid, "financas"), { titulo: tit, valor: val, tipo: document.getElementById('f-tip').value, timestamp: Date.now() });
+            closeModal('modal-financa');
+        };
+
+        window.saveNota = async () => {
+            const tit = document.getElementById('n-tit').value;
+            const txt = document.getElementById('n-txt').value;
+            if(!tit) return;
+            await addDoc(collection(db, "users", state.user.uid, "anotacoes"), { titulo: tit, conteudo: txt, corHex: "#FFFFFF", timestamp: Date.now() });
+            closeModal('modal-nota');
+        };
+
+        // --- MODO FOCO ---
+        let fTimer; let fLeft = 30*60; let fRun = false;
+        window.setFoco = m => { clearInterval(fTimer); fRun=false; fLeft=m*60; updateF(); document.getElementById('foco-icon').classList.replace('fa-pause','fa-play'); };
+        window.resetFoco = () => setFoco(30);
+        function updateF() { document.getElementById('foco-timer').innerText = `${Math.floor(fLeft/60).toString().padStart(2,'0')}:${(fLeft%60).toString().padStart(2,'0')}`; }
+        document.getElementById('btn-play-foco').addEventListener('click', () => {
+            const ic = document.getElementById('foco-icon');
+            if(fRun) { clearInterval(fTimer); ic.classList.replace('fa-pause','fa-play'); } 
+            else { ic.classList.replace('fa-play','fa-pause'); fTimer = setInterval(()=>{ if(fLeft>0){fLeft--;updateF();}else{clearInterval(fTimer);alert("Concluído!");} },1000); }
+            fRun = !fRun;
+        });
+
+        // --- CALCULADORA ---
+        let calcExp = "";
+        window.calc = (val) => {
+            const res = document.getElementById('calc-res');
+            const exp = document.getElementById('calc-exp');
+            if(val === 'C') { calcExp = ""; res.innerText = "0"; exp.innerText = ""; return; }
+            if(val === 'DEL') { calcExp = calcExp.slice(0, -1); res.innerText = calcExp || "0"; return; }
+            if(val === '=') { try { res.innerText = eval(calcExp.replace(/×/g, '*').replace(/÷/g, '/')); exp.innerText = calcExp; calcExp = res.innerText; } catch { res.innerText="Erro"; } return; }
+            calcExp += val;
+            res.innerText = calcExp;
+        };
+
+        // --- ORGANIZA IA (GROQ) ---
+        document.getElementById('btn-ia-send').addEventListener('click', sendIA);
+        document.getElementById('ia-input').addEventListener('keypress', e => { if(e.key === 'Enter') sendIA(); });
+
+        async function sendIA() {
+            const inp = document.getElementById('ia-input');
+            const txt = inp.value.trim();
+            if(!txt) return; inp.value = '';
+            
+            if(!state.groqKey) return alert("Chave Groq não encontrada no Firebase.");
+
+            addChat(txt, true);
+            document.getElementById('ia-status').innerText = "A pensar...";
+            document.getElementById('ia-status').style.color = "#B14AE2";
+
+            const ctx = `Tarefas: ${JSON.stringify(state.tarefas.map(t=>({id:t.id, titulo:t.titulo})))}\nAulas: ${JSON.stringify(state.aulas.map(a=>({id:a.id, mat:a.materia})))}\nAções de Admin: ADD_TAREFA(titulo), DELETE_TAREFA(id), CONCLUIR_TAREFA(id), ADD_NOTA(titulo, conteudo), CHANGE_THEME(theme). Retorna SEMPRE um JSON no final se fizeres ação: {"action":"NOME", "params":{"chave":"val"}}`;
+
+            try {
+                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.groqKey}` },
+                    body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"system", content: ctx}, {role:"user", content: txt}] })
+                });
+                const data = await res.json();
+                let iaTxt = data.choices[0].message.content;
+
+                // Extrai JSON
+                const sIdx = iaTxt.indexOf('{'); const eIdx = iaTxt.lastIndexOf('}');
+                if(sIdx !== -1 && eIdx !== -1) {
+                    try {
+                        const act = JSON.parse(iaTxt.substring(sIdx, eIdx+1));
+                        if(act.action === "ADD_TAREFA") addDoc(collection(db, "users", state.user.uid, "tarefas"), {titulo: act.params.titulo, concluida: false, prioridade: "Média", timestamp: Date.now()});
+                        if(act.action === "DELETE_TAREFA") deleteDoc(doc(db, "users", state.user.uid, "tarefas", act.params.id));
+                        if(act.action === "CONCLUIR_TAREFA") updateDoc(doc(db, "users", state.user.uid, "tarefas", act.params.id), {concluida: true});
+                        if(act.action === "ADD_NOTA") addDoc(collection(db, "users", state.user.uid, "anotacoes"), {titulo: act.params.titulo, conteudo: act.params.conteudo, corHex: "#fff", timestamp: Date.now()});
+                        if(act.action === "CHANGE_THEME") setTheme(act.params.theme);
+                        iaTxt = iaTxt.replace(iaTxt.substring(sIdx, eIdx+1), "").trim();
+                        iaTxt += "\n\n[Ação executada com sucesso!]";
+                    } catch(e) {}
+                }
+                addChat(iaTxt, false);
+            } catch(e) { addChat("Erro de ligação à API.", false); }
+            document.getElementById('ia-status').innerText = "Sempre online (Groq)";
+            document.getElementById('ia-status').style.color = "#32D74B";
+        }
+
+        function addChat(msg, isUser) {
+            const cont = document.getElementById('ia-chat');
+            const html = `
+                <div class="flex gap-3 ${isUser?'justify-end':''}">
+                    ${isUser?'':`<div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0"><i class="fa-solid fa-graduation-cap text-black text-sm"></i></div>`}
+                    <div class="${isUser?'chat-user':'chat-ai'} p-4 text-sm leading-relaxed max-w-[85%] shadow-lg">${msg.replace(/\n/g,'<br>')}</div>
+                </div>`;
+            cont.innerHTML += html;
+            cont.parentElement.scrollTop = cont.parentElement.scrollHeight;
+        }
     </script>
 </body>
 </html>
