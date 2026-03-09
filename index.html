@@ -681,7 +681,249 @@
             document.getElementById(id).classList.remove('hidden-screen');
         }
 
-        // --- AUTENTICAÇÃO E INIT ---
+        // Lógica do Tema (Claro/Escuro)
+        const themeBtn = document.getElementById('btn-toggle-theme');
+        themeBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // --- SISTEMA DE SELEÇÃO: SEMESTRE E UNIVERSIDADES ---
+        const semestersData = [
+            "1º Semestre", "2º Semestre", "3º Semestre", "4º Semestre", 
+            "5º Semestre", "6º Semestre", "7º Semestre", "8º Semestre", 
+            "9º Semestre", "10º Semestre", "11º Semestre", "12º Semestre"
+        ];
+
+        const universitiesData = [
+            "UFRB - Universidade Federal do Recôncavo da Bahia", "UFBA - Universidade Federal da Bahia",
+            "UFOB - Universidade Federal do Oeste da Bahia", "UFSB - Universidade Federal do Sul da Bahia",
+            "UNIVASF - Universidade Federal do Vale do São Francisco", "UNEB - Universidade do Estado da Bahia",
+            "UEFS - Universidade Estadual de Feira de Santana", "UESB - Universidade Estadual do Sudoeste da Bahia",
+            "UESC - Universidade Estadual de Santa Cruz", "IFBA - Instituto Federal da Bahia", "IF Baiano - Instituto Federal Baiano",
+            "UFAC - Universidade Federal do Acre", "UFAL - Universidade Federal de Alagoas", "UNIFAP - Universidade Federal do Amapá",
+            "UFAM - Universidade Federal do Amazonas", "UNILAB - Universidade da Integração Internacional da Lusofonia Afro-Brasileira",
+            "UFC - Universidade Federal do Ceará", "UFCA - Universidade Federal do Cariri", "UnB - Universidade de Brasília",
+            "UFES - Universidade Federal do Espírito Santo", "UFG - Universidade Federal de Goiás", "UFCAT - Universidade Federal de Catalão",
+            "UFJ - Universidade Federal de Jataí", "UFMA - Universidade Federal do Maranhão", "UFMT - Universidade Federal de Mato Grosso",
+            "UFR - Universidade Federal de Rondonópolis", "UFMS - Universidade Federal de Mato Grosso do Sul",
+            "UFGD - Universidade Federal da Grande Dourados", "UFMG - Universidade Federal de Minas Gerais",
+            "UFOP - Universidade Federal de Ouro Preto", "UFLA - Universidade Federal de Lavras", "UFV - Universidade Federal de Viçosa",
+            "UNIFAL - Universidade Federal de Alfenas", "UNIFEI - Universidade Federal de Itajubá", "UFJF - Universidade Federal de Juiz de Fora",
+            "UFSJ - Universidade Federal de São João del-Rei", "UFU - Universidade Federal de Uberlândia",
+            "UFVJM - Universidade Federal dos Vales do Jequitinhonha e Mucuri", "UFTM - Universidade Federal do Triângulo Mineiro",
+            "UFPA - Universidade Federal do Pará", "UNIFESSPA - Universidade Federal do Sul e Sudeste do Pará",
+            "UFOPA - Universidade Federal do Oeste do Pará", "UFPB - Universidade Federal da Paraíba",
+            "UFCG - Universidade Federal de Campina Grande", "UFPR - Universidade Federal do Paraná",
+            "UTFPR - Universidade Tecnológica Federal do Paraná", "UNILA - Universidade Federal da Integração Latino-Americana",
+            "UFPE - Universidade Federal de Pernambuco", "UFRPE - Universidade Federal Rural de Pernambuco",
+            "UFAPE - Universidade Federal do Agreste de Pernambuco", "UFPI - Universidade Federal do Piauí",
+            "UFDPar - Universidade Federal do Delta do Parnaíba", "UFRJ - Universidade Federal do Rio de Janeiro",
+            "UFF - Universidade Federal Fluminense", "UFRRJ - Universidade Federal Rural do Rio de Janeiro",
+            "UNIRIO - Universidade Federal do Estado do Rio de Janeiro", "UFRN - Universidade Federal do Rio Grande do Norte",
+            "UFERSA - Universidade Federal Rural do Semi-Árido", "UFRGS - Universidade Federal do Rio Grande do Sul",
+            "UFSM - Universidade Federal de Santa Maria", "UFPel - Universidade Federal de Pelotas",
+            "UNIPAMPA - Universidade Federal do Pampa", "UFCSPA - Universidade Federal de Ciências da Saúde de Porto Alegre",
+            "UFFS - Universidade Federal da Fronteira Sul", "UNIR - Universidade Federal de Rondônia",
+            "UFRR - Universidade Federal de Roraima", "UFSC - Universidade Federal de Santa Catarina",
+            "UNIFESP - Universidade Federal de São Paulo", "UFSCar - Universidade Federal de São Carlos",
+            "UFABC - Universidade Federal do ABC", "UFS - Universidade Federal de Sergipe", "UFT - Universidade Federal do Tocantins",
+            "UFNT - Universidade Federal do Norte do Tocantins", "USP - Universidade de São Paulo",
+            "UNICAMP - Universidade Estadual de Campinas", "UNESP - Universidade Estadual Paulista",
+            "UERJ - Universidade do Estado do Rio de Janeiro", "UEL - Universidade Estadual de Londrina",
+            "UEM - Universidade Estadual de Maringá", "UENF - Universidade Estadual do Norte Fluminense",
+            "UECE - Universidade Estadual do Ceará", "UVA - Universidade Estadual Vale do Acaraú",
+            "URCA - Universidade Regional do Cariri", "UEMG - Universidade do Estado de Minas Gerais",
+            "UNIMONTES - Universidade Estadual de Montes Claros", "UEG - Universidade Estadual de Goiás",
+            "UEMA - Universidade Estadual do Maranhão", "UEPB - Universidade Estadual da Paraíba",
+            "UEPG - Universidade Estadual de Ponta Grossa", "UNIOESTE - Universidade Estadual do Oeste do Paraná",
+            "UNICENTRO - Universidade Estadual do Centro-Oeste", "UENP - Universidade Estadual do Norte do Paraná",
+            "IFCE - Instituto Federal do Ceará", "IFMG - Instituto Federal de Minas Gerais", "IFPB - Instituto Federal da Paraíba",
+            "IFPE - Instituto Federal de Pernambuco", "IFPI - Instituto Federal do Piauí", "IFPR - Instituto Federal do Paraná",
+            "IFRJ - Instituto Federal do Rio de Janeiro", "IFRN - Instituto Federal do Rio Grande do Norte",
+            "IFRS - Instituto Federal do Rio Grande do Sul", "IFSC - Instituto Federal de Santa Catarina",
+            "IFSP - Instituto Federal de São Paulo", "Anhanguera", "Anhembi Morumbi", "Cruzeiro do Sul",
+            "ESPM - Escola Superior de Propaganda e Marketing", "Estácio", "FGV - Fundação Getulio Vargas",
+            "FMU - Faculdades Metropolitanas Unidas", "Ibmec", "Insper", "Mackenzie - Universidade Presbiteriana Mackenzie",
+            "PUC-Campinas - Pontifícia Universidade Católica de Campinas", "PUC-MG - Pontifícia Universidade Católica de Minas Gerais",
+            "PUC-PR - Pontifícia Universidade Católica do Paraná", "PUC-RJ - Pontifícia Universidade Católica do Rio de Janeiro",
+            "PUC-RS - Pontifícia Universidade Católica do Rio Grande do Sul", "PUC-SP - Pontifícia Universidade Católica de São Paulo",
+            "UNIP - Universidade Paulista", "UNISINOS - Universidade do Vale do Rio dos Sinos",
+            "Outra (Digitar manualmente)"
+        ];
+
+        document.getElementById('btn-open-semester').addEventListener('click', () => {
+            const list = document.getElementById('semester-list');
+            list.innerHTML = semestersData.map(sem => `
+                <div class="p-4 rounded-xl hover:bg-surface-light dark:hover:bg-surface-dark cursor-pointer transition-colors border border-transparent hover:border-black/5 dark:hover:border-white/5" onclick="selectSemester('${sem}')">
+                    <span class="font-medium text-lg">${sem}</span>
+                </div>
+                <div class="h-px w-full bg-black/5 dark:bg-white/5 last:hidden"></div>
+            `).join('');
+            showScreen('screen-select-semester');
+        });
+
+        document.getElementById('btn-close-semester').addEventListener('click', () => showScreen('setup-screen'));
+
+        window.selectSemester = function(sem) {
+            document.getElementById('setup-semester').value = sem;
+            document.getElementById('setup-semester-display').innerText = sem;
+            document.getElementById('setup-semester-display').classList.replace('text-gray-400', 'text-content');
+            showScreen('setup-screen');
+            validateSetupForm();
+        };
+
+        document.getElementById('btn-open-university').addEventListener('click', () => {
+            document.getElementById('search-university').value = '';
+            renderUniversities('');
+            showScreen('screen-select-university');
+            setTimeout(() => document.getElementById('search-university').focus(), 100);
+        });
+
+        document.getElementById('btn-close-university').addEventListener('click', () => showScreen('setup-screen'));
+
+        document.getElementById('search-university').addEventListener('input', (e) => renderUniversities(e.target.value));
+
+        function renderUniversities(filterText) {
+            const list = document.getElementById('university-list');
+            const lowerFilter = filterText.toLowerCase();
+            const filtered = universitiesData.filter(uni => uni.toLowerCase().includes(lowerFilter));
+            
+            if (filtered.length === 0) {
+                list.innerHTML = `<p class="text-gray-500 text-center py-8">Nenhuma universidade encontrada.</p>`;
+                return;
+            }
+
+            list.innerHTML = filtered.map(uni => `
+                <div class="p-4 rounded-xl hover:bg-surface-light dark:hover:bg-surface-dark cursor-pointer transition-colors border border-transparent hover:border-black/5 dark:hover:border-white/5" onclick="selectUniversity('${uni.replace(/'/g, "\\'")}')">
+                    <span class="${uni === 'Outra (Digitar manualmente)' ? 'font-bold text-primary' : 'font-medium'} text-base">${uni}</span>
+                </div>
+                <div class="h-px w-full bg-black/5 dark:bg-white/5 last:hidden"></div>
+            `).join('');
+        }
+
+        window.selectUniversity = function(uni) {
+            document.getElementById('setup-university').value = uni;
+            document.getElementById('setup-university-display').innerText = uni;
+            document.getElementById('setup-university-display').classList.replace('text-gray-400', 'text-content');
+            
+            if (uni === "Outra (Digitar manualmente)") {
+                document.getElementById('custom-university-container').classList.remove('hidden');
+            } else {
+                document.getElementById('custom-university-container').classList.add('hidden');
+                document.getElementById('setup-custom-university').value = '';
+            }
+            
+            showScreen('setup-screen');
+            validateSetupForm();
+        };
+
+        // --- VALIDAÇÃO DO NOME DE UTILIZADOR NO FIRESTORE ---
+        let isUsernameValid = false;
+        let usernameTimeout = null;
+        const usernameInput = document.getElementById('setup-username');
+        const usernameStatus = document.getElementById('username-status');
+
+        usernameInput.addEventListener('input', (e) => {
+            let val = e.target.value.replace(/\s+/g, '').toLowerCase();
+            e.target.value = val;
+            isUsernameValid = false;
+            validateSetupForm();
+
+            if (val.length < 3) {
+                usernameStatus.innerText = "Mínimo de 3 caracteres.";
+                usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-danger";
+                return;
+            }
+
+            usernameStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A verificar...';
+            usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-primary";
+
+            clearTimeout(usernameTimeout);
+            usernameTimeout = setTimeout(async () => {
+                try {
+                    const q = query(collection(db, "users"), where("username", "==", val));
+                    const querySnapshot = await getDocs(q);
+                    if (querySnapshot.empty) {
+                        usernameStatus.innerHTML = '<i class="fa-solid fa-check"></i> Nome disponível!';
+                        usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-success";
+                        isUsernameValid = true;
+                    } else {
+                        usernameStatus.innerHTML = '<i class="fa-solid fa-xmark"></i> Nome já em uso.';
+                        usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-danger";
+                        isUsernameValid = false;
+                    }
+                    validateSetupForm();
+                } catch (error) {
+                    usernameStatus.innerText = "Erro ao verificar.";
+                }
+            }, 800);
+        });
+
+        // --- VALIDAÇÃO GERAL DO PERFIL E SALVAMENTO ---
+        function validateSetupForm() {
+            const name = document.getElementById('setup-name').value.trim();
+            const course = document.getElementById('setup-course').value.trim();
+            const sem = document.getElementById('setup-semester').value;
+            const uni = document.getElementById('setup-university').value;
+            const customUni = document.getElementById('setup-custom-university').value.trim();
+            
+            let isUniValid = uni && uni !== "" && (uni !== "Outra (Digitar manualmente)" || customUni !== "");
+            let isValid = name && course && sem && isUniValid && isUsernameValid;
+            
+            document.getElementById('btn-save-profile').disabled = !isValid;
+        }
+
+        ['setup-name', 'setup-course', 'setup-custom-university'].forEach(id => {
+            document.getElementById(id).addEventListener('input', validateSetupForm);
+        });
+
+        document.getElementById('btn-save-profile').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-save-profile');
+            btn.disabled = true;
+            document.getElementById('save-btn-text').innerText = "A guardar...";
+            document.getElementById('save-btn-spinner').classList.remove('hidden');
+
+            const name = document.getElementById('setup-name').value.trim();
+            const username = document.getElementById('setup-username').value.trim();
+            const course = document.getElementById('setup-course').value.trim();
+            const semester = document.getElementById('setup-semester').value;
+            let university = document.getElementById('setup-university').value;
+            
+            if (university === "Outra (Digitar manualmente)") {
+                university = document.getElementById('setup-custom-university').value.trim();
+            }
+
+            const profileData = {
+                displayName: name,
+                username: username,
+                course: course,
+                semester: semester,
+                university: university,
+                profileImageUrl: state.user.photoURL || ""
+            };
+
+            try {
+                await setDoc(doc(db, "users", state.user.uid), profileData);
+                window.location.reload(); // Recarrega para iniciar sessão limpa com dados
+            } catch (error) {
+                alert("Erro ao guardar o perfil. Tente novamente.");
+                btn.disabled = false;
+                document.getElementById('save-btn-text').innerText = "Finalizar Perfil";
+                document.getElementById('save-btn-spinner').classList.add('hidden');
+            }
+        });
+
+        // --- AUTENTICAÇÃO E INIT PRINCIPAL ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 state.user = user;
