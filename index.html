@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR" class="dark">
+<html lang="pt-PT" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,11 +13,19 @@
             theme: {
                 extend: {
                     colors: {
-                        background: '#0a0a0a',
-                        surface: '#171717',
-                        primary: '#3b82f6', // Azul moderno
-                        accent: '#8b5cf6', // Roxo
-                        text: '#f5f5f5'
+                        background: {
+                            light: '#FBFBFD',
+                            dark: '#050505'
+                        },
+                        surface: {
+                            light: '#F2F2F7',
+                            dark: '#1C1C1E'
+                        },
+                        primary: '#0A84FF',
+                        accent: '#B14AE2',
+                        success: '#32D74B',
+                        danger: '#FF3B30',
+                        warning: '#xFFFF00'
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
@@ -32,86 +40,187 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #0a0a0a; color: #f5f5f5; }
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s, color 0.3s;
+        }
         
-        /* Animações suaves para troca de telas */
+        /* Efeito Liquid Glass (Vidro Líquido) adaptável ao tema */
+        .liquid-glass {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .dark .liquid-glass {
+            background: rgba(28, 28, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        html:not(.dark) .liquid-glass {
+            background: rgba(255, 255, 255, 0.6);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+
+        /* Animações suaves para troca de ecrãs */
         .fade-enter { animation: fadeIn 0.5s ease-out forwards; }
-        .fade-exit { animation: fadeOut 0.5s ease-in forwards; }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-10px); visibility: hidden; }
-        }
 
-        /* Esconder telas inativas */
+        /* Esconder ecrãs inativos */
         .hidden-screen { display: none !important; }
+
+        /* Estilização da Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 10px; }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex items-center justify-center relative">
+<body class="h-screen w-screen overflow-hidden flex items-center justify-center relative bg-background-light dark:bg-background-dark text-black dark:text-white">
 
-    <!-- 1. TELA DE CARREGAMENTO -->
-    <div id="loading-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-background z-50 flex">
+    <!-- Botão de Teste de Tema (Podes remover mais tarde) -->
+    <button id="btn-toggle-theme" class="absolute top-6 right-6 z-[100] liquid-glass p-3 rounded-full w-12 h-12 flex items-center justify-center hover:scale-105 transition-transform">
+        <i class="fa-solid fa-moon dark:hidden"></i>
+        <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
+    </button>
+
+    <!-- 1. ECRÃ DE CARREGAMENTO -->
+    <div id="loading-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-background-light dark:bg-background-dark z-50 flex">
         <div class="relative flex items-center justify-center mb-6">
-            <!-- Efeito de brilho pulsante atrás do ícone -->
-            <div class="absolute w-24 h-24 bg-primary rounded-full blur-xl opacity-50 animate-pulse"></div>
-            <i class="fa-solid fa-graduation-cap text-6xl text-white relative z-10 animate-bounce"></i>
+            <div class="absolute w-24 h-24 bg-primary rounded-full blur-xl opacity-40 animate-pulse"></div>
+            <i class="fa-solid fa-graduation-cap text-6xl text-primary relative z-10 animate-bounce"></i>
         </div>
-        <h1 class="text-4xl font-extrabold tracking-tight text-white mb-2">OrganizaEdu</h1>
-        <p class="text-gray-400 font-medium flex items-center gap-2">
-            <i class="fa-solid fa-circle-notch fa-spin text-primary"></i> Conectando aos servidores...
+        <h1 class="text-4xl font-extrabold tracking-tight mb-2">OrganizaEdu</h1>
+        <p class="text-gray-500 font-medium flex items-center gap-2">
+            <i class="fa-solid fa-circle-notch fa-spin text-primary"></i> A conectar aos servidores...
         </p>
     </div>
 
-    <!-- 2. TELA DE LOGIN -->
-    <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-background z-40 hidden-screen overflow-hidden">
-        <!-- Luzes decorativas de fundo (Efeito moderno para PC) -->
+    <!-- 2. ECRÃ DE LOGIN -->
+    <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-background-light dark:bg-background-dark z-40 hidden-screen overflow-hidden">
         <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
         <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
         
-        <div class="bg-surface border border-white/10 p-10 rounded-3xl shadow-2xl z-10 max-w-md w-full mx-4 flex flex-col items-center text-center fade-enter">
-            <div class="w-20 h-20 bg-background border border-white/10 rounded-2xl flex items-center justify-center mb-6 shadow-inner">
+        <div class="liquid-glass p-10 rounded-[32px] z-10 max-w-md w-full mx-4 flex flex-col items-center text-center fade-enter">
+            <div class="w-20 h-20 bg-surface-light dark:bg-surface-dark rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                 <i class="fa-solid fa-graduation-cap text-4xl text-primary"></i>
             </div>
             
-            <h2 class="text-3xl font-bold text-white mb-3">Bem-vindo de volta</h2>
-            <p class="text-gray-400 mb-10 text-sm leading-relaxed">
-                Acesse o OrganizaEdu pelo navegador e mantenha seus estudos sincronizados com seu celular.
+            <h2 class="text-3xl font-extrabold mb-3">Bem-vindo</h2>
+            <p class="text-gray-500 mb-10 text-sm leading-relaxed font-medium">
+                Aceda ao OrganizaEdu pelo navegador e mantenha os seus estudos sincronizados com o seu telemóvel.
             </p>
 
-            <button id="btn-google-login" class="w-full bg-white text-black font-bold py-3 px-6 rounded-xl flex items-center justify-center gap-3 hover:bg-gray-200 hover:scale-[1.02] transition-all shadow-lg">
+            <button id="btn-google-login" class="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-lg">
                 <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="Google" class="w-5 h-5">
-                Entrar com Google
+                Continuar com o Google
             </button>
-
-            <p class="mt-8 text-xs text-gray-500">
-                Ao continuar, você concorda com nossos Termos de Serviço e Política de Privacidade.
-            </p>
         </div>
     </div>
 
-    <!-- 3. TELA PRINCIPAL (Em branco por enquanto, para os próximos passos) -->
-    <div id="main-app-screen" class="absolute inset-0 bg-background z-30 hidden-screen flex flex-col items-center justify-center">
-        <h1 class="text-2xl font-bold text-success mb-4"><i class="fa-solid fa-check-circle mr-2"></i>Login bem-sucedido!</h1>
-        <p class="text-gray-400 mb-6" id="welcome-message">Carregando seus dados...</p>
-        <button id="btn-logout" class="bg-surface border border-white/10 text-white px-6 py-2 rounded-lg hover:bg-white/5 transition">
-            <i class="fa-solid fa-right-from-bracket mr-2"></i>Sair
-        </button>
+    <!-- 3. ECRÃ DE CONFIGURAÇÃO DE PERFIL (SETUP) -->
+    <div id="setup-screen" class="absolute inset-0 flex items-center justify-center bg-background-light dark:bg-background-dark z-40 hidden-screen overflow-y-auto py-10">
+        <div class="liquid-glass p-8 md:p-10 rounded-[32px] z-10 max-w-lg w-full mx-4 flex flex-col fade-enter my-auto">
+            <h2 class="text-3xl font-extrabold mb-2 text-center">Complete o seu perfil</h2>
+            <p class="text-gray-500 mb-8 text-center text-sm font-medium">Precisamos de alguns dados para personalizar a sua experiência.</p>
+
+            <div class="flex flex-col gap-5">
+                <!-- Nome -->
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Nome de Exibição</label>
+                    <input type="text" id="setup-name" placeholder="Ex: João Silva" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
+                </div>
+
+                <!-- Username com Validação -->
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Nome de Utilizador (@)</label>
+                    <input type="text" id="setup-username" placeholder="Ex: joaosilva" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
+                    <p id="username-status" class="text-xs font-semibold mt-2 ml-1 text-gray-500">Este nome deve ser único.</p>
+                </div>
+
+                <!-- Curso -->
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Curso</label>
+                    <input type="text" id="setup-course" placeholder="Qual o seu curso?" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
+                </div>
+
+                <!-- Semestre e Universidade lado a lado (em ecrãs maiores) -->
+                <div class="flex flex-col md:flex-row gap-5">
+                    <div class="flex-1">
+                        <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Semestre</label>
+                        <select id="setup-semester" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50">
+                            <option value="1º Semestre">1º Semestre</option>
+                            <option value="2º Semestre">2º Semestre</option>
+                            <option value="3º Semestre">3º Semestre</option>
+                            <option value="4º Semestre">4º Semestre</option>
+                            <option value="5º Semestre">5º Semestre</option>
+                            <option value="6º Semestre">6º Semestre</option>
+                            <option value="7º Semestre">7º Semestre</option>
+                            <option value="8º Semestre">8º Semestre</option>
+                            <option value="9º Semestre">9º Semestre</option>
+                            <option value="10º Semestre">10º Semestre</option>
+                            <option value="11º Semestre">11º Semestre</option>
+                            <option value="12º Semestre">12º Semestre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Universidade -->
+                <div>
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Universidade</label>
+                    <select id="setup-university" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50">
+                        <option value="" disabled selected>Selecione a universidade...</option>
+                        <option value="UFRB - Universidade Federal do Recôncavo da Bahia">UFRB - Univ. Federal do Recôncavo da Bahia</option>
+                        <option value="UFBA - Universidade Federal da Bahia">UFBA - Univ. Federal da Bahia</option>
+                        <option value="UFOB - Universidade Federal do Oeste da Bahia">UFOB - Univ. Federal do Oeste da Bahia</option>
+                        <option value="UFSB - Universidade Federal do Sul da Bahia">UFSB - Univ. Federal do Sul da Bahia</option>
+                        <option value="USP - Universidade de São Paulo">USP - Universidade de São Paulo</option>
+                        <option value="UNICAMP - Universidade Estadual de Campinas">UNICAMP - Univ. Estadual de Campinas</option>
+                        <option value="UFRJ - Universidade Federal do Rio de Janeiro">UFRJ - Univ. Federal do Rio de Janeiro</option>
+                        <option value="UFMG - Universidade Federal de Minas Gerais">UFMG - Univ. Federal de Minas Gerais</option>
+                        <option value="Outra (Digitar manualmente)">Outra (Digitar manualmente)</option>
+                    </select>
+                </div>
+
+                <!-- Campo de Universidade Customizada (Oculto inicialmente) -->
+                <div id="custom-university-container" class="hidden">
+                    <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Qual o nome da universidade?</label>
+                    <input type="text" id="setup-custom-university" placeholder="Escreva o nome..." class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
+                </div>
+            </div>
+
+            <button id="btn-save-profile" disabled class="w-full mt-8 bg-primary disabled:bg-gray-500 text-white font-bold py-4 px-6 rounded-2xl flex items-center justify-center transition-all shadow-lg hover:bg-blue-600 disabled:shadow-none disabled:opacity-50">
+                <span id="save-btn-text">Finalizar Perfil</span>
+                <i id="save-btn-spinner" class="fa-solid fa-circle-notch fa-spin hidden ml-2"></i>
+            </button>
+        </div>
     </div>
 
-    <!-- FIREBASE E LÓGICA DE LOGIN -->
+    <!-- 4. TELA PRINCIPAL (Painel Base) -->
+    <div id="main-app-screen" class="absolute inset-0 bg-background-light dark:bg-background-dark z-30 hidden-screen flex flex-col items-center justify-center">
+        <div class="liquid-glass p-10 rounded-3xl text-center">
+            <h1 class="text-3xl font-extrabold text-success mb-4"><i class="fa-solid fa-check-circle mr-2"></i>Tudo Pronto!</h1>
+            <p class="text-gray-500 mb-2 text-lg" id="welcome-message">Carregando...</p>
+            <p class="text-sm font-bold text-primary mb-8" id="user-info-display">@usuario • Curso</p>
+            
+            <button id="btn-logout" class="bg-surface-light dark:bg-surface-dark border border-black/5 dark:border-white/5 px-6 py-3 rounded-xl font-bold hover:bg-danger/10 hover:text-danger transition-colors">
+                <i class="fa-solid fa-right-from-bracket mr-2"></i>Sair da conta
+            </button>
+        </div>
+    </div>
+
+    <!-- FIREBASE E LÓGICA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { 
-            getAuth, 
-            GoogleAuthProvider, 
-            signInWithPopup, 
-            onAuthStateChanged, 
-            signOut 
+            getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut 
         } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { 
+            getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs 
+        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
         // Configuração do Firebase fornecida
         const firebaseConfig = {
@@ -127,58 +236,211 @@
         // Inicialização
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
+        const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        // Referências das Telas
-        const loadingScreen = document.getElementById('loading-screen');
-        const loginScreen = document.getElementById('login-screen');
-        const mainAppScreen = document.getElementById('main-app-screen');
+        let currentUser = null;
+        let isUsernameValid = false;
 
-        // Função para trocar de tela
-        function showScreen(screenElement) {
-            loadingScreen.classList.add('hidden-screen');
-            loginScreen.classList.add('hidden-screen');
-            mainAppScreen.classList.add('hidden-screen');
-            
-            screenElement.classList.remove('hidden-screen');
+        // Referências DOM
+        const screens = {
+            loading: document.getElementById('loading-screen'),
+            login: document.getElementById('login-screen'),
+            setup: document.getElementById('setup-screen'),
+            main: document.getElementById('main-app-screen')
+        };
+
+        // Função para trocar de ecrã
+        function showScreen(screenName) {
+            Object.values(screens).forEach(s => s.classList.add('hidden-screen'));
+            screens[screenName].classList.remove('hidden-screen');
         }
 
-        // Observador de Estado de Autenticação
-        onAuthStateChanged(auth, (user) => {
-            // Simular um tempinho de carregamento para as fontes e estilos renderizarem bonitos
-            setTimeout(() => {
-                if (user) {
-                    // Usuário logado
-                    document.getElementById('welcome-message').innerText = `Bem-vindo, ${user.displayName}! A interface principal será construída aqui.`;
-                    showScreen(mainAppScreen);
-                    console.log("Usuário logado:", user.uid);
-                } else {
-                    // Usuário não logado
-                    showScreen(loginScreen);
+        // Lógica do Tema (Claro/Escuro)
+        const themeBtn = document.getElementById('btn-toggle-theme');
+        themeBtn.addEventListener('click', () => {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.setItem('theme', 'light');
+            } else {
+                html.classList.add('dark');
+                localStorage.setItem('theme', 'dark');
+            }
+        });
+        // Aplicar tema guardado
+        if (localStorage.getItem('theme') === 'light') {
+            document.documentElement.classList.remove('dark');
+        }
+
+        // Observador de Autenticação
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    // Verificar se o utilizador já tem perfil na base de dados
+                    const docRef = doc(db, "users", user.uid);
+                    const docSnap = await getDoc(docRef);
+
+                    setTimeout(() => {
+                        if (docSnap.exists()) {
+                            // Perfil existe, vai para a app principal
+                            const userData = docSnap.data();
+                            document.getElementById('welcome-message').innerText = `Bem-vindo de volta, ${userData.displayName.split(' ')[0]}!`;
+                            document.getElementById('user-info-display').innerText = `@${userData.username} • ${userData.course}`;
+                            showScreen('main');
+                        } else {
+                            // Primeiro login, vai para a configuração de perfil
+                            document.getElementById('setup-name').value = user.displayName || "";
+                            showScreen('setup');
+                        }
+                    }, 1000);
+                } catch (error) {
+                    console.error("Erro ao verificar utilizador:", error);
+                    showScreen('login');
                 }
-            }, 1500); 
+            } else {
+                setTimeout(() => showScreen('login'), 1000);
+            }
         });
 
         // Ação de Login
         document.getElementById('btn-google-login').addEventListener('click', async () => {
             try {
-                // Volta pra tela de loading durante o processamento do popup
-                showScreen(loadingScreen); 
+                showScreen('loading'); 
                 await signInWithPopup(auth, provider);
-                // O onAuthStateChanged vai ser acionado automaticamente se der certo
             } catch (error) {
-                console.error("Erro no login:", error);
-                alert("Falha ao fazer login: " + error.message);
-                showScreen(loginScreen); // Volta pro login se der erro
+                alert("Falha ao iniciar sessão: " + error.message);
+                showScreen('login');
             }
         });
 
-        // Ação de Logout (provisório para testes)
+        // Lógica para o campo "Universidade Customizada"
+        const uniSelect = document.getElementById('setup-university');
+        const customUniContainer = document.getElementById('custom-university-container');
+        
+        uniSelect.addEventListener('change', (e) => {
+            if (e.target.value === "Outra (Digitar manualmente)") {
+                customUniContainer.classList.remove('hidden');
+            } else {
+                customUniContainer.classList.add('hidden');
+            }
+            validateSetupForm();
+        });
+
+        // Lógica de Validação de Nome de Utilizador (Debounce)
+        const usernameInput = document.getElementById('setup-username');
+        const usernameStatus = document.getElementById('username-status');
+        let usernameTimeout = null;
+
+        usernameInput.addEventListener('input', (e) => {
+            // Formatar: sem espaços, minúsculas
+            let val = e.target.value.replace(/\s+/g, '').toLowerCase();
+            e.target.value = val;
+            
+            isUsernameValid = false;
+            validateSetupForm();
+
+            if (val.length < 3) {
+                usernameStatus.innerText = "Mínimo de 3 caracteres.";
+                usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-danger";
+                return;
+            }
+
+            usernameStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A verificar...';
+            usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-primary";
+
+            clearTimeout(usernameTimeout);
+            usernameTimeout = setTimeout(async () => {
+                try {
+                    const q = query(collection(db, "users"), where("username", "==", val));
+                    const querySnapshot = await getDocs(q);
+                    
+                    if (querySnapshot.empty) {
+                        usernameStatus.innerHTML = '<i class="fa-solid fa-check"></i> Nome disponível!';
+                        usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-success";
+                        isUsernameValid = true;
+                    } else {
+                        usernameStatus.innerHTML = '<i class="fa-solid fa-xmark"></i> Nome já em uso.';
+                        usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-danger";
+                        isUsernameValid = false;
+                    }
+                    validateSetupForm();
+                } catch (error) {
+                    console.error("Erro na validação:", error);
+                    usernameStatus.innerText = "Erro ao verificar.";
+                }
+            }, 800); // 800ms delay
+        });
+
+        // Validação do Formulário Completo
+        function validateSetupForm() {
+            const name = document.getElementById('setup-name').value.trim();
+            const course = document.getElementById('setup-course').value.trim();
+            const uni = uniSelect.value;
+            const customUni = document.getElementById('setup-custom-university').value.trim();
+            
+            let isUniValid = uni !== "" && (uni !== "Outra (Digitar manualmente)" || customUni !== "");
+            let isValid = name && course && isUniValid && isUsernameValid;
+            
+            document.getElementById('btn-save-profile').disabled = !isValid;
+        }
+
+        // Adicionar eventos de validação aos outros campos
+        ['setup-name', 'setup-course', 'setup-custom-university'].forEach(id => {
+            document.getElementById(id).addEventListener('input', validateSetupForm);
+        });
+
+        // Salvar Perfil
+        document.getElementById('btn-save-profile').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-save-profile');
+            const spinner = document.getElementById('save-btn-spinner');
+            const btnText = document.getElementById('save-btn-text');
+
+            btn.disabled = true;
+            spinner.classList.remove('hidden');
+            btnText.innerText = "A guardar...";
+
+            const name = document.getElementById('setup-name').value.trim();
+            const username = document.getElementById('setup-username').value.trim();
+            const course = document.getElementById('setup-course').value.trim();
+            const semester = document.getElementById('setup-semester').value;
+            let university = uniSelect.value;
+            if (university === "Outra (Digitar manualmente)") {
+                university = document.getElementById('setup-custom-university').value.trim();
+            }
+
+            const profileData = {
+                displayName: name,
+                username: username,
+                course: course,
+                semester: semester,
+                university: university,
+                profileImageUrl: currentUser.photoURL || ""
+            };
+
+            try {
+                await setDoc(doc(db, "users", currentUser.uid), profileData);
+                // Força o onAuthStateChanged a reagir novamente ou muda direto
+                document.getElementById('welcome-message').innerText = `Bem-vindo, ${name.split(' ')[0]}!`;
+                document.getElementById('user-info-display').innerText = `@${username} • ${course}`;
+                showScreen('main');
+            } catch (error) {
+                console.error("Erro ao guardar perfil:", error);
+                alert("Ocorreu um erro ao guardar o seu perfil.");
+            } finally {
+                btn.disabled = false;
+                spinner.classList.add('hidden');
+                btnText.innerText = "Finalizar Perfil";
+            }
+        });
+
+        // Ação de Logout
         document.getElementById('btn-logout').addEventListener('click', () => {
-            showScreen(loadingScreen);
+            showScreen('loading');
             signOut(auth).catch(error => {
                 console.error("Erro ao sair:", error);
-                showScreen(mainAppScreen);
+                showScreen('main');
             });
         });
     </script>
