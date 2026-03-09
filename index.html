@@ -2,8 +2,8 @@
 <html lang="pt-PT" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OrganizaEdu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OrganizaEdu - Desktop</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -13,15 +13,17 @@
             theme: {
                 extend: {
                     colors: {
-                        background: 'var(--bg-color)',
-                        surface: 'var(--surface-color)',
-                        content: 'var(--content-color)',
                         primary: '#0A84FF',
                         accent: '#B14AE2',
                         success: '#32D74B',
                         danger: '#FF3B30',
                         warning: '#xFFFF00',
-                        foco: '#00C7BE'
+                        foco: '#00C7BE',
+                        // Definindo cores semânticas para Claro/Escuro
+                        bgLight: '#FBFBFD',
+                        surfaceLight: '#F2F2F7',
+                        bgDark: '#050505',
+                        surfaceDark: '#1C1C1E',
                     },
                     fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
@@ -34,413 +36,503 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        :root {
-            --bg-color: #050505;
-            --surface-color: #1C1C1E;
-            --content-color: #FFFFFF;
-        }
-        .theme-light {
-            --bg-color: #FBFBFD;
-            --surface-color: #F2F2F7;
-            --content-color: #000000;
-        }
+        body { font-family: 'Inter', sans-serif; overflow: hidden; }
         
-        body { font-family: 'Inter', sans-serif; background-color: var(--bg-color); color: var(--content-color); overflow: hidden; transition: background-color 0.3s, color 0.3s; }
-        
-        ::-webkit-scrollbar { width: 0px; background: transparent; }
-        
-        .liquid-glass {
-            background: rgba(28, 28, 30, 0.5);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        .theme-light .liquid-glass {
-            background: rgba(255, 255, 255, 0.7);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
+        /* Custom Scrollbar for PC */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(150, 150, 150, 0.5); }
 
-        .screen, .view-section, .sub-view { display: none; flex-direction: column; height: 100%; width: 100%; position: absolute; top: 0; left: 0; overflow-y: auto; padding-bottom: 110px;}
-        .active-screen { display: flex; z-index: 10; animation: fadeIn 0.3s; }
-        .active-view { display: flex; animation: fadeUp 0.3s; }
-        .active-sub { display: flex; z-index: 20; background-color: var(--bg-color); animation: slideInRight 0.3s; }
+        .screen, .view-section { display: none; height: 100%; width: 100%; flex-direction: column; overflow-y: auto; }
+        .active-screen, .active-view { display: flex; animation: fadeIn 0.4s ease-out; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideInRight { from { transform: translateX(100%); } to { transform: translateX(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
+        /* Chat Bubbles */
         .chat-user { background: linear-gradient(135deg, #B14AE2, #6A0DAD); color: white; border-radius: 20px 20px 4px 20px; }
-        .chat-ai { background: var(--surface-color); color: var(--content-color); border-radius: 20px 20px 20px 4px; }
+        .chat-ai { border-radius: 20px 20px 20px 4px; }
+        
+        /* Sidebar Link Active State */
+        .nav-item.active { background-color: #0A84FF; color: white; box-shadow: 0 4px 14px rgba(10, 132, 255, 0.3); }
+        .nav-item.active i { color: white !important; }
     </style>
 </head>
-<body class="antialiased">
+<body class="antialiased bg-bgLight dark:bg-bgDark text-black dark:text-white transition-colors duration-300 h-screen w-screen flex">
 
-    <!-- ECRÃ DE LOADING -->
-    <div id="screen-loading" class="screen active-screen justify-center items-center bg-background">
-        <i class="fa-solid fa-graduation-cap text-6xl text-primary animate-bounce mb-4"></i>
-        <h1 class="text-3xl font-extrabold tracking-tight">OrganizaEdu</h1>
+    <!-- 1. ECRÃ DE LOADING -->
+    <div id="screen-loading" class="screen active-screen justify-center items-center fixed inset-0 z-50 bg-bgLight dark:bg-bgDark">
+        <i class="fa-solid fa-graduation-cap text-7xl text-primary animate-bounce mb-6"></i>
+        <h1 class="text-4xl font-extrabold tracking-tight">OrganizaEdu</h1>
+        <p class="mt-4 text-gray-500 font-medium">A carregar o seu ambiente de estudo...</p>
     </div>
 
-    <!-- ECRÃ DE LOGIN -->
-    <div id="screen-login" class="screen bg-background relative overflow-hidden">
-        <div class="absolute -top-20 -left-20 w-72 h-72 bg-accent opacity-20 rounded-full blur-3xl"></div>
-        <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-primary opacity-20 rounded-full blur-3xl"></div>
+    <!-- 2. ECRÃ DE LOGIN -->
+    <div id="screen-login" class="screen fixed inset-0 z-40 bg-bgLight dark:bg-bgDark relative overflow-hidden flex flex-col justify-center items-center">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-accent opacity-20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 -right-40 w-96 h-96 bg-primary opacity-20 rounded-full blur-3xl"></div>
         
-        <div class="flex-1 flex flex-col justify-center items-center px-8 z-10 pt-20">
-            <i class="fa-solid fa-graduation-cap text-7xl text-content mb-8"></i>
-            <h1 class="text-4xl font-extrabold mb-4">Bem-vindo</h1>
-            <p class="text-center text-content opacity-50 text-lg">A sua vida académica organizada<br>de forma incrivelmente simples.</p>
-        </div>
-        <div class="p-8 z-10 pb-20">
-            <button id="btn-login" class="w-full bg-content text-background font-bold text-lg py-4 rounded-2xl flex justify-center items-center gap-3">
+        <div class="z-10 flex flex-col items-center max-w-md w-full bg-surfaceLight dark:bg-surfaceDark p-10 rounded-3xl shadow-2xl border border-black/5 dark:border-white/5">
+            <i class="fa-solid fa-graduation-cap text-6xl text-black dark:text-white mb-6"></i>
+            <h1 class="text-3xl font-extrabold mb-2 text-center">Bem-vindo ao OrganizaEdu</h1>
+            <p class="text-center text-gray-500 mb-10">A sua vida académica organizada de forma inteligente no seu computador.</p>
+            
+            <button id="btn-login" class="w-full bg-black dark:bg-white text-white dark:text-black font-bold text-lg py-4 rounded-xl flex justify-center items-center gap-3 hover:scale-[1.02] transition-transform shadow-lg">
                 <i class="fa-brands fa-google text-xl"></i> Continuar com o Google
             </button>
         </div>
     </div>
 
-    <!-- ECRÃ SETUP PROFILE -->
-    <div id="screen-setup" class="screen bg-background p-6">
-        <h1 class="text-3xl font-extrabold mt-12 mb-2">Complete o perfil</h1>
-        <p class="text-content opacity-50 mb-8">Precisamos de alguns dados para personalizar a sua experiência.</p>
-        
-        <input type="text" id="setup-name" placeholder="Nome de Perfil" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none">
-        <input type="text" id="setup-user" placeholder="Nome de Utilizador (@)" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none">
-        <input type="text" id="setup-course" placeholder="Qual o seu curso?" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none">
-        <select id="setup-sem" class="w-full bg-surface rounded-2xl p-4 mb-4 text-content outline-none appearance-none">
-            <option value="1º Semestre">1º Semestre</option>
-            <option value="2º Semestre">2º Semestre</option>
-            <option value="3º Semestre">3º Semestre</option>
-        </select>
-        <select id="setup-uni" class="w-full bg-surface rounded-2xl p-4 mb-8 text-content outline-none appearance-none">
-            <option value="UFRB - Universidade Federal do Recôncavo da Bahia">UFRB - Univ. Federal do Recôncavo da Bahia</option>
-            <option value="UFBA - Universidade Federal da Bahia">UFBA - Univ. Federal da Bahia</option>
-            <option value="Outra">Outra</option>
-        </select>
+    <!-- 3. ECRÃ DE SETUP PROFILE -->
+    <div id="screen-setup" class="screen fixed inset-0 z-40 bg-bgLight dark:bg-bgDark flex justify-center items-center">
+        <div class="w-full max-w-lg bg-surfaceLight dark:bg-surfaceDark p-10 rounded-3xl shadow-2xl border border-black/5 dark:border-white/5 overflow-y-auto max-h-[90vh]">
+            <h1 class="text-3xl font-extrabold mb-2">Complete o perfil</h1>
+            <p class="text-gray-500 mb-8">Precisamos de alguns dados para preparar o seu painel.</p>
+            
+            <div class="flex flex-col gap-5 mb-8">
+                <div>
+                    <label class="text-sm font-bold text-gray-500 ml-1">Nome de Perfil</label>
+                    <input type="text" id="setup-name" placeholder="Ex: João Silva" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/10 dark:border-white/10 focus:border-primary">
+                </div>
+                <div>
+                    <label class="text-sm font-bold text-gray-500 ml-1">Nome de Utilizador</label>
+                    <input type="text" id="setup-user" placeholder="Ex: @joaosilva" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/10 dark:border-white/10 focus:border-primary">
+                </div>
+                <div>
+                    <label class="text-sm font-bold text-gray-500 ml-1">Curso</label>
+                    <input type="text" id="setup-course" placeholder="Ex: Engenharia Informática" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/10 dark:border-white/10 focus:border-primary">
+                </div>
+                <div class="flex gap-4">
+                    <div class="flex-1">
+                        <label class="text-sm font-bold text-gray-500 ml-1">Semestre</label>
+                        <select id="setup-sem" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/10 dark:border-white/10">
+                            <option value="1º Semestre">1º Sem</option><option value="2º Semestre">2º Sem</option><option value="3º Semestre">3º Sem</option>
+                            <option value="4º Semestre">4º Sem</option><option value="5º Semestre">5º Sem</option><option value="6º Semestre">6º Sem</option>
+                        </select>
+                    </div>
+                    <div class="flex-1">
+                        <label class="text-sm font-bold text-gray-500 ml-1">Universidade</label>
+                        <select id="setup-uni" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/10 dark:border-white/10">
+                            <option value="UFRB - Universidade Federal do Recôncavo da Bahia">UFRB (Circular Ativo)</option>
+                            <option value="UFBA - Universidade Federal da Bahia">UFBA</option>
+                            <option value="Outra">Outra</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
 
-        <button id="btn-save-setup" class="w-full bg-content text-background font-bold py-4 rounded-2xl">Finalizar Perfil</button>
+            <button id="btn-save-setup" class="w-full bg-primary text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition-colors shadow-lg shadow-primary/30">Aceder ao Painel</button>
+        </div>
     </div>
 
-    <!-- APP PRINCIPAL -->
-    <div id="screen-app" class="screen bg-background">
-        <!-- Main Header -->
-        <header id="main-header" class="w-full px-6 pt-12 pb-4 flex justify-between items-center z-10 bg-background">
-            <h2 class="text-2xl font-bold" id="ui-greeting">Olá, Estudante</h2>
-            <img id="ui-avatar" src="" class="w-12 h-12 rounded-full object-cover cursor-pointer" onclick="openSubView('profile')">
-        </header>
+    <!-- ================= APP PRINCIPAL COM BARRA LATERAL ================= -->
+    <div id="screen-app" class="screen flex-row w-full h-full bg-bgLight dark:bg-bgDark">
+        
+        <!-- SIDEBAR ESQUERDA -->
+        <aside class="w-72 h-full bg-surfaceLight dark:bg-surfaceDark border-r border-black/5 dark:border-white/5 flex flex-col transition-colors duration-300 shrink-0">
+            <!-- Logo -->
+            <div class="p-8 flex items-center gap-4 border-b border-black/5 dark:border-white/5">
+                <div class="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
+                    <i class="fa-solid fa-graduation-cap text-xl"></i>
+                </div>
+                <span class="font-extrabold text-2xl tracking-tight">OrganizaEdu</span>
+            </div>
 
-        <!-- VIEWS PRINCIPAIS (TABS) -->
-        <div id="views-container" class="flex-1 relative w-full">
+            <!-- Navegação -->
+            <nav class="flex-1 overflow-y-auto p-4 flex flex-col gap-2 mt-4">
+                <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 ml-4">Principal</p>
+                
+                <button onclick="switchTab('home')" class="nav-item active flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-border-all w-5 text-gray-500 text-lg"></i> Painel Inicial
+                </button>
+                <button onclick="switchTab('aulas')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-calendar-days w-5 text-gray-500 text-lg"></i> As Minhas Aulas
+                </button>
+                <button onclick="switchTab('tarefas')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-list-check w-5 text-gray-500 text-lg"></i> Tarefas
+                </button>
+                <button onclick="switchTab('ia')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-wand-magic-sparkles w-5 text-accent text-lg"></i> Organiza IA
+                </button>
+
+                <p class="text-xs font-bold text-gray-400 dark:text-gray-500 uppercase tracking-wider mb-2 mt-6 ml-4">Ferramentas</p>
+
+                <button onclick="switchTab('financas')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-dollar-sign w-5 text-success text-lg"></i> Finanças
+                </button>
+                <button onclick="switchTab('anotacoes')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-note-sticky w-5 text-gray-500 text-lg"></i> Anotações
+                </button>
+                <button onclick="switchTab('foco')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-stopwatch w-5 text-[#00C7BE] text-lg"></i> Modo Foco
+                </button>
+                <button onclick="switchTab('calculadora')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-calculator w-5 text-gray-500 text-lg"></i> Calculadora Pro
+                </button>
+                
+                <!-- Circular UFRB (Mostrado via JS se for da UFRB) -->
+                <button id="nav-circular" onclick="switchTab('circular')" class="nav-item hidden flex items-center gap-4 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-all">
+                    <i class="fa-solid fa-bus w-5 text-primary text-lg"></i> Circular UFRB
+                </button>
+            </nav>
+
+            <!-- Rodapé Sidebar (Perfil & Tema) -->
+            <div class="p-4 border-t border-black/5 dark:border-white/5 flex flex-col gap-2 bg-surfaceLight dark:bg-surfaceDark">
+                <button onclick="toggleTheme()" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-colors">
+                    <span class="flex items-center gap-3 text-gray-600 dark:text-gray-300">
+                        <i class="fa-solid fa-moon dark:hidden w-5 text-lg"></i>
+                        <i class="fa-solid fa-sun hidden dark:inline w-5 text-lg"></i>
+                        <span class="dark:hidden">Modo Escuro</span>
+                        <span class="hidden dark:inline">Modo Claro</span>
+                    </span>
+                    <div class="w-10 h-5 bg-gray-300 dark:bg-primary rounded-full relative transition-colors">
+                        <div class="absolute w-4 h-4 bg-white rounded-full top-0.5 left-0.5 dark:translate-x-5 transition-transform shadow-sm"></div>
+                    </div>
+                </button>
+                
+                <div onclick="switchTab('profile')" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-colors cursor-pointer mt-2">
+                    <img id="ui-avatar" src="" class="w-10 h-10 rounded-full border-2 border-primary object-cover">
+                    <div class="flex flex-col">
+                        <span id="ui-greeting" class="text-sm font-bold truncate max-w-[150px]">Estudante</span>
+                        <span class="text-xs text-gray-500">Ver Perfil</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ÁREA DE CONTEÚDO PRINCIPAL -->
+        <main id="views-container" class="flex-1 h-full relative overflow-hidden bg-bgLight dark:bg-bgDark transition-colors duration-300">
             
             <!-- HOME TAB -->
-            <div id="tab-home" class="view-section active-view px-6">
-                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-6">O Teu Painel</h1>
-                <div id="home-widgets-container" class="flex flex-col gap-6"></div>
+            <div id="tab-home" class="view-section active-view h-full overflow-y-auto">
+                <div class="max-w-6xl mx-auto w-full p-10">
+                    <div class="flex justify-between items-end mb-10">
+                        <div>
+                            <h1 class="text-4xl font-extrabold tracking-tight mb-2">O Teu Painel</h1>
+                            <p class="text-gray-500 font-medium">Resumo do teu dia académico.</p>
+                        </div>
+                        <p class="font-bold text-gray-400" id="current-date"></p>
+                    </div>
+                    
+                    <!-- Grelha de Widgets Desktop -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" id="home-widgets-container">
+                        <!-- Gerado via JS -->
+                    </div>
+
+                    <div class="mt-12 grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fa-solid fa-list-check text-primary"></i> Próximas Tarefas</h2>
+                            <div id="home-tasks-list" class="flex flex-col gap-4"></div>
+                        </div>
+                        <div>
+                            <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fa-solid fa-calendar-day text-danger"></i> Aulas de Hoje</h2>
+                            <div id="home-aulas-list" class="flex flex-col gap-4"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <!-- AULAS TAB -->
-            <div id="tab-aulas" class="view-section px-6">
-                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-6">As Tuas Aulas</h1>
-                <div id="aulas-list" class="flex flex-col gap-4"></div>
-                <button onclick="openModal('modal-aula')" class="fixed bottom-28 right-6 w-16 h-16 bg-content text-background rounded-2xl flex items-center justify-center shadow-lg z-30">
-                    <i class="fa-solid fa-plus text-2xl"></i>
-                </button>
+            <div id="tab-aulas" class="view-section h-full overflow-y-auto">
+                <div class="max-w-5xl mx-auto w-full p-10">
+                    <div class="flex justify-between items-center mb-10">
+                        <h1 class="text-4xl font-extrabold tracking-tight">As Tuas Aulas</h1>
+                        <button onclick="openModal('modal-aula')" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition flex items-center gap-2 shadow-lg shadow-primary/30">
+                            <i class="fa-solid fa-plus"></i> Adicionar Aula
+                        </button>
+                    </div>
+                    <!-- Grelha de Aulas Desktop -->
+                    <div id="aulas-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                </div>
             </div>
 
-            <!-- IA TAB -->
-            <div id="tab-ia" class="view-section">
-                <div class="px-6 pt-12 pb-4 border-b border-content/5 flex items-center gap-4 bg-background sticky top-0 z-20">
-                    <div class="w-12 h-12 rounded-full bg-white flex items-center justify-center"><i class="fa-solid fa-graduation-cap text-black text-xl"></i></div>
-                    <div>
-                        <h2 class="text-xl font-bold text-content">Organiza IA</h2>
-                        <p class="text-xs font-semibold text-success" id="ia-status">Sempre online (Groq)</p>
+            <!-- TAREFAS TAB -->
+            <div id="tab-tarefas" class="view-section h-full overflow-y-auto">
+                <div class="max-w-5xl mx-auto w-full p-10">
+                    <div class="flex justify-between items-center mb-10">
+                        <h1 class="text-4xl font-extrabold tracking-tight">Gerenciador de Tarefas</h1>
+                        <button onclick="openModal('modal-tarefa')" class="bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition flex items-center gap-2 shadow-lg shadow-primary/30">
+                            <i class="fa-solid fa-plus"></i> Nova Tarefa
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-4 mb-8 bg-surfaceLight dark:bg-surfaceDark p-2 rounded-2xl w-fit">
+                        <button class="px-6 py-2 rounded-xl bg-bgLight dark:bg-bgDark font-bold shadow-sm" id="btn-tab-pendentes" onclick="filterTasks('pendentes')">Pendentes</button>
+                        <button class="px-6 py-2 rounded-xl text-gray-500 font-bold hover:text-black dark:hover:text-white transition" id="btn-tab-concluidas" onclick="filterTasks('concluidas')">Concluídas</button>
+                    </div>
+
+                    <div id="lista-tarefas" class="flex flex-col gap-4"></div>
+                </div>
+            </div>
+
+            <!-- FINANÇAS TAB -->
+            <div id="tab-financas" class="view-section h-full overflow-y-auto">
+                <div class="max-w-5xl mx-auto w-full p-10">
+                    <div class="flex justify-between items-center mb-10">
+                        <h1 class="text-4xl font-extrabold tracking-tight">Finanças Pessoais</h1>
+                        <button onclick="openModal('modal-financa')" class="bg-success text-white px-6 py-3 rounded-xl font-bold hover:bg-green-600 transition flex items-center gap-2 shadow-lg shadow-success/30">
+                            <i class="fa-solid fa-plus"></i> Nova Transação
+                        </button>
+                    </div>
+                    
+                    <div class="bg-surfaceLight dark:bg-surfaceDark rounded-[32px] p-8 mb-10 flex justify-between items-center border border-black/5 dark:border-white/5">
+                        <div>
+                            <p class="text-gray-500 font-bold tracking-wider uppercase text-sm mb-2">Saldo Atual</p>
+                            <h1 class="text-5xl font-extrabold" id="fin-saldo">R$ 0,00</h1>
+                        </div>
+                        <div class="flex gap-8">
+                            <div class="text-right">
+                                <p class="text-success font-bold text-sm mb-1"><i class="fa-solid fa-arrow-up"></i> Receitas</p>
+                                <p class="text-2xl font-bold" id="fin-receitas">R$ 0,00</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-danger font-bold text-sm mb-1"><i class="fa-solid fa-arrow-down"></i> Despesas</p>
+                                <p class="text-2xl font-bold" id="fin-despesas">R$ 0,00</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="text-xl font-bold mb-4">Histórico Recente</h2>
+                    <div id="lista-financas" class="flex flex-col gap-3"></div>
+                </div>
+            </div>
+
+            <!-- ANOTAÇÕES TAB -->
+            <div id="tab-anotacoes" class="view-section h-full overflow-y-auto">
+                <div class="max-w-6xl mx-auto w-full p-10">
+                    <div class="flex justify-between items-center mb-10">
+                        <h1 class="text-4xl font-extrabold tracking-tight">Bloco de Anotações</h1>
+                        <button onclick="openModal('modal-nota')" class="bg-accent text-white px-6 py-3 rounded-xl font-bold hover:bg-purple-600 transition flex items-center gap-2 shadow-lg shadow-accent/30">
+                            <i class="fa-solid fa-plus"></i> Nova Nota
+                        </button>
+                    </div>
+                    <!-- Grelha estilo Pinterest para notas no Desktop -->
+                    <div class="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6" id="lista-notas"></div>
+                </div>
+            </div>
+
+            <!-- MODO FOCO TAB -->
+            <div id="tab-foco" class="view-section h-full flex flex-col justify-center items-center">
+                <h1 class="text-4xl font-extrabold tracking-tight mb-12">Modo Foco</h1>
+                
+                <div class="relative w-96 h-96 rounded-full border-[20px] border-surfaceLight dark:border-surfaceDark flex items-center justify-center mb-16 shadow-2xl">
+                    <div class="flex flex-col items-center">
+                        <i class="fa-solid fa-stopwatch text-foco text-5xl mb-4"></i>
+                        <span id="foco-timer" class="text-8xl font-light tracking-tighter">25:00</span>
                     </div>
                 </div>
-                <div id="ia-chat" class="flex-1 p-6 flex flex-col gap-4 pb-28"></div>
-                <div class="fixed bottom-24 w-full px-6 z-20">
-                    <div class="relative flex items-center bg-surface rounded-[24px] p-2">
-                        <input type="text" id="ia-input" placeholder="Pede à IA para criar uma tarefa..." class="w-full bg-transparent p-3 text-content outline-none">
-                        <button id="btn-ia-send" class="w-10 h-10 bg-accent rounded-full flex items-center justify-center shrink-0">
-                            <i class="fa-solid fa-paper-plane text-white"></i>
+                
+                <div class="flex gap-4 mb-16 w-full max-w-md">
+                    <button class="flex-1 py-4 rounded-2xl bg-surfaceLight dark:bg-surfaceDark font-bold hover:bg-foco hover:text-white transition" onclick="setFoco(15)">15 min</button>
+                    <button class="flex-1 py-4 rounded-2xl bg-foco text-white font-bold shadow-lg shadow-foco/30" onclick="setFoco(25)">25 min</button>
+                    <button class="flex-1 py-4 rounded-2xl bg-surfaceLight dark:bg-surfaceDark font-bold hover:bg-foco hover:text-white transition" onclick="setFoco(50)">50 min</button>
+                </div>
+                
+                <div class="flex gap-8 items-center">
+                    <button onclick="resetFoco()" class="w-20 h-20 rounded-full bg-surfaceLight dark:bg-surfaceDark flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-800 transition"><i class="fa-solid fa-stop text-3xl"></i></button>
+                    <button id="btn-play-foco" class="w-32 h-32 rounded-full bg-gradient-to-r from-foco to-[#00A29A] flex items-center justify-center shadow-2xl hover:scale-105 transition-transform">
+                        <i class="fa-solid fa-play text-white text-5xl ml-2" id="foco-icon"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CALCULADORA TAB -->
+            <div id="tab-calculadora" class="view-section h-full flex flex-col justify-center items-center">
+                <div class="w-full max-w-md bg-surfaceLight dark:bg-surfaceDark p-8 rounded-[40px] shadow-2xl border border-black/5 dark:border-white/5">
+                    <h2 class="text-xl font-bold mb-6 text-center text-gray-500 uppercase tracking-widest">Calculadora Pro</h2>
+                    <div class="flex flex-col justify-end items-end mb-8 bg-bgLight dark:bg-bgDark p-6 rounded-3xl h-32 border border-black/5 dark:border-white/5">
+                        <p id="calc-exp" class="text-xl font-medium text-gray-400 break-all"></p>
+                        <p id="calc-res" class="text-5xl font-bold text-primary mt-2 break-all">0</p>
+                    </div>
+                    <div class="grid grid-cols-4 gap-4">
+                        <button class="py-4 bg-danger/10 text-danger rounded-2xl text-2xl font-bold hover:bg-danger hover:text-white transition" onclick="calc('C')">C</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('(')">(</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc(')')">)</button>
+                        <button class="py-4 bg-primary/10 text-primary rounded-2xl text-3xl font-bold hover:bg-primary hover:text-white transition" onclick="calc('/')">÷</button>
+                        
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('7')">7</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('8')">8</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('9')">9</button>
+                        <button class="py-4 bg-primary/10 text-primary rounded-2xl text-3xl font-bold hover:bg-primary hover:text-white transition" onclick="calc('*')">×</button>
+                        
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('4')">4</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('5')">5</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('6')">6</button>
+                        <button class="py-4 bg-primary/10 text-primary rounded-2xl text-4xl font-bold hover:bg-primary hover:text-white transition" onclick="calc('-')">-</button>
+                        
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('1')">1</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('2')">2</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('3')">3</button>
+                        <button class="py-4 bg-primary/10 text-primary rounded-2xl text-3xl font-bold hover:bg-primary hover:text-white transition" onclick="calc('+')">+</button>
+                        
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('0')">0</button>
+                        <button class="py-4 bg-bgLight dark:bg-bgDark rounded-2xl text-2xl font-bold hover:bg-gray-200 dark:hover:bg-gray-800 transition" onclick="calc('.')">.</button>
+                        <button class="py-4 bg-danger/10 text-danger rounded-2xl text-2xl font-bold hover:bg-danger hover:text-white transition" onclick="calc('DEL')">⌫</button>
+                        <button class="py-4 bg-primary text-white rounded-2xl text-3xl font-bold shadow-lg hover:bg-blue-600 transition" onclick="calc('=')">=</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- IA TAB (LAYOUT ESPECÍFICO DE DESKTOP CHAT) -->
+            <div id="tab-ia" class="view-section h-full flex flex-col relative bg-surfaceLight dark:bg-surfaceDark">
+                <!-- Header IA -->
+                <div class="px-10 py-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between bg-surfaceLight dark:bg-surfaceDark shrink-0">
+                    <div class="flex items-center gap-4">
+                        <div class="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center shadow-lg shadow-accent/30"><i class="fa-solid fa-wand-magic-sparkles text-xl"></i></div>
+                        <div>
+                            <h2 class="text-2xl font-extrabold">Organiza IA</h2>
+                            <p class="text-sm font-bold text-success" id="ia-status"><i class="fa-solid fa-circle text-[10px] mr-1"></i> Sempre online (Groq LLaMA 3)</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Área de Mensagens -->
+                <div id="ia-chat" class="flex-1 p-10 flex flex-col gap-6 overflow-y-auto bg-bgLight dark:bg-bgDark"></div>
+                <!-- Input Area (Fixed at bottom of this view) -->
+                <div class="p-6 bg-surfaceLight dark:bg-surfaceDark border-t border-black/5 dark:border-white/5 shrink-0">
+                    <div class="max-w-4xl mx-auto relative flex items-center bg-bgLight dark:bg-bgDark rounded-2xl border border-black/10 dark:border-white/10 shadow-sm focus-within:border-accent focus-within:ring-2 focus-within:ring-accent/20 transition-all p-2">
+                        <input type="text" id="ia-input" placeholder="Pede à IA para criar uma tarefa, nota ou apagar algo..." class="w-full bg-transparent py-3 pl-4 pr-16 outline-none text-lg">
+                        <button id="btn-ia-send" class="absolute right-2 w-12 h-12 bg-accent rounded-xl flex items-center justify-center hover:bg-purple-600 transition shadow-lg shadow-accent/30">
+                            <i class="fa-solid fa-paper-plane text-white text-lg"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- FERRAMENTAS TAB -->
-            <div id="tab-ferramentas" class="view-section px-6">
-                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-2">Menu de Extras</h1>
-                <p class="text-content opacity-50 text-sm mb-6">Tudo o que precisas para o teu dia a dia.</p>
-                
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('financas')">
-                        <div class="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center"><i class="fa-solid fa-dollar-sign text-success text-2xl"></i></div>
-                        <span class="font-bold text-sm">Finanças</span>
+            <!-- PROFILE TAB -->
+            <div id="tab-profile" class="view-section h-full overflow-y-auto">
+                <div class="max-w-3xl mx-auto w-full p-10">
+                    <h1 class="text-4xl font-extrabold tracking-tight mb-10">Meu Perfil</h1>
+                    
+                    <div class="bg-surfaceLight dark:bg-surfaceDark rounded-[32px] p-10 flex flex-col items-center border border-black/5 dark:border-white/5 shadow-sm mb-8">
+                        <img id="prof-avatar-large" src="" class="w-40 h-40 rounded-full border-4 border-primary object-cover mb-6 shadow-xl">
+                        <h2 class="text-3xl font-extrabold mb-2" id="prof-name-large">Nome</h2>
+                        <p class="text-lg text-gray-500 font-medium mb-1" id="prof-uni-large">Universidade</p>
+                        <p class="text-gray-400 font-medium" id="prof-course-large">Curso - Semestre</p>
                     </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('tarefas')">
-                        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center"><i class="fa-solid fa-list-check text-primary text-2xl"></i></div>
-                        <span class="font-bold text-sm">Tarefas</span>
-                    </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('anotacoes')">
-                        <div class="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center"><i class="fa-solid fa-note-sticky text-accent text-2xl"></i></div>
-                        <span class="font-bold text-sm">Anotações</span>
-                    </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('calculadora')">
-                        <div class="w-14 h-14 rounded-full bg-[#B14AE2]/10 flex items-center justify-center"><i class="fa-solid fa-calculator text-[#B14AE2] text-2xl"></i></div>
-                        <span class="font-bold text-sm">Calculadora</span>
-                    </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('foco')">
-                        <div class="w-14 h-14 rounded-full bg-foco/10 flex items-center justify-center"><i class="fa-solid fa-stopwatch text-foco text-2xl"></i></div>
-                        <span class="font-bold text-sm">Modo Foco</span>
-                    </div>
-                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="openSubView('circular')">
-                        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center"><i class="fa-solid fa-bus text-primary text-2xl"></i></div>
-                        <span class="font-bold text-sm">Circular</span>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <!-- NAVBAR INFERIOR -->
-        <nav id="bottom-nav" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] liquid-glass rounded-[32px] flex justify-around items-center py-3 z-40">
-            <button onclick="switchTab('home')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-100" data-target="home">
-                <i class="fa-solid fa-border-all text-2xl"></i><span class="text-[10px] font-bold">Início</span>
-            </button>
-            <button onclick="switchTab('aulas')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 hover:opacity-100" data-target="aulas">
-                <i class="fa-solid fa-calendar-days text-2xl"></i><span class="text-[10px] font-bold">Aulas</span>
-            </button>
-            <button onclick="switchTab('ia')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 hover:opacity-100" data-target="ia">
-                <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i><span class="text-[10px] font-bold">IA</span>
-            </button>
-            <button onclick="switchTab('ferramentas')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 hover:opacity-100" data-target="ferramentas">
-                <i class="fa-solid fa-layer-group text-2xl"></i><span class="text-[10px] font-bold">Menu</span>
-            </button>
-        </nav>
-    </div>
-
-    <!-- ================= SUB-VIEWS (ECRÃS COMPLETOS) ================= -->
-    
-    <!-- TAREFAS -->
-    <div id="sub-tarefas" class="sub-view">
-        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
-            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
-            <h2 class="text-xl font-bold">Gerenciador de Tarefas</h2>
-        </div>
-        <div class="px-6 flex flex-col gap-4" id="lista-tarefas"></div>
-        <button onclick="openModal('modal-tarefa')" class="fixed bottom-8 right-6 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white z-30">
-            <i class="fa-solid fa-plus text-2xl"></i>
-        </button>
-    </div>
-
-    <!-- FINANÇAS -->
-    <div id="sub-financas" class="sub-view">
-        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
-            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
-            <h2 class="text-xl font-bold">Finanças Pessoais</h2>
-        </div>
-        <div class="px-6">
-            <div class="bg-surface rounded-3xl p-6 mb-6">
-                <p class="text-sm opacity-60 font-semibold mb-2">Saldo Atual</p>
-                <h1 class="text-4xl font-extrabold" id="fin-saldo">R$ 0,00</h1>
-            </div>
-            <h3 class="font-bold text-lg mb-4">Histórico</h3>
-            <div id="lista-financas" class="flex flex-col gap-4"></div>
-        </div>
-        <button onclick="openModal('modal-financa')" class="fixed bottom-8 right-6 w-16 h-16 bg-content text-background rounded-2xl flex items-center justify-center z-30">
-            <i class="fa-solid fa-plus text-2xl"></i>
-        </button>
-    </div>
-
-    <!-- ANOTAÇÕES -->
-    <div id="sub-anotacoes" class="sub-view">
-        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
-            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
-            <h2 class="text-xl font-bold">Anotações</h2>
-        </div>
-        <div class="px-6 grid grid-cols-2 gap-4" id="lista-notas"></div>
-        <button onclick="openModal('modal-nota')" class="fixed bottom-8 right-6 w-16 h-16 bg-accent text-white rounded-2xl flex items-center justify-center z-30">
-            <i class="fa-solid fa-plus text-2xl"></i>
-        </button>
-    </div>
-
-    <!-- MODO FOCO -->
-    <div id="sub-foco" class="sub-view items-center">
-        <div class="w-full px-6 pt-12 pb-4 flex items-center gap-4">
-            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
-            <h2 class="text-xl font-bold">Modo Foco</h2>
-        </div>
-        <div class="flex-1 flex flex-col items-center justify-center w-full px-6 pb-20">
-            <div class="relative w-72 h-72 rounded-full border-[16px] border-surface flex items-center justify-center mb-12 shadow-2xl">
-                <div class="flex flex-col items-center">
-                    <i class="fa-solid fa-stopwatch text-foco text-4xl mb-2"></i>
-                    <span id="foco-timer" class="text-6xl font-light tracking-tighter">30:00</span>
-                </div>
-            </div>
-            <div class="flex gap-4 mb-16 w-full max-w-sm">
-                <button class="flex-1 py-3 rounded-2xl bg-surface font-bold" onclick="setFoco(5)">5m</button>
-                <button class="flex-1 py-3 rounded-2xl bg-surface font-bold" onclick="setFoco(30)">30m</button>
-                <button class="flex-1 py-3 rounded-2xl bg-surface font-bold" onclick="setFoco(60)">1h</button>
-            </div>
-            <div class="flex gap-8 items-center">
-                <button onclick="resetFoco()" class="w-16 h-16 rounded-full bg-surface flex items-center justify-center"><i class="fa-solid fa-stop text-2xl"></i></button>
-                <button id="btn-play-foco" class="w-24 h-24 rounded-full bg-gradient-to-r from-foco to-[#00A29A] flex items-center justify-center shadow-lg shadow-foco/30">
-                    <i class="fa-solid fa-play text-white text-4xl ml-1" id="foco-icon"></i>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- CALCULADORA -->
-    <div id="sub-calculadora" class="sub-view">
-        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
-            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
-            <h2 class="text-xl font-bold">Calculadora Pro</h2>
-        </div>
-        <div class="flex-1 flex flex-col px-6 pb-8">
-            <div class="flex-1 flex flex-col justify-end items-end mb-6">
-                <p id="calc-exp" class="text-3xl font-light opacity-50 break-all"></p>
-                <p id="calc-res" class="text-5xl font-bold text-primary mt-2 break-all">0</p>
-            </div>
-            <div class="grid grid-cols-4 gap-3 h-[60%]">
-                <button class="bg-danger/20 text-danger rounded-[32px] text-2xl font-bold" onclick="calc('C')">C</button>
-                <button class="bg-surface rounded-[32px] text-2xl font-bold" onclick="calc('(')">(</button>
-                <button class="bg-surface rounded-[32px] text-2xl font-bold" onclick="calc(')')">)</button>
-                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('/')">÷</button>
-                
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('7')">7</button>
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('8')">8</button>
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('9')">9</button>
-                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('*')">×</button>
-                
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('4')">4</button>
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('5')">5</button>
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('6')">6</button>
-                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('-')">-</button>
-                
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('1')">1</button>
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('2')">2</button>
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('3')">3</button>
-                <button class="bg-primary/20 text-primary rounded-[32px] text-3xl font-bold" onclick="calc('+')">+</button>
-                
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('0')">0</button>
-                <button class="bg-surface rounded-[32px] text-3xl font-bold" onclick="calc('.')">.</button>
-                <button class="bg-danger/20 text-danger rounded-[32px] text-2xl font-bold" onclick="calc('DEL')">⌫</button>
-                <button class="bg-primary text-white rounded-[32px] text-3xl font-bold shadow-lg" onclick="calc('=')">=</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- PROFILE E SETTINGS -->
-    <div id="sub-profile" class="sub-view">
-        <div class="px-6 pt-12 pb-4 flex items-center justify-between">
-            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
-            <h2 class="text-xl font-bold">Meu Perfil</h2>
-            <i class="fa-solid fa-gear text-xl cursor-pointer" onclick="openSubView('settings')"></i>
-        </div>
-        <div class="px-6 flex flex-col items-center">
-            <img id="prof-avatar" src="" class="w-32 h-32 rounded-full border-4 border-accent object-cover mb-4">
-            <h2 class="text-2xl font-bold mb-1" id="prof-name">Nome</h2>
-            <p class="opacity-50 mb-8" id="prof-uni">Universidade</p>
-            
-            <div class="w-full bg-surface rounded-3xl p-6 flex flex-col gap-4">
-                <h3 class="font-bold text-lg mb-2">Aparência</h3>
-                <div class="flex justify-between items-center p-4 bg-background rounded-xl cursor-pointer" onclick="setTheme('Claro')">
-                    <div class="flex gap-4 items-center"><i class="fa-solid fa-sun"></i><span>Modo Claro</span></div>
-                </div>
-                <div class="flex justify-between items-center p-4 bg-background rounded-xl cursor-pointer" onclick="setTheme('Escuro')">
-                    <div class="flex gap-4 items-center"><i class="fa-solid fa-moon"></i><span>Modo Escuro</span></div>
+                    <button onclick="logout()" class="w-full bg-danger/10 text-danger hover:bg-danger hover:text-white transition font-bold py-4 rounded-2xl text-lg flex items-center justify-center gap-3">
+                        <i class="fa-solid fa-right-from-bracket"></i> Terminar Sessão
+                    </button>
                 </div>
             </div>
 
-            <button onclick="logout()" class="w-full mt-8 bg-danger/10 text-danger font-bold py-4 rounded-2xl"><i class="fa-solid fa-right-from-bracket mr-2"></i> Sair da conta</button>
-        </div>
-    </div>
-
-    <!-- CIRCULAR -->
-    <div id="sub-circular" class="sub-view">
-        <div class="px-6 pt-12 pb-4 flex items-center gap-4">
-            <i class="fa-solid fa-arrow-left text-xl cursor-pointer" onclick="closeSubView()"></i>
-            <h2 class="text-xl font-bold">Circular UFRB</h2>
-        </div>
-        <div class="px-6 flex flex-col gap-4" id="circular-list">
-            <!-- Gerado via JS -->
-        </div>
-    </div>
-
-
-    <!-- ================= MODAIS ================= -->
-    <div id="modal-tarefa" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
-        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
-            <h3 class="text-xl font-bold mb-6">Nova Tarefa</h3>
-            <input type="text" id="t-titulo" placeholder="Título" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none">
-            <select id="t-prio" class="w-full bg-background rounded-2xl p-4 mb-6 text-content outline-none appearance-none">
-                <option value="Baixa">Baixa Prioridade</option>
-                <option value="Média" selected>Média Prioridade</option>
-                <option value="Alta">Alta Prioridade</option>
-            </select>
-            <div class="flex gap-4">
-                <button onclick="closeModal('modal-tarefa')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
-                <button onclick="saveTarefa()" class="flex-1 bg-primary text-white py-4 rounded-2xl font-bold">Salvar</button>
+            <!-- CIRCULAR TAB -->
+            <div id="tab-circular" class="view-section h-full overflow-y-auto">
+                <div class="max-w-5xl mx-auto w-full p-10">
+                    <h1 class="text-4xl font-extrabold tracking-tight mb-2">Circular UFRB</h1>
+                    <p class="text-gray-500 mb-10">Acompanha os horários dos autocarros no campus.</p>
+                    <div id="circular-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Gerado via JS -->
+                    </div>
+                </div>
             </div>
-        </div>
+
+        </main>
     </div>
 
-    <div id="modal-aula" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
-        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
-            <h3 class="text-xl font-bold mb-6">Nova Aula</h3>
-            <input type="text" id="a-mat" placeholder="Matéria" class="w-full bg-background rounded-2xl p-3 mb-3 text-content outline-none">
-            <input type="text" id="a-prof" placeholder="Professor" class="w-full bg-background rounded-2xl p-3 mb-3 text-content outline-none">
-            <input type="text" id="a-loc" placeholder="Local" class="w-full bg-background rounded-2xl p-3 mb-3 text-content outline-none">
-            <div class="flex gap-3 mb-3">
-                <select id="a-dia" class="flex-1 bg-background rounded-2xl p-3 text-content outline-none appearance-none">
-                    <option value="Seg">Segunda</option><option value="Ter">Terça</option><option value="Qua">Quarta</option>
-                    <option value="Qui">Quinta</option><option value="Sex">Sexta</option><option value="Sáb">Sábado</option>
-                </select>
-            </div>
-            <div class="flex gap-3 mb-6">
-                <input type="time" id="a-ini" class="flex-1 bg-background rounded-2xl p-3 text-content outline-none" value="08:00">
-                <input type="time" id="a-fim" class="flex-1 bg-background rounded-2xl p-3 text-content outline-none" value="10:00">
+
+    <!-- ================= MODAIS DESKTOP ================= -->
+    <div id="modal-tarefa" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center backdrop-blur-sm transition-opacity">
+        <div class="bg-surfaceLight dark:bg-surfaceDark w-full max-w-lg rounded-[32px] p-8 shadow-2xl border border-black/10 dark:border-white/10 transform scale-100">
+            <h3 class="text-2xl font-extrabold mb-6">Nova Tarefa</h3>
+            <input type="text" id="t-titulo" placeholder="O que precisas de fazer?" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mb-4 outline-none border border-black/5 dark:border-white/5 focus:border-primary">
+            <input type="text" id="t-desc" placeholder="Descrição (Opcional)" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mb-4 outline-none border border-black/5 dark:border-white/5 focus:border-primary">
+            <div class="flex gap-4 mb-8">
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Prioridade</label>
+                    <select id="t-prio" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/5 dark:border-white/5">
+                        <option value="Baixa">Baixa</option>
+                        <option value="Média" selected>Média</option>
+                        <option value="Alta">Alta</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Data</label>
+                    <input type="date" id="t-data" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/5 dark:border-white/5">
+                </div>
             </div>
             <div class="flex gap-4">
-                <button onclick="closeModal('modal-aula')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
-                <button onclick="saveAula()" class="flex-1 bg-content text-background py-4 rounded-2xl font-bold">Salvar</button>
+                <button onclick="closeModal('modal-tarefa')" class="flex-1 bg-gray-200 dark:bg-gray-800 text-black dark:text-white py-4 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-700 transition">Cancelar</button>
+                <button onclick="saveTarefa()" class="flex-1 bg-primary text-white py-4 rounded-xl font-bold shadow-lg shadow-primary/30 hover:bg-blue-600 transition">Guardar</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-financa" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
-        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
-            <h3 class="text-xl font-bold mb-6">Nova Transação</h3>
-            <input type="text" id="f-tit" placeholder="Título (Ex: Lanche)" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none">
-            <input type="number" id="f-val" placeholder="Valor (Ex: 15.50)" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none">
-            <select id="f-tip" class="w-full bg-background rounded-2xl p-4 mb-6 text-content outline-none appearance-none">
-                <option value="Despesa">Despesa (-)</option>
-                <option value="Receita">Receita (+)</option>
-            </select>
+    <div id="modal-aula" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center backdrop-blur-sm transition-opacity">
+        <div class="bg-surfaceLight dark:bg-surfaceDark w-full max-w-lg rounded-[32px] p-8 shadow-2xl border border-black/10 dark:border-white/10">
+            <h3 class="text-2xl font-extrabold mb-6">Adicionar Aula</h3>
+            <input type="text" id="a-mat" placeholder="Nome da Matéria (Ex: Cálculo I)" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mb-4 outline-none border border-black/5 dark:border-white/5 focus:border-primary">
+            <div class="flex gap-4 mb-4">
+                <input type="text" id="a-prof" placeholder="Professor" class="flex-1 bg-bgLight dark:bg-bgDark rounded-xl p-4 outline-none border border-black/5 dark:border-white/5 focus:border-primary">
+                <input type="text" id="a-loc" placeholder="Local/Sala" class="flex-1 bg-bgLight dark:bg-bgDark rounded-xl p-4 outline-none border border-black/5 dark:border-white/5 focus:border-primary">
+            </div>
+            <div class="flex gap-4 mb-8">
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Dia</label>
+                    <select id="a-dia" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/5 dark:border-white/5">
+                        <option value="Seg">Segunda</option><option value="Ter">Terça</option><option value="Qua">Quarta</option>
+                        <option value="Qui">Quinta</option><option value="Sex">Sexta</option><option value="Sáb">Sábado</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Início</label>
+                    <input type="time" id="a-ini" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/5 dark:border-white/5" value="08:00">
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Fim</label>
+                    <input type="time" id="a-fim" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/5 dark:border-white/5" value="10:00">
+                </div>
+            </div>
             <div class="flex gap-4">
-                <button onclick="closeModal('modal-financa')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
-                <button onclick="saveFinanca()" class="flex-1 bg-success text-white py-4 rounded-2xl font-bold">Salvar</button>
+                <button onclick="closeModal('modal-aula')" class="flex-1 bg-gray-200 dark:bg-gray-800 text-black dark:text-white py-4 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-700 transition">Cancelar</button>
+                <button onclick="saveAula()" class="flex-1 bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold shadow-lg hover:scale-105 transition">Adicionar à Agenda</button>
             </div>
         </div>
     </div>
 
-    <div id="modal-nota" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
-        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
-            <h3 class="text-xl font-bold mb-6">Nova Anotação</h3>
-            <input type="text" id="n-tit" placeholder="Título" class="w-full bg-background rounded-2xl p-4 mb-4 text-content outline-none font-bold">
-            <textarea id="n-txt" placeholder="Escreve algo..." class="w-full bg-background rounded-2xl p-4 mb-6 text-content outline-none h-40 resize-none"></textarea>
+    <div id="modal-financa" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center backdrop-blur-sm transition-opacity">
+        <div class="bg-surfaceLight dark:bg-surfaceDark w-full max-w-lg rounded-[32px] p-8 shadow-2xl border border-black/10 dark:border-white/10">
+            <h3 class="text-2xl font-extrabold mb-6">Nova Transação</h3>
+            <input type="text" id="f-tit" placeholder="Título (Ex: Almoço)" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mb-4 outline-none border border-black/5 dark:border-white/5 focus:border-success">
+            <div class="flex gap-4 mb-8">
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Valor (R$)</label>
+                    <input type="number" id="f-val" placeholder="0.00" step="0.01" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/5 dark:border-white/5 focus:border-success">
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Tipo</label>
+                    <select id="f-tip" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mt-1 outline-none border border-black/5 dark:border-white/5">
+                        <option value="Despesa">Despesa (-)</option>
+                        <option value="Receita">Receita (+)</option>
+                    </select>
+                </div>
+            </div>
             <div class="flex gap-4">
-                <button onclick="closeModal('modal-nota')" class="flex-1 bg-background py-4 rounded-2xl font-bold">Cancelar</button>
-                <button onclick="saveNota()" class="flex-1 bg-accent text-white py-4 rounded-2xl font-bold">Salvar</button>
+                <button onclick="closeModal('modal-financa')" class="flex-1 bg-gray-200 dark:bg-gray-800 text-black dark:text-white py-4 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-700 transition">Cancelar</button>
+                <button onclick="saveFinanca()" class="flex-1 bg-success text-white py-4 rounded-xl font-bold shadow-lg shadow-success/30 hover:bg-green-600 transition">Registar</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT PRINCIPAL -->
+    <div id="modal-nota" class="hidden fixed inset-0 bg-black/60 z-50 flex justify-center items-center backdrop-blur-sm transition-opacity">
+        <div class="bg-surfaceLight dark:bg-surfaceDark w-full max-w-2xl rounded-[32px] p-8 shadow-2xl border border-black/10 dark:border-white/10">
+            <h3 class="text-2xl font-extrabold mb-6">Nova Anotação</h3>
+            <input type="text" id="n-tit" placeholder="Título da Nota" class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mb-4 outline-none border border-black/5 dark:border-white/5 font-bold text-lg focus:border-accent">
+            <textarea id="n-txt" placeholder="Escreve o que te vier à cabeça..." class="w-full bg-bgLight dark:bg-bgDark rounded-xl p-4 mb-8 outline-none border border-black/5 dark:border-white/5 h-64 resize-none focus:border-accent"></textarea>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-nota')" class="flex-1 bg-gray-200 dark:bg-gray-800 text-black dark:text-white py-4 rounded-xl font-bold hover:bg-gray-300 dark:hover:bg-gray-700 transition">Cancelar</button>
+                <button onclick="saveNota()" class="flex-1 bg-accent text-white py-4 rounded-xl font-bold shadow-lg shadow-accent/30 hover:bg-purple-600 transition">Guardar Anotação</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT PRINCIPAL E LÓGICA -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
         import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, setDoc, getDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+        // CREDENCIAIS FIREBASE 
         const firebaseConfig = {
             apiKey: "AIzaSyA3g9gmFn-Uc_SoLHsVhH7eIwgzMOYmIAQ",
             authDomain: "organizaedu.firebaseapp.com",
@@ -455,42 +547,49 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // ESTADO GLOBAL
+        // ESTADO GLOBAL DA APLICAÇÃO
         window.state = {
             user: null, profile: null,
             tarefas: [], aulas: [], financas: [], anotacoes: [],
-            groqKey: "", theme: localStorage.getItem("theme") || "Escuro"
+            groqKey: "", 
+            theme: localStorage.getItem("theme") || "Escuro",
+            taskFilter: 'pendentes' // pendentes ou concluidas
         };
+
+        // Data Atual no Dashboard
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('pt-PT', options);
+
+        // --- SISTEMA DE TEMA CLARO/ESCURO ---
+        window.toggleTheme = () => { setTheme(state.theme === 'Escuro' ? 'Claro' : 'Escuro'); };
+        window.setTheme = t => {
+            state.theme = t; localStorage.setItem("theme", t);
+            if(t === 'Claro') document.documentElement.classList.remove('dark');
+            else document.documentElement.classList.add('dark');
+        };
+        setTheme(state.theme); // Apply immediately on load
 
         // --- UTILIDADES ---
         window.openModal = id => document.getElementById(id).classList.remove('hidden');
         window.closeModal = id => document.getElementById(id).classList.add('hidden');
-        window.setTheme = t => {
-            state.theme = t; localStorage.setItem("theme", t);
-            if(t === 'Claro') document.documentElement.classList.add('theme-light');
-            else document.documentElement.classList.remove('theme-light');
-        };
-        setTheme(state.theme); // Apply on load
 
-        // --- NAVEGAÇÃO ---
+        // --- NAVEGAÇÃO DESKTOP ---
         window.switchTab = function(tabId) {
+            // Esconde todas as views
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            // Mostra a view alvo
             document.getElementById('tab-' + tabId).classList.add('active-view');
-            document.getElementById('main-header').style.display = tabId === 'ia' ? 'none' : 'flex';
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                if(btn.dataset.target === tabId) { btn.classList.add('opacity-100'); btn.classList.remove('opacity-40'); }
-                else { btn.classList.add('opacity-40'); btn.classList.remove('opacity-100'); }
+            
+            // Atualiza botões da barra lateral
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                if(btn.getAttribute('onclick').includes(tabId)) { 
+                    btn.classList.add('active'); 
+                    btn.classList.remove('text-gray-500');
+                } else { 
+                    btn.classList.remove('active'); 
+                    btn.classList.add('text-gray-500');
+                }
             });
-        };
-
-        window.openSubView = function(id) {
-            document.getElementById('bottom-nav').style.display = 'none';
-            document.getElementById('sub-' + id).classList.add('active-sub');
-        };
-
-        window.closeSubView = function() {
-            document.querySelectorAll('.sub-view').forEach(el => el.classList.remove('active-sub'));
-            document.getElementById('bottom-nav').style.display = 'flex';
         };
 
         function showScreen(id) {
@@ -498,7 +597,7 @@
             document.getElementById('screen-' + id).classList.add('active-screen');
         }
 
-        // --- AUTENTICAÇÃO ---
+        // --- AUTENTICAÇÃO E INICIALIZAÇÃO ---
         onAuthStateChanged(auth, async (user) => {
             setTimeout(async () => {
                 if (user) {
@@ -506,11 +605,21 @@
                     const docSnap = await getDoc(doc(db, "users", user.uid));
                     if (docSnap.exists()) {
                         state.profile = docSnap.data();
-                        document.getElementById('ui-greeting').innerText = `Olá, ${state.profile.displayName.split(' ')[0]}`;
+                        
+                        // Atualizar UI com dados do perfil
+                        document.getElementById('ui-greeting').innerText = state.profile.displayName;
                         document.getElementById('ui-avatar').src = state.profile.profileImageUrl || `https://ui-avatars.com/api/?name=${state.profile.displayName}&background=1C1C1E&color=fff`;
-                        document.getElementById('prof-avatar').src = document.getElementById('ui-avatar').src;
-                        document.getElementById('prof-name').innerText = state.profile.displayName;
-                        document.getElementById('prof-uni').innerText = state.profile.university;
+                        document.getElementById('prof-avatar-large').src = document.getElementById('ui-avatar').src;
+                        document.getElementById('prof-name-large').innerText = state.profile.displayName;
+                        document.getElementById('prof-uni-large').innerText = state.profile.university;
+                        document.getElementById('prof-course-large').innerText = `${state.profile.course || 'Sem Curso'} - ${state.profile.semester || ''}`;
+
+                        // Mostra a aba "Circular" apenas se for da UFRB
+                        if (state.profile.university.includes("UFRB")) {
+                            document.getElementById('nav-circular').classList.remove('hidden');
+                            renderCircular(); // Renderiza os dados locais estáticos
+                        }
+
                         showScreen('app');
                         initRealtimeListeners();
                     } else {
@@ -519,122 +628,233 @@
                 } else {
                     showScreen('login');
                 }
-            }, 1000);
+            }, 1000); // Efeito estético de loading
         });
 
         document.getElementById('btn-login').addEventListener('click', () => signInWithPopup(auth, new GoogleAuthProvider()));
-        window.logout = () => { if(confirm("Sair?")) signOut(auth); };
+        window.logout = () => { if(confirm("Tem a certeza que deseja sair?")) signOut(auth); };
 
         document.getElementById('btn-save-setup').addEventListener('click', async () => {
             const name = document.getElementById('setup-name').value;
+            const user = document.getElementById('setup-user').value;
+            const crs = document.getElementById('setup-course').value;
+            const sem = document.getElementById('setup-sem').value;
             const uni = document.getElementById('setup-uni').value;
-            if(!name) return alert("Preenche o nome!");
-            const profileData = { displayName: name, university: uni, profileImageUrl: "" };
+            
+            if(!name || !user || !crs) return alert("Preencha todos os campos obrigatórios!");
+            
+            const profileData = { displayName: name, username: user, course: crs, semester: sem, university: uni, profileImageUrl: "" };
             await setDoc(doc(db, "users", state.user.uid), profileData);
             window.location.reload();
         });
 
-        // --- FIREBASE LISTENERS ---
+        // --- FIREBASE LISTENERS (TEMPO REAL) ---
         function initRealtimeListeners() {
+            // Obter chave da API Groq da base de dados
             getDoc(doc(db, "app_config", "keys")).then(d => { if(d.exists()) state.groqKey = d.data().groq || ""; });
 
             onSnapshot(query(collection(db, "users", state.user.uid, "tarefas"), orderBy("timestamp", "desc")), snap => {
-                state.tarefas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderTarefas(); renderHomeWidgets();
+                state.tarefas = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderTarefas(); renderHomeWidgets();
             });
             onSnapshot(collection(db, "users", state.user.uid, "aulas"), snap => {
-                state.aulas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAulas(); renderHomeWidgets();
+                state.aulas = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderAulas(); renderHomeWidgets();
             });
             onSnapshot(query(collection(db, "users", state.user.uid, "financas"), orderBy("timestamp", "desc")), snap => {
-                state.financas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderFinancas();
+                state.financas = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderFinancas();
             });
             onSnapshot(query(collection(db, "users", state.user.uid, "anotacoes"), orderBy("timestamp", "desc")), snap => {
-                state.anotacoes = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAnotacoes();
+                state.anotacoes = snap.docs.map(d => ({id: d.id, ...d.data()})); 
+                renderAnotacoes();
             });
         }
 
-        // --- RENDERS ---
+        // --- RENDERS DA INTERFACE ---
+        
         function renderHomeWidgets() {
             const cont = document.getElementById('home-widgets-container');
             const pendentes = state.tarefas.filter(t=>!t.concluida).length;
-            const aulasHoje = state.aulas.filter(a=>a.dia === "Seg").length; // Simplificação para web (sempre assume Seg ou filtra real)
+            const aulasTotais = state.aulas.length;
 
             cont.innerHTML = `
-                <div class="bg-surface rounded-[24px] p-5 cursor-pointer border border-content/5" onclick="openSubView('tarefas')">
-                    <div class="flex items-center justify-between mb-4"><span class="text-[10px] font-extrabold text-primary tracking-widest">TAREFAS</span><i class="fa-solid fa-list-check text-gray-500"></i></div>
-                    <h3 class="text-2xl font-bold">${pendentes} pendentes</h3>
-                    <p class="text-sm opacity-50">Toca para gerir</p>
+                <!-- Widget Tarefas -->
+                <div class="bg-surfaceLight dark:bg-surfaceDark rounded-3xl p-6 cursor-pointer border border-black/5 dark:border-white/5 hover:scale-105 transition-transform shadow-sm" onclick="switchTab('tarefas')">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xl"><i class="fa-solid fa-list-check"></i></div>
+                        <i class="fa-solid fa-arrow-right text-gray-300 dark:text-gray-600"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold mb-1">${pendentes}</h3>
+                    <p class="text-gray-500 font-medium">Tarefas Pendentes</p>
                 </div>
-                <div class="bg-surface rounded-[24px] p-5 cursor-pointer border border-content/5" onclick="switchTab('aulas')">
-                    <div class="flex items-center justify-between mb-4"><span class="text-[10px] font-extrabold text-danger tracking-widest">AULAS</span><i class="fa-solid fa-calendar text-gray-500"></i></div>
-                    <h3 class="text-2xl font-bold">${state.aulas.length} cadastradas</h3>
-                    <p class="text-sm opacity-50">Agenda completa</p>
+                <!-- Widget Aulas -->
+                <div class="bg-surfaceLight dark:bg-surfaceDark rounded-3xl p-6 cursor-pointer border border-black/5 dark:border-white/5 hover:scale-105 transition-transform shadow-sm" onclick="switchTab('aulas')">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-danger/10 flex items-center justify-center text-danger text-xl"><i class="fa-solid fa-calendar-day"></i></div>
+                        <i class="fa-solid fa-arrow-right text-gray-300 dark:text-gray-600"></i>
+                    </div>
+                    <h3 class="text-3xl font-extrabold mb-1">${aulasTotais}</h3>
+                    <p class="text-gray-500 font-medium">Aulas na Agenda</p>
+                </div>
+                <!-- Widget Foco -->
+                <div class="bg-surfaceLight dark:bg-surfaceDark rounded-3xl p-6 cursor-pointer border border-black/5 dark:border-white/5 hover:scale-105 transition-transform shadow-sm" onclick="switchTab('foco')">
+                    <div class="flex justify-between items-center mb-6">
+                        <div class="w-12 h-12 rounded-xl bg-foco/10 flex items-center justify-center text-foco text-xl"><i class="fa-solid fa-stopwatch"></i></div>
+                        <i class="fa-solid fa-arrow-right text-gray-300 dark:text-gray-600"></i>
+                    </div>
+                    <h3 class="text-2xl font-extrabold mb-1 mt-1">Iniciar Estudo</h3>
+                    <p class="text-gray-500 font-medium">Aceder ao Modo Foco</p>
                 </div>
             `;
+
+            // Mini lista na Home
+            const homeTasks = document.getElementById('home-tasks-list');
+            homeTasks.innerHTML = state.tarefas.filter(t=>!t.concluida).slice(0, 3).map(t => `
+                <div class="bg-surfaceLight dark:bg-surfaceDark p-4 rounded-2xl flex items-center gap-4 border border-black/5 dark:border-white/5">
+                    <div class="w-3 h-3 rounded-full ${t.prioridade === 'Alta' ? 'bg-danger' : (t.prioridade === 'Média' ? 'bg-warning' : 'bg-success')}"></div>
+                    <span class="font-bold flex-1 truncate">${t.titulo}</span>
+                </div>
+            `).join('') || '<p class="text-gray-500">Tudo em dia!</p>';
+
+            const homeAulas = document.getElementById('home-aulas-list');
+            homeAulas.innerHTML = state.aulas.slice(0, 3).map(a => `
+                <div class="bg-surfaceLight dark:bg-surfaceDark p-4 rounded-2xl flex items-center gap-4 border border-black/5 dark:border-white/5">
+                    <div class="w-1.5 h-10 rounded-full" style="background-color: ${a.corHex}"></div>
+                    <div>
+                        <p class="font-bold text-sm" style="color: ${a.corHex}">${a.inicio} - ${a.fim}</p>
+                        <p class="font-bold">${a.materia}</p>
+                    </div>
+                </div>
+            `).join('') || '<p class="text-gray-500">Nenhuma aula registada.</p>';
         }
+
+        window.filterTasks = (type) => {
+            state.taskFilter = type;
+            if(type === 'pendentes') {
+                document.getElementById('btn-tab-pendentes').classList.add('bg-bgLight', 'dark:bg-bgDark', 'text-black', 'dark:text-white', 'shadow-sm');
+                document.getElementById('btn-tab-pendentes').classList.remove('text-gray-500');
+                document.getElementById('btn-tab-concluidas').classList.add('text-gray-500');
+                document.getElementById('btn-tab-concluidas').classList.remove('bg-bgLight', 'dark:bg-bgDark', 'text-black', 'dark:text-white', 'shadow-sm');
+            } else {
+                document.getElementById('btn-tab-concluidas').classList.add('bg-bgLight', 'dark:bg-bgDark', 'text-black', 'dark:text-white', 'shadow-sm');
+                document.getElementById('btn-tab-concluidas').classList.remove('text-gray-500');
+                document.getElementById('btn-tab-pendentes').classList.add('text-gray-500');
+                document.getElementById('btn-tab-pendentes').classList.remove('bg-bgLight', 'dark:bg-bgDark', 'text-black', 'dark:text-white', 'shadow-sm');
+            }
+            renderTarefas();
+        };
 
         function renderTarefas() {
             const cont = document.getElementById('lista-tarefas');
-            cont.innerHTML = state.tarefas.map(t => `
-                <div class="bg-surface rounded-2xl p-5 flex items-center gap-4">
-                    <i class="fa-${t.concluida ? 'solid fa-circle-check text-success' : 'regular fa-circle text-content/30'} text-3xl cursor-pointer" onclick="toggleTask('${t.id}', ${t.concluida})"></i>
+            const filtradas = state.tarefas.filter(t => state.taskFilter === 'pendentes' ? !t.concluida : t.concluida);
+            
+            cont.innerHTML = filtradas.map(t => `
+                <div class="bg-surfaceLight dark:bg-surfaceDark rounded-3xl p-6 flex items-center gap-5 border border-black/5 dark:border-white/5 group transition-all hover:shadow-md">
+                    <i class="fa-${t.concluida ? 'solid fa-circle-check text-success' : 'regular fa-circle text-gray-400 dark:text-gray-600'} text-3xl cursor-pointer transition-transform hover:scale-110" onclick="toggleTask('${t.id}', ${t.concluida})"></i>
                     <div class="flex-1 ${t.concluida ? 'opacity-40 line-through' : ''}">
-                        <h4 class="font-bold text-lg">${t.titulo}</h4>
-                        <p class="text-xs opacity-60">${t.prioridade} • ${t.descricao || 'Sem descrição'}</p>
+                        <h4 class="font-extrabold text-xl mb-1">${t.titulo}</h4>
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-bold px-2 py-1 rounded-md bg-black/5 dark:bg-white/5 ${t.prioridade === 'Alta' ? 'text-danger' : (t.prioridade === 'Média' ? 'text-warning' : 'text-success')}">${t.prioridade}</span>
+                            ${t.descricao ? `<span class="text-sm text-gray-500 truncate max-w-[200px]">${t.descricao}</span>` : ''}
+                            ${t.data ? `<span class="text-xs text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${t.data}</span>` : ''}
+                        </div>
                     </div>
-                    <i class="fa-solid fa-trash text-danger opacity-50 cursor-pointer p-2" onclick="deleteTask('${t.id}')"></i>
+                    <button onclick="deleteTask('${t.id}')" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `).join('');
+
+            if(filtradas.length === 0) {
+                cont.innerHTML = `<div class="text-center mt-20"><i class="fa-solid fa-clipboard-check text-6xl text-gray-300 dark:text-gray-800 mb-4"></i><h3 class="text-xl font-bold text-gray-500">Tudo limpo por aqui!</h3></div>`;
+            }
         }
 
         function renderAulas() {
             document.getElementById('aulas-list').innerHTML = state.aulas.map(a => `
-                <div class="bg-surface rounded-2xl p-4 flex gap-4 items-center">
-                    <div class="w-2 h-12 rounded-full" style="background-color: ${a.corHex}"></div>
+                <div class="bg-surfaceLight dark:bg-surfaceDark rounded-3xl p-6 flex gap-6 items-center border border-black/5 dark:border-white/5 group">
+                    <div class="w-3 h-16 rounded-full" style="background-color: ${a.corHex || '#0A84FF'}"></div>
                     <div class="flex-1">
-                        <p class="text-xs font-bold" style="color: ${a.corHex}">${a.dia} | ${a.inicio} - ${a.fim}</p>
-                        <h4 class="font-bold text-lg">${a.materia}</h4>
-                        <p class="text-sm opacity-60">${a.professor} • ${a.local}</p>
+                        <p class="text-sm font-extrabold uppercase tracking-widest mb-1" style="color: ${a.corHex || '#0A84FF'}">${a.dia} &bull; ${a.inicio} às ${a.fim}</p>
+                        <h4 class="font-extrabold text-2xl mb-1">${a.materia}</h4>
+                        <p class="text-gray-500 font-medium"><i class="fa-solid fa-user-tie mr-1"></i> ${a.professor} &bull; <i class="fa-solid fa-location-dot ml-1 mr-1"></i> ${a.local}</p>
                     </div>
-                    <i class="fa-solid fa-trash text-danger opacity-50 cursor-pointer p-2" onclick="deleteAula('${t.id}')"></i>
+                    <button onclick="deleteAula('${a.id}')" class="w-12 h-12 rounded-full flex items-center justify-center text-gray-400 hover:text-danger hover:bg-danger/10 opacity-0 group-hover:opacity-100 transition-all"><i class="fa-solid fa-trash text-lg"></i></button>
                 </div>
             `).join('');
         }
 
         function renderFinancas() {
-            let saldo = 0;
+            let saldo = 0; let rec = 0; let des = 0;
             const html = state.financas.map(f => {
                 const isR = f.tipo === "Receita";
-                if(isR) saldo += f.valor; else saldo -= f.valor;
+                if(isR) { saldo += f.valor; rec += f.valor; } else { saldo -= f.valor; des += f.valor; }
                 return `
-                <div class="bg-surface rounded-2xl p-4 flex justify-between items-center">
+                <div class="bg-surfaceLight dark:bg-surfaceDark rounded-2xl p-5 flex justify-between items-center border border-black/5 dark:border-white/5 group">
                     <div class="flex items-center gap-4">
-                        <div class="w-10 h-10 rounded-full flex items-center justify-center bg-${isR?'success':'danger'}/10">
-                            <i class="fa-solid fa-arrow-${isR?'up text-success':'down text-danger'}"></i>
+                        <div class="w-12 h-12 rounded-xl flex items-center justify-center bg-${isR?'success':'danger'}/10">
+                            <i class="fa-solid fa-arrow-${isR?'up text-success':'down text-danger'} text-xl"></i>
                         </div>
-                        <div><h4 class="font-bold">${f.titulo}</h4><p class="text-xs opacity-50">${f.tipo}</p></div>
+                        <div>
+                            <h4 class="font-bold text-lg">${f.titulo}</h4>
+                            <p class="text-xs font-semibold text-gray-500 uppercase tracking-wider">${new Date(f.timestamp).toLocaleDateString()}</p>
+                        </div>
                     </div>
-                    <span class="font-bold text-${isR?'success':'danger'}">${isR?'+':'-'}R$ ${f.valor.toFixed(2)}</span>
+                    <div class="flex items-center gap-4">
+                        <span class="font-extrabold text-xl text-${isR?'success':'content'}">${isR?'+':'-'}R$ ${f.valor.toFixed(2)}</span>
+                        <button onclick="deleteFinanca('${f.id}')" class="text-gray-400 hover:text-danger opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                    </div>
                 </div>`
             }).join('');
             document.getElementById('lista-financas').innerHTML = html;
             document.getElementById('fin-saldo').innerText = `R$ ${saldo.toFixed(2)}`;
+            document.getElementById('fin-saldo').className = `text-5xl font-extrabold ${saldo >= 0 ? 'text-content' : 'text-danger'}`;
+            document.getElementById('fin-receitas').innerText = `R$ ${rec.toFixed(2)}`;
+            document.getElementById('fin-despesas').innerText = `R$ ${des.toFixed(2)}`;
         }
 
         function renderAnotacoes() {
             document.getElementById('lista-notas').innerHTML = state.anotacoes.map(n => `
-                <div class="rounded-2xl p-4 min-h-[120px] relative border border-content/10" style="background-color: ${n.corHex}; color: #000">
-                    <h4 class="font-bold mb-2 line-clamp-2">${n.titulo}</h4>
-                    <p class="text-xs opacity-70 line-clamp-4">${n.conteudo}</p>
+                <div class="rounded-3xl p-6 relative shadow-sm hover:shadow-md transition-shadow group break-inside-avoid" style="background-color: ${n.corHex === '#1C1C1E' || n.corHex === '#F2F2F7' ? 'var(--surface-color)' : n.corHex}; color: ${n.corHex === '#1C1C1E' || n.corHex === '#F2F2F7' ? 'var(--content-color)' : '#000'}">
+                    <h4 class="font-extrabold text-xl mb-3 pr-8">${n.titulo}</h4>
+                    <p class="text-sm opacity-80 leading-relaxed whitespace-pre-wrap">${n.conteudo}</p>
+                    <button onclick="deleteAnotacao('${n.id}')" class="absolute top-4 right-4 w-8 h-8 bg-black/10 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `).join('');
         }
 
-        // --- AÇÕES FIRESTORE DA UI ---
+        // Dados Estáticos do Circular da UFRB (Implementação exata da app nativa)
+        const busSchedule = [
+            { routeName: "Saída da Garagem p/ Campus", start: "06:25", end: "06:50" },
+            { routeName: "Circulando no Campus", start: "06:50", end: "07:10" },
+            { routeName: "Recolhe para Garagem", start: "07:55", end: "08:20" },
+            { routeName: "Saída da Garagem p/ Campus", start: "11:30", end: "11:55" },
+            { routeName: "Circulando no Campus", start: "11:55", end: "12:20" },
+            { routeName: "Recolhe para Garagem", start: "12:20", end: "12:45" },
+            { routeName: "Saída da Garagem p/ Campus", start: "17:30", end: "17:55" },
+            { routeName: "Circulando no Campus", start: "17:55", end: "18:15" },
+            { routeName: "Recolhe para Garagem", start: "22:30", end: "22:50" }
+        ];
+
+        function renderCircular() {
+            document.getElementById('circular-list').innerHTML = busSchedule.map(b => `
+                <div class="bg-surfaceLight dark:bg-surfaceDark rounded-3xl p-6 border border-black/5 dark:border-white/5 flex items-center gap-6">
+                    <div class="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-3xl"><i class="fa-solid fa-bus-simple"></i></div>
+                    <div>
+                        <span class="text-primary font-extrabold text-sm tracking-widest uppercase">${b.start} às ${b.end}</span>
+                        <h3 class="text-xl font-bold mt-1">${b.routeName}</h3>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // --- AÇÕES CRUD DO FIRESTORE VIA UI ---
         window.saveTarefa = async () => {
             const tit = document.getElementById('t-titulo').value;
+            const desc = document.getElementById('t-desc').value;
+            const data = document.getElementById('t-data').value;
             if(!tit) return;
-            await addDoc(collection(db, "users", state.user.uid, "tarefas"), { titulo: tit, prioridade: document.getElementById('t-prio').value, descricao: "", concluida: false, timestamp: Date.now() });
-            closeModal('modal-tarefa'); document.getElementById('t-titulo').value = '';
+            await addDoc(collection(db, "users", state.user.uid, "tarefas"), { titulo: tit, descricao: desc, data: data, prioridade: document.getElementById('t-prio').value, concluida: false, timestamp: Date.now() });
+            closeModal('modal-tarefa'); document.getElementById('t-titulo').value = ''; document.getElementById('t-desc').value = '';
         };
         window.toggleTask = async (id, status) => await updateDoc(doc(db, "users", state.user.uid, "tarefas", id), { concluida: !status });
         window.deleteTask = async (id) => await deleteDoc(doc(db, "users", state.user.uid, "tarefas", id));
@@ -642,7 +862,9 @@
         window.saveAula = async () => {
             const mat = document.getElementById('a-mat').value;
             if(!mat) return;
-            await addDoc(collection(db, "users", state.user.uid, "aulas"), { materia: mat, professor: document.getElementById('a-prof').value, local: document.getElementById('a-loc').value, dia: document.getElementById('a-dia').value, inicio: document.getElementById('a-ini').value, fim: document.getElementById('a-fim').value, corHex: "#0A84FF" });
+            const cores = ['#0A84FF', '#FF3B30', '#32D74B', '#FF9F0A', '#B14AE2'];
+            const randomColor = cores[Math.floor(Math.random() * cores.length)];
+            await addDoc(collection(db, "users", state.user.uid, "aulas"), { materia: mat, professor: document.getElementById('a-prof').value, local: document.getElementById('a-loc').value, dia: document.getElementById('a-dia').value, inicio: document.getElementById('a-ini').value, fim: document.getElementById('a-fim').value, corHex: randomColor });
             closeModal('modal-aula');
         };
         window.deleteAula = async (id) => await deleteDoc(doc(db, "users", state.user.uid, "aulas", id));
@@ -652,30 +874,34 @@
             const val = parseFloat(document.getElementById('f-val').value);
             if(!tit || isNaN(val)) return;
             await addDoc(collection(db, "users", state.user.uid, "financas"), { titulo: tit, valor: val, tipo: document.getElementById('f-tip').value, timestamp: Date.now() });
-            closeModal('modal-financa');
+            closeModal('modal-financa'); document.getElementById('f-tit').value = ''; document.getElementById('f-val').value = '';
         };
+        window.deleteFinanca = async (id) => await deleteDoc(doc(db, "users", state.user.uid, "financas", id));
 
         window.saveNota = async () => {
             const tit = document.getElementById('n-tit').value;
             const txt = document.getElementById('n-txt').value;
-            if(!tit) return;
-            await addDoc(collection(db, "users", state.user.uid, "anotacoes"), { titulo: tit, conteudo: txt, corHex: "#FFFFFF", timestamp: Date.now() });
-            closeModal('modal-nota');
+            if(!tit && !txt) return;
+            const cores = ['#FFD8D8', '#FFE4C4', '#FFF5BA', '#E2F6D8', '#D4F1F4', '#E6E6FA', 'var(--surface-color)'];
+            const rColor = cores[Math.floor(Math.random() * cores.length)];
+            await addDoc(collection(db, "users", state.user.uid, "anotacoes"), { titulo: tit, conteudo: txt, corHex: rColor, timestamp: Date.now() });
+            closeModal('modal-nota'); document.getElementById('n-tit').value = ''; document.getElementById('n-txt').value = '';
         };
+        window.deleteAnotacao = async (id) => await deleteDoc(doc(db, "users", state.user.uid, "anotacoes", id));
 
-        // --- MODO FOCO ---
-        let fTimer; let fLeft = 30*60; let fRun = false;
+        // --- MODO FOCO (TIMER) ---
+        let fTimer; let fLeft = 25*60; let fRun = false;
         window.setFoco = m => { clearInterval(fTimer); fRun=false; fLeft=m*60; updateF(); document.getElementById('foco-icon').classList.replace('fa-pause','fa-play'); };
-        window.resetFoco = () => setFoco(30);
+        window.resetFoco = () => setFoco(25);
         function updateF() { document.getElementById('foco-timer').innerText = `${Math.floor(fLeft/60).toString().padStart(2,'0')}:${(fLeft%60).toString().padStart(2,'0')}`; }
         document.getElementById('btn-play-foco').addEventListener('click', () => {
             const ic = document.getElementById('foco-icon');
             if(fRun) { clearInterval(fTimer); ic.classList.replace('fa-pause','fa-play'); } 
-            else { ic.classList.replace('fa-play','fa-pause'); fTimer = setInterval(()=>{ if(fLeft>0){fLeft--;updateF();}else{clearInterval(fTimer);alert("Concluído!");} },1000); }
+            else { ic.classList.replace('fa-play','fa-pause'); fTimer = setInterval(()=>{ if(fLeft>0){fLeft--;updateF();}else{clearInterval(fTimer);alert("Sessão concluída! Vai beber água.");} },1000); }
             fRun = !fRun;
         });
 
-        // --- CALCULADORA ---
+        // --- CALCULADORA PRO ---
         let calcExp = "";
         window.calc = (val) => {
             const res = document.getElementById('calc-res');
@@ -687,7 +913,7 @@
             res.innerText = calcExp;
         };
 
-        // --- ORGANIZA IA (GROQ) ---
+        // --- ORGANIZA IA (API GROQ) ---
         document.getElementById('btn-ia-send').addEventListener('click', sendIA);
         document.getElementById('ia-input').addEventListener('keypress', e => { if(e.key === 'Enter') sendIA(); });
 
@@ -696,13 +922,22 @@
             const txt = inp.value.trim();
             if(!txt) return; inp.value = '';
             
-            if(!state.groqKey) return alert("Chave Groq não encontrada no Firebase.");
+            if(!state.groqKey) return alert("Chave da Groq não encontrada. Configura a chave na Firestore em app_config/keys.");
 
             addChat(txt, true);
-            document.getElementById('ia-status').innerText = "A pensar...";
-            document.getElementById('ia-status').style.color = "#B14AE2";
+            document.getElementById('ia-status').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> A pensar...';
+            document.getElementById('ia-status').classList.replace('text-success', 'text-accent');
 
-            const ctx = `Tarefas: ${JSON.stringify(state.tarefas.map(t=>({id:t.id, titulo:t.titulo})))}\nAulas: ${JSON.stringify(state.aulas.map(a=>({id:a.id, mat:a.materia})))}\nAções de Admin: ADD_TAREFA(titulo), DELETE_TAREFA(id), CONCLUIR_TAREFA(id), ADD_NOTA(titulo, conteudo), CHANGE_THEME(theme). Retorna SEMPRE um JSON no final se fizeres ação: {"action":"NOME", "params":{"chave":"val"}}`;
+            // Formata o contexto
+            const ctxTarefas = state.tarefas.map(t=>({id:t.id, titulo:t.titulo, status: t.concluida?"Feita":"Pendente"}));
+            const ctxAulas = state.aulas.map(a=>({id:a.id, mat:a.materia}));
+            
+            const ctx = `És a Organiza IA.
+REGRAS OBRIGATÓRIAS: NUNCA mostres UUIDs. Sê direta.
+Se pedirem para criar um resumo/texto, responde normalmente E SALVA NAS ANOTAÇÕES via JSON.
+Contexto: Tarefas: ${JSON.stringify(ctxTarefas)} | Aulas: ${JSON.stringify(ctxAulas)}
+Ações: ADD_TAREFA(titulo, prioridade), DELETE_TAREFA(id), CONCLUIR_TAREFA(id), ADD_AULA(materia, dia, inicio, fim, corHex), DELETE_AULA(id), ADD_NOTA(titulo, conteudo), CHANGE_THEME(theme).
+Para ações, insere no FINAL: {"action":"NOME_ACAO", "params":{"chave":"val"}}`;
 
             try {
                 const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -712,35 +947,46 @@
                 const data = await res.json();
                 let iaTxt = data.choices[0].message.content;
 
-                // Extrai JSON
+                // Extração e Execução de JSON Mágico
                 const sIdx = iaTxt.indexOf('{'); const eIdx = iaTxt.lastIndexOf('}');
+                let executed = false;
                 if(sIdx !== -1 && eIdx !== -1) {
                     try {
                         const act = JSON.parse(iaTxt.substring(sIdx, eIdx+1));
-                        if(act.action === "ADD_TAREFA") addDoc(collection(db, "users", state.user.uid, "tarefas"), {titulo: act.params.titulo, concluida: false, prioridade: "Média", timestamp: Date.now()});
+                        if(act.action === "ADD_TAREFA") addDoc(collection(db, "users", state.user.uid, "tarefas"), {titulo: act.params.titulo, concluida: false, prioridade: act.params.prioridade || "Média", timestamp: Date.now()});
                         if(act.action === "DELETE_TAREFA") deleteDoc(doc(db, "users", state.user.uid, "tarefas", act.params.id));
                         if(act.action === "CONCLUIR_TAREFA") updateDoc(doc(db, "users", state.user.uid, "tarefas", act.params.id), {concluida: true});
-                        if(act.action === "ADD_NOTA") addDoc(collection(db, "users", state.user.uid, "anotacoes"), {titulo: act.params.titulo, conteudo: act.params.conteudo, corHex: "#fff", timestamp: Date.now()});
+                        if(act.action === "ADD_NOTA") addDoc(collection(db, "users", state.user.uid, "anotacoes"), {titulo: act.params.titulo, conteudo: act.params.conteudo, corHex: "#FFFFFF", timestamp: Date.now()});
+                        if(act.action === "ADD_AULA") addDoc(collection(db, "users", state.user.uid, "aulas"), {materia: act.params.materia, professor: "IA", local: "-", dia: act.params.dia || "Seg", inicio: act.params.inicio || "08:00", fim: act.params.fim || "10:00", corHex: act.params.corHex || "#0A84FF"});
+                        if(act.action === "DELETE_AULA") deleteDoc(doc(db, "users", state.user.uid, "aulas", act.params.id));
                         if(act.action === "CHANGE_THEME") setTheme(act.params.theme);
+                        
                         iaTxt = iaTxt.replace(iaTxt.substring(sIdx, eIdx+1), "").trim();
-                        iaTxt += "\n\n[Ação executada com sucesso!]";
-                    } catch(e) {}
+                        executed = true;
+                    } catch(e) { console.error("Erro JSON IA", e); }
                 }
-                addChat(iaTxt, false);
-            } catch(e) { addChat("Erro de ligação à API.", false); }
-            document.getElementById('ia-status').innerText = "Sempre online (Groq)";
-            document.getElementById('ia-status').style.color = "#32D74B";
+                
+                addChat(iaTxt, false, executed);
+            } catch(e) { addChat("Desculpa, ocorreu um erro na ligação à IA.", false); }
+            
+            document.getElementById('ia-status').innerHTML = '<i class="fa-solid fa-circle text-[10px] mr-1"></i> Sempre online (Groq LLaMA 3)';
+            document.getElementById('ia-status').classList.replace('text-accent', 'text-success');
         }
 
-        function addChat(msg, isUser) {
+        function addChat(msg, isUser, executedAction = false) {
             const cont = document.getElementById('ia-chat');
+            let systemBadge = executedAction ? `<div class="mt-3 inline-flex items-center gap-2 bg-accent/20 text-accent px-3 py-1 rounded-lg text-xs font-bold"><i class="fa-solid fa-check"></i> Ação executada</div>` : '';
+            
             const html = `
-                <div class="flex gap-3 ${isUser?'justify-end':''}">
-                    ${isUser?'':`<div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0"><i class="fa-solid fa-graduation-cap text-black text-sm"></i></div>`}
-                    <div class="${isUser?'chat-user':'chat-ai'} p-4 text-sm leading-relaxed max-w-[85%] shadow-lg">${msg.replace(/\n/g,'<br>')}</div>
+                <div class="flex gap-4 ${isUser?'justify-end':''}">
+                    ${isUser?'':`<div class="w-10 h-10 rounded-full bg-black dark:bg-white flex items-center justify-center shrink-0 shadow-lg"><i class="fa-solid fa-wand-magic-sparkles text-white dark:text-black"></i></div>`}
+                    <div class="${isUser?'chat-user':'chat-ai shadow-sm border border-black/5 dark:border-white/5'} p-5 text-base leading-relaxed max-w-[75%]">
+                        ${msg.replace(/\n/g,'<br>')}
+                        ${systemBadge}
+                    </div>
                 </div>`;
             cont.innerHTML += html;
-            cont.parentElement.scrollTop = cont.parentElement.scrollHeight;
+            cont.scrollTop = cont.scrollHeight;
         }
     </script>
 </body>
