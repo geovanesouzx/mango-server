@@ -63,11 +63,17 @@
         }
 
         /* Animações suaves para troca de ecrãs */
-        .fade-enter { animation: fadeIn 0.5s ease-out forwards; }
+        .fade-enter { animation: fadeIn 0.4s ease-out forwards; }
+        .slide-up { animation: slideUp 0.3s ease-out forwards; }
         
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
         }
 
         /* Esconder ecrãs inativos */
@@ -122,8 +128,8 @@
     </div>
 
     <!-- 3. ECRÃ DE CONFIGURAÇÃO DE PERFIL (SETUP) -->
-    <div id="setup-screen" class="absolute inset-0 flex items-center justify-center bg-background-light dark:bg-background-dark z-40 hidden-screen overflow-y-auto py-10">
-        <div class="liquid-glass p-8 md:p-10 rounded-[32px] z-10 max-w-lg w-full mx-4 flex flex-col fade-enter my-auto">
+    <div id="setup-screen" class="absolute inset-0 flex items-center justify-center bg-background-light dark:bg-background-dark z-30 hidden-screen overflow-y-auto py-10">
+        <div class="liquid-glass p-8 md:p-10 rounded-[32px] z-10 max-w-lg w-full mx-4 flex flex-col fade-enter my-auto relative">
             <h2 class="text-3xl font-extrabold mb-2 text-center">Complete o seu perfil</h2>
             <p class="text-gray-500 mb-8 text-center text-sm font-medium">Precisamos de alguns dados para personalizar a sua experiência.</p>
 
@@ -147,168 +153,26 @@
                     <input type="text" id="setup-course" placeholder="Qual o seu curso?" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
                 </div>
 
-                <!-- Semestre e Universidade lado a lado (em ecrãs maiores) -->
+                <!-- Semestre e Universidade (Usando botões que abrem modais/ecrãs) -->
                 <div class="flex flex-col md:flex-row gap-5">
                     <div class="flex-1">
                         <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Semestre</label>
-                        <select id="setup-semester" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50">
-                            <option value="1º Semestre">1º Semestre</option>
-                            <option value="2º Semestre">2º Semestre</option>
-                            <option value="3º Semestre">3º Semestre</option>
-                            <option value="4º Semestre">4º Semestre</option>
-                            <option value="5º Semestre">5º Semestre</option>
-                            <option value="6º Semestre">6º Semestre</option>
-                            <option value="7º Semestre">7º Semestre</option>
-                            <option value="8º Semestre">8º Semestre</option>
-                            <option value="9º Semestre">9º Semestre</option>
-                            <option value="10º Semestre">10º Semestre</option>
-                            <option value="11º Semestre">11º Semestre</option>
-                            <option value="12º Semestre">12º Semestre</option>
-                        </select>
+                        <div id="btn-open-semester" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 flex justify-between items-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                            <span id="setup-semester-display" class="text-gray-400">Selecione o semestre...</span>
+                            <i class="fa-solid fa-chevron-down text-gray-500"></i>
+                        </div>
+                        <input type="hidden" id="setup-semester">
                     </div>
                 </div>
 
                 <!-- Universidade -->
                 <div>
                     <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Universidade</label>
-                    <select id="setup-university" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none appearance-none cursor-pointer focus:ring-2 focus:ring-primary/50">
-                        <option value="" disabled selected>Selecione a universidade...</option>
-                        
-                        <optgroup label="Bahia (Em Destaque)">
-                            <option value="UFRB - Universidade Federal do Recôncavo da Bahia">UFRB - Universidade Federal do Recôncavo da Bahia</option>
-                            <option value="UFBA - Universidade Federal da Bahia">UFBA - Universidade Federal da Bahia</option>
-                            <option value="UFOB - Universidade Federal do Oeste da Bahia">UFOB - Universidade Federal do Oeste da Bahia</option>
-                            <option value="UFSB - Universidade Federal do Sul da Bahia">UFSB - Universidade Federal do Sul da Bahia</option>
-                            <option value="UNIVASF - Universidade Federal do Vale do São Francisco">UNIVASF - Universidade Federal do Vale do São Francisco</option>
-                            <option value="UNEB - Universidade do Estado da Bahia">UNEB - Universidade do Estado da Bahia</option>
-                            <option value="UEFS - Universidade Estadual de Feira de Santana">UEFS - Universidade Estadual de Feira de Santana</option>
-                            <option value="UESB - Universidade Estadual do Sudoeste da Bahia">UESB - Universidade Estadual do Sudoeste da Bahia</option>
-                            <option value="UESC - Universidade Estadual de Santa Cruz">UESC - Universidade Estadual de Santa Cruz</option>
-                            <option value="IFBA - Instituto Federal da Bahia">IFBA - Instituto Federal da Bahia</option>
-                            <option value="IF Baiano - Instituto Federal Baiano">IF Baiano - Instituto Federal Baiano</option>
-                        </optgroup>
-
-                        <optgroup label="Universidades Federais">
-                            <option value="UFAC - Universidade Federal do Acre">UFAC - Universidade Federal do Acre</option>
-                            <option value="UFAL - Universidade Federal de Alagoas">UFAL - Universidade Federal de Alagoas</option>
-                            <option value="UNIFAP - Universidade Federal do Amapá">UNIFAP - Universidade Federal do Amapá</option>
-                            <option value="UFAM - Universidade Federal do Amazonas">UFAM - Universidade Federal do Amazonas</option>
-                            <option value="UNILAB - Universidade da Integração Internacional da Lusofonia Afro-Brasileira">UNILAB - Universidade da Integração Internacional da Lusofonia Afro-Brasileira</option>
-                            <option value="UFC - Universidade Federal do Ceará">UFC - Universidade Federal do Ceará</option>
-                            <option value="UFCA - Universidade Federal do Cariri">UFCA - Universidade Federal do Cariri</option>
-                            <option value="UnB - Universidade de Brasília">UnB - Universidade de Brasília</option>
-                            <option value="UFES - Universidade Federal do Espírito Santo">UFES - Universidade Federal do Espírito Santo</option>
-                            <option value="UFG - Universidade Federal de Goiás">UFG - Universidade Federal de Goiás</option>
-                            <option value="UFCAT - Universidade Federal de Catalão">UFCAT - Universidade Federal de Catalão</option>
-                            <option value="UFJ - Universidade Federal de Jataí">UFJ - Universidade Federal de Jataí</option>
-                            <option value="UFMA - Universidade Federal do Maranhão">UFMA - Universidade Federal do Maranhão</option>
-                            <option value="UFMT - Universidade Federal de Mato Grosso">UFMT - Universidade Federal de Mato Grosso</option>
-                            <option value="UFR - Universidade Federal de Rondonópolis">UFR - Universidade Federal de Rondonópolis</option>
-                            <option value="UFMS - Universidade Federal de Mato Grosso do Sul">UFMS - Universidade Federal de Mato Grosso do Sul</option>
-                            <option value="UFGD - Universidade Federal da Grande Dourados">UFGD - Universidade Federal da Grande Dourados</option>
-                            <option value="UFMG - Universidade Federal de Minas Gerais">UFMG - Universidade Federal de Minas Gerais</option>
-                            <option value="UFOP - Universidade Federal de Ouro Preto">UFOP - Universidade Federal de Ouro Preto</option>
-                            <option value="UFLA - Universidade Federal de Lavras">UFLA - Universidade Federal de Lavras</option>
-                            <option value="UFV - Universidade Federal de Viçosa">UFV - Universidade Federal de Viçosa</option>
-                            <option value="UNIFAL - Universidade Federal de Alfenas">UNIFAL - Universidade Federal de Alfenas</option>
-                            <option value="UNIFEI - Universidade Federal de Itajubá">UNIFEI - Universidade Federal de Itajubá</option>
-                            <option value="UFJF - Universidade Federal de Juiz de Fora">UFJF - Universidade Federal de Juiz de Fora</option>
-                            <option value="UFSJ - Universidade Federal de São João del-Rei">UFSJ - Universidade Federal de São João del-Rei</option>
-                            <option value="UFU - Universidade Federal de Uberlândia">UFU - Universidade Federal de Uberlândia</option>
-                            <option value="UFVJM - Universidade Federal dos Vales do Jequitinhonha e Mucuri">UFVJM - Universidade Federal dos Vales do Jequitinhonha e Mucuri</option>
-                            <option value="UFTM - Universidade Federal do Triângulo Mineiro">UFTM - Universidade Federal do Triângulo Mineiro</option>
-                            <option value="UFPA - Universidade Federal do Pará">UFPA - Universidade Federal do Pará</option>
-                            <option value="UNIFESSPA - Universidade Federal do Sul e Sudeste do Pará">UNIFESSPA - Universidade Federal do Sul e Sudeste do Pará</option>
-                            <option value="UFOPA - Universidade Federal do Oeste do Pará">UFOPA - Universidade Federal do Oeste do Pará</option>
-                            <option value="UFPB - Universidade Federal da Paraíba">UFPB - Universidade Federal da Paraíba</option>
-                            <option value="UFCG - Universidade Federal de Campina Grande">UFCG - Universidade Federal de Campina Grande</option>
-                            <option value="UFPR - Universidade Federal do Paraná">UFPR - Universidade Federal do Paraná</option>
-                            <option value="UTFPR - Universidade Tecnológica Federal do Paraná">UTFPR - Universidade Tecnológica Federal do Paraná</option>
-                            <option value="UNILA - Universidade Federal da Integração Latino-Americana">UNILA - Universidade Federal da Integração Latino-Americana</option>
-                            <option value="UFPE - Universidade Federal de Pernambuco">UFPE - Universidade Federal de Pernambuco</option>
-                            <option value="UFRPE - Universidade Federal Rural de Pernambuco">UFRPE - Universidade Federal Rural de Pernambuco</option>
-                            <option value="UFAPE - Universidade Federal do Agreste de Pernambuco">UFAPE - Universidade Federal do Agreste de Pernambuco</option>
-                            <option value="UFPI - Universidade Federal do Piauí">UFPI - Universidade Federal do Piauí</option>
-                            <option value="UFDPar - Universidade Federal do Delta do Parnaíba">UFDPar - Universidade Federal do Delta do Parnaíba</option>
-                            <option value="UFRJ - Universidade Federal do Rio de Janeiro">UFRJ - Universidade Federal do Rio de Janeiro</option>
-                            <option value="UFF - Universidade Federal Fluminense">UFF - Universidade Federal Fluminense</option>
-                            <option value="UFRRJ - Universidade Federal Rural do Rio de Janeiro">UFRRJ - Universidade Federal Rural do Rio de Janeiro</option>
-                            <option value="UNIRIO - Universidade Federal do Estado do Rio de Janeiro">UNIRIO - Universidade Federal do Estado do Rio de Janeiro</option>
-                            <option value="UFRN - Universidade Federal do Rio Grande do Norte">UFRN - Universidade Federal do Rio Grande do Norte</option>
-                            <option value="UFERSA - Universidade Federal Rural do Semi-Árido">UFERSA - Universidade Federal Rural do Semi-Árido</option>
-                            <option value="UFRGS - Universidade Federal do Rio Grande do Sul">UFRGS - Universidade Federal do Rio Grande do Sul</option>
-                            <option value="UFSM - Universidade Federal de Santa Maria">UFSM - Universidade Federal de Santa Maria</option>
-                            <option value="UFPel - Universidade Federal de Pelotas">UFPel - Universidade Federal de Pelotas</option>
-                            <option value="UNIPAMPA - Universidade Federal do Pampa">UNIPAMPA - Universidade Federal do Pampa</option>
-                            <option value="UFCSPA - Universidade Federal de Ciências da Saúde de Porto Alegre">UFCSPA - Universidade Federal de Ciências da Saúde de Porto Alegre</option>
-                            <option value="UFFS - Universidade Federal da Fronteira Sul">UFFS - Universidade Federal da Fronteira Sul</option>
-                            <option value="UNIR - Universidade Federal de Rondônia">UNIR - Universidade Federal de Rondônia</option>
-                            <option value="UFRR - Universidade Federal de Roraima">UFRR - Universidade Federal de Roraima</option>
-                            <option value="UFSC - Universidade Federal de Santa Catarina">UFSC - Universidade Federal de Santa Catarina</option>
-                            <option value="UNIFESP - Universidade Federal de São Paulo">UNIFESP - Universidade Federal de São Paulo</option>
-                            <option value="UFSCar - Universidade Federal de São Carlos">UFSCar - Universidade Federal de São Carlos</option>
-                            <option value="UFABC - Universidade Federal do ABC">UFABC - Universidade Federal do ABC</option>
-                            <option value="UFS - Universidade Federal de Sergipe">UFS - Universidade Federal de Sergipe</option>
-                            <option value="UFT - Universidade Federal do Tocantins">UFT - Universidade Federal do Tocantins</option>
-                            <option value="UFNT - Universidade Federal do Norte do Tocantins">UFNT - Universidade Federal do Norte do Tocantins</option>
-                        </optgroup>
-
-                        <optgroup label="Universidades Estaduais">
-                            <option value="USP - Universidade de São Paulo">USP - Universidade de São Paulo</option>
-                            <option value="UNICAMP - Universidade Estadual de Campinas">UNICAMP - Universidade Estadual de Campinas</option>
-                            <option value="UNESP - Universidade Estadual Paulista">UNESP - Universidade Estadual Paulista</option>
-                            <option value="UERJ - Universidade do Estado do Rio de Janeiro">UERJ - Universidade do Estado do Rio de Janeiro</option>
-                            <option value="UEL - Universidade Estadual de Londrina">UEL - Universidade Estadual de Londrina</option>
-                            <option value="UEM - Universidade Estadual de Maringá">UEM - Universidade Estadual de Maringá</option>
-                            <option value="UENF - Universidade Estadual do Norte Fluminense">UENF - Universidade Estadual do Norte Fluminense</option>
-                            <option value="UECE - Universidade Estadual do Ceará">UECE - Universidade Estadual do Ceará</option>
-                            <option value="UVA - Universidade Estadual Vale do Acaraú">UVA - Universidade Estadual Vale do Acaraú</option>
-                            <option value="URCA - Universidade Regional do Cariri">URCA - Universidade Regional do Cariri</option>
-                            <option value="UEMG - Universidade do Estado de Minas Gerais">UEMG - Universidade do Estado de Minas Gerais</option>
-                            <option value="UNIMONTES - Universidade Estadual de Montes Claros">UNIMONTES - Universidade Estadual de Montes Claros</option>
-                            <option value="UEG - Universidade Estadual de Goiás">UEG - Universidade Estadual de Goiás</option>
-                            <option value="UEMA - Universidade Estadual do Maranhão">UEMA - Universidade Estadual do Maranhão</option>
-                            <option value="UEPB - Universidade Estadual da Paraíba">UEPB - Universidade Estadual da Paraíba</option>
-                            <option value="UEPG - Universidade Estadual de Ponta Grossa">UEPG - Universidade Estadual de Ponta Grossa</option>
-                            <option value="UNIOESTE - Universidade Estadual do Oeste do Paraná">UNIOESTE - Universidade Estadual do Oeste do Paraná</option>
-                            <option value="UNICENTRO - Universidade Estadual do Centro-Oeste">UNICENTRO - Universidade Estadual do Centro-Oeste</option>
-                            <option value="UENP - Universidade Estadual do Norte do Paraná">UENP - Universidade Estadual do Norte do Paraná</option>
-                        </optgroup>
-
-                        <optgroup label="Institutos Federais e Privadas">
-                            <option value="IFCE - Instituto Federal do Ceará">IFCE - Instituto Federal do Ceará</option>
-                            <option value="IFMG - Instituto Federal de Minas Gerais">IFMG - Instituto Federal de Minas Gerais</option>
-                            <option value="IFPB - Instituto Federal da Paraíba">IFPB - Instituto Federal da Paraíba</option>
-                            <option value="IFPE - Instituto Federal de Pernambuco">IFPE - Instituto Federal de Pernambuco</option>
-                            <option value="IFPI - Instituto Federal do Piauí">IFPI - Instituto Federal do Piauí</option>
-                            <option value="IFPR - Instituto Federal do Paraná">IFPR - Instituto Federal do Paraná</option>
-                            <option value="IFRJ - Instituto Federal do Rio de Janeiro">IFRJ - Instituto Federal do Rio de Janeiro</option>
-                            <option value="IFRN - Instituto Federal do Rio Grande do Norte">IFRN - Instituto Federal do Rio Grande do Norte</option>
-                            <option value="IFRS - Instituto Federal do Rio Grande do Sul">IFRS - Instituto Federal do Rio Grande do Sul</option>
-                            <option value="IFSC - Instituto Federal de Santa Catarina">IFSC - Instituto Federal de Santa Catarina</option>
-                            <option value="IFSP - Instituto Federal de São Paulo">IFSP - Instituto Federal de São Paulo</option>
-                            <option value="Anhanguera">Anhanguera</option>
-                            <option value="Anhembi Morumbi">Anhembi Morumbi</option>
-                            <option value="Cruzeiro do Sul">Cruzeiro do Sul</option>
-                            <option value="ESPM - Escola Superior de Propaganda e Marketing">ESPM - Escola Superior de Propaganda e Marketing</option>
-                            <option value="Estácio">Estácio</option>
-                            <option value="FGV - Fundação Getulio Vargas">FGV - Fundação Getulio Vargas</option>
-                            <option value="FMU - Faculdades Metropolitanas Unidas">FMU - Faculdades Metropolitanas Unidas</option>
-                            <option value="Ibmec">Ibmec</option>
-                            <option value="Insper">Insper</option>
-                            <option value="Mackenzie - Universidade Presbiteriana Mackenzie">Mackenzie - Universidade Presbiteriana Mackenzie</option>
-                            <option value="PUC-Campinas - Pontifícia Universidade Católica de Campinas">PUC-Campinas - Pontifícia Universidade Católica de Campinas</option>
-                            <option value="PUC-MG - Pontifícia Universidade Católica de Minas Gerais">PUC-MG - Pontifícia Universidade Católica de Minas Gerais</option>
-                            <option value="PUC-PR - Pontifícia Universidade Católica do Paraná">PUC-PR - Pontifícia Universidade Católica do Paraná</option>
-                            <option value="PUC-RJ - Pontifícia Universidade Católica do Rio de Janeiro">PUC-RJ - Pontifícia Universidade Católica do Rio de Janeiro</option>
-                            <option value="PUC-RS - Pontifícia Universidade Católica do Rio Grande do Sul">PUC-RS - Pontifícia Universidade Católica do Rio Grande do Sul</option>
-                            <option value="PUC-SP - Pontifícia Universidade Católica de São Paulo">PUC-SP - Pontifícia Universidade Católica de São Paulo</option>
-                            <option value="UNIP - Universidade Paulista">UNIP - Universidade Paulista</option>
-                            <option value="UNISINOS - Universidade do Vale do Rio dos Sinos">UNISINOS - Universidade do Vale do Rio dos Sinos</option>
-                        </optgroup>
-
-                        <option value="Outra (Digitar manualmente)" class="font-bold">Outra (Digitar manualmente)</option>
-                    </select>
+                    <div id="btn-open-university" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 flex justify-between items-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
+                        <span id="setup-university-display" class="text-gray-400 truncate pr-4">Selecione a universidade...</span>
+                        <i class="fa-solid fa-chevron-down text-gray-500"></i>
+                    </div>
+                    <input type="hidden" id="setup-university">
                 </div>
 
                 <!-- Campo de Universidade Customizada (Oculto inicialmente) -->
@@ -325,8 +189,47 @@
         </div>
     </div>
 
-    <!-- 4. TELA PRINCIPAL (Painel Base) -->
-    <div id="main-app-screen" class="absolute inset-0 bg-background-light dark:bg-background-dark z-30 hidden-screen flex flex-col items-center justify-center">
+    <!-- ECRÃ DE SELEÇÃO DE SEMESTRE -->
+    <div id="screen-select-semester" class="absolute inset-0 bg-background-light dark:bg-background-dark z-50 hidden-screen flex-col slide-up">
+        <div class="px-6 pt-10 pb-4 flex items-center gap-4 border-b border-black/5 dark:border-white/5 sticky top-0 bg-background-light dark:bg-background-dark z-10">
+            <button id="btn-close-semester" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-light dark:bg-surface-dark hover:bg-black/10 dark:hover:bg-white/10 transition">
+                <i class="fa-solid fa-arrow-left"></i>
+            </button>
+            <h2 class="text-2xl font-bold">Escolha o Semestre</h2>
+        </div>
+        <div class="flex-1 overflow-y-auto p-6">
+            <div class="max-w-2xl mx-auto flex flex-col gap-2" id="semester-list">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- ECRÃ DE SELEÇÃO DE UNIVERSIDADE -->
+    <div id="screen-select-university" class="absolute inset-0 bg-background-light dark:bg-background-dark z-50 hidden-screen flex-col slide-up">
+        <div class="px-6 pt-10 pb-4 flex flex-col gap-4 border-b border-black/5 dark:border-white/5 sticky top-0 bg-background-light dark:bg-background-dark z-10">
+            <div class="flex items-center gap-4">
+                <button id="btn-close-university" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-light dark:bg-surface-dark hover:bg-black/10 dark:hover:bg-white/10 transition">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <h2 class="text-2xl font-bold">Procurar Universidade</h2>
+            </div>
+            
+            <!-- Barra de Pesquisa -->
+            <div class="relative w-full max-w-2xl mx-auto mt-2">
+                <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
+                <input type="text" id="search-university" placeholder="Ex: USP, Ceará, Bahia..." class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
+            </div>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto p-6">
+            <div class="max-w-2xl mx-auto flex flex-col gap-2" id="university-list">
+                <!-- Preenchido via JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. TELA PRINCIPAL (Painel Base Provisório) -->
+    <div id="main-app-screen" class="absolute inset-0 bg-background-light dark:bg-background-dark z-20 hidden-screen flex flex-col items-center justify-center">
         <div class="liquid-glass p-10 rounded-3xl text-center">
             <h1 class="text-3xl font-extrabold text-success mb-4"><i class="fa-solid fa-check-circle mr-2"></i>Tudo Pronto!</h1>
             <p class="text-gray-500 mb-2 text-lg" id="welcome-message">Carregando...</p>
@@ -368,7 +271,7 @@
         let currentUser = null;
         let isUsernameValid = false;
 
-        // Referências DOM
+        // Referências DOM - Ecrãs Principais
         const screens = {
             loading: document.getElementById('loading-screen'),
             login: document.getElementById('login-screen'),
@@ -376,7 +279,12 @@
             main: document.getElementById('main-app-screen')
         };
 
-        // Função para trocar de ecrã
+        // Referências DOM - Ecrãs de Seleção
+        const screenSelectSemester = document.getElementById('screen-select-semester');
+        const screenSelectUniversity = document.getElementById('screen-select-university');
+        const customUniContainer = document.getElementById('custom-university-container');
+
+        // Função para trocar de ecrã principal
         function showScreen(screenName) {
             Object.values(screens).forEach(s => s.classList.add('hidden-screen'));
             screens[screenName].classList.remove('hidden-screen');
@@ -394,10 +302,223 @@
                 localStorage.setItem('theme', 'dark');
             }
         });
-        // Aplicar tema guardado
         if (localStorage.getItem('theme') === 'light') {
             document.documentElement.classList.remove('dark');
         }
+
+        // DADOS PARA OS MENUS DE SELEÇÃO
+        const semestersData = [
+            "1º Semestre", "2º Semestre", "3º Semestre", "4º Semestre", 
+            "5º Semestre", "6º Semestre", "7º Semestre", "8º Semestre", 
+            "9º Semestre", "10º Semestre", "11º Semestre", "12º Semestre"
+        ];
+
+        const universitiesData = [
+            "UFRB - Universidade Federal do Recôncavo da Bahia",
+            "UFBA - Universidade Federal da Bahia",
+            "UFOB - Universidade Federal do Oeste da Bahia",
+            "UFSB - Universidade Federal do Sul da Bahia",
+            "UNIVASF - Universidade Federal do Vale do São Francisco",
+            "UNEB - Universidade do Estado da Bahia",
+            "UEFS - Universidade Estadual de Feira de Santana",
+            "UESB - Universidade Estadual do Sudoeste da Bahia",
+            "UESC - Universidade Estadual de Santa Cruz",
+            "IFBA - Instituto Federal da Bahia",
+            "IF Baiano - Instituto Federal Baiano",
+            "UFAC - Universidade Federal do Acre",
+            "UFAL - Universidade Federal de Alagoas",
+            "UNIFAP - Universidade Federal do Amapá",
+            "UFAM - Universidade Federal do Amazonas",
+            "UNILAB - Universidade da Integração Internacional da Lusofonia Afro-Brasileira",
+            "UFC - Universidade Federal do Ceará",
+            "UFCA - Universidade Federal do Cariri",
+            "UnB - Universidade de Brasília",
+            "UFES - Universidade Federal do Espírito Santo",
+            "UFG - Universidade Federal de Goiás",
+            "UFCAT - Universidade Federal de Catalão",
+            "UFJ - Universidade Federal de Jataí",
+            "UFMA - Universidade Federal do Maranhão",
+            "UFMT - Universidade Federal de Mato Grosso",
+            "UFR - Universidade Federal de Rondonópolis",
+            "UFMS - Universidade Federal de Mato Grosso do Sul",
+            "UFGD - Universidade Federal da Grande Dourados",
+            "UFMG - Universidade Federal de Minas Gerais",
+            "UFOP - Universidade Federal de Ouro Preto",
+            "UFLA - Universidade Federal de Lavras",
+            "UFV - Universidade Federal de Viçosa",
+            "UNIFAL - Universidade Federal de Alfenas",
+            "UNIFEI - Universidade Federal de Itajubá",
+            "UFJF - Universidade Federal de Juiz de Fora",
+            "UFSJ - Universidade Federal de São João del-Rei",
+            "UFU - Universidade Federal de Uberlândia",
+            "UFVJM - Universidade Federal dos Vales do Jequitinhonha e Mucuri",
+            "UFTM - Universidade Federal do Triângulo Mineiro",
+            "UFPA - Universidade Federal do Pará",
+            "UNIFESSPA - Universidade Federal do Sul e Sudeste do Pará",
+            "UFOPA - Universidade Federal do Oeste do Pará",
+            "UFPB - Universidade Federal da Paraíba",
+            "UFCG - Universidade Federal de Campina Grande",
+            "UFPR - Universidade Federal do Paraná",
+            "UTFPR - Universidade Tecnológica Federal do Paraná",
+            "UNILA - Universidade Federal da Integração Latino-Americana",
+            "UFPE - Universidade Federal de Pernambuco",
+            "UFRPE - Universidade Federal Rural de Pernambuco",
+            "UFAPE - Universidade Federal do Agreste de Pernambuco",
+            "UFPI - Universidade Federal do Piauí",
+            "UFDPar - Universidade Federal do Delta do Parnaíba",
+            "UFRJ - Universidade Federal do Rio de Janeiro",
+            "UFF - Universidade Federal Fluminense",
+            "UFRRJ - Universidade Federal Rural do Rio de Janeiro",
+            "UNIRIO - Universidade Federal do Estado do Rio de Janeiro",
+            "UFRN - Universidade Federal do Rio Grande do Norte",
+            "UFERSA - Universidade Federal Rural do Semi-Árido",
+            "UFRGS - Universidade Federal do Rio Grande do Sul",
+            "UFSM - Universidade Federal de Santa Maria",
+            "UFPel - Universidade Federal de Pelotas",
+            "UNIPAMPA - Universidade Federal do Pampa",
+            "UFCSPA - Universidade Federal de Ciências da Saúde de Porto Alegre",
+            "UFFS - Universidade Federal da Fronteira Sul",
+            "UNIR - Universidade Federal de Rondônia",
+            "UFRR - Universidade Federal de Roraima",
+            "UFSC - Universidade Federal de Santa Catarina",
+            "UNIFESP - Universidade Federal de São Paulo",
+            "UFSCar - Universidade Federal de São Carlos",
+            "UFABC - Universidade Federal do ABC",
+            "UFS - Universidade Federal de Sergipe",
+            "UFT - Universidade Federal do Tocantins",
+            "UFNT - Universidade Federal do Norte do Tocantins",
+            "USP - Universidade de São Paulo",
+            "UNICAMP - Universidade Estadual de Campinas",
+            "UNESP - Universidade Estadual Paulista",
+            "UERJ - Universidade do Estado do Rio de Janeiro",
+            "UEL - Universidade Estadual de Londrina",
+            "UEM - Universidade Estadual de Maringá",
+            "UENF - Universidade Estadual do Norte Fluminense",
+            "UECE - Universidade Estadual do Ceará",
+            "UVA - Universidade Estadual Vale do Acaraú",
+            "URCA - Universidade Regional do Cariri",
+            "UEMG - Universidade do Estado de Minas Gerais",
+            "UNIMONTES - Universidade Estadual de Montes Claros",
+            "UEG - Universidade Estadual de Goiás",
+            "UEMA - Universidade Estadual do Maranhão",
+            "UEPB - Universidade Estadual da Paraíba",
+            "UEPG - Universidade Estadual de Ponta Grossa",
+            "UNIOESTE - Universidade Estadual do Oeste do Paraná",
+            "UNICENTRO - Universidade Estadual do Centro-Oeste",
+            "UENP - Universidade Estadual do Norte do Paraná",
+            "IFCE - Instituto Federal do Ceará",
+            "IFMG - Instituto Federal de Minas Gerais",
+            "IFPB - Instituto Federal da Paraíba",
+            "IFPE - Instituto Federal de Pernambuco",
+            "IFPI - Instituto Federal do Piauí",
+            "IFPR - Instituto Federal do Paraná",
+            "IFRJ - Instituto Federal do Rio de Janeiro",
+            "IFRN - Instituto Federal do Rio Grande do Norte",
+            "IFRS - Instituto Federal do Rio Grande do Sul",
+            "IFSC - Instituto Federal de Santa Catarina",
+            "IFSP - Instituto Federal de São Paulo",
+            "Anhanguera",
+            "Anhembi Morumbi",
+            "Cruzeiro do Sul",
+            "ESPM - Escola Superior de Propaganda e Marketing",
+            "Estácio",
+            "FGV - Fundação Getulio Vargas",
+            "FMU - Faculdades Metropolitanas Unidas",
+            "Ibmec",
+            "Insper",
+            "Mackenzie - Universidade Presbiteriana Mackenzie",
+            "PUC-Campinas - Pontifícia Universidade Católica de Campinas",
+            "PUC-MG - Pontifícia Universidade Católica de Minas Gerais",
+            "PUC-PR - Pontifícia Universidade Católica do Paraná",
+            "PUC-RJ - Pontifícia Universidade Católica do Rio de Janeiro",
+            "PUC-RS - Pontifícia Universidade Católica do Rio Grande do Sul",
+            "PUC-SP - Pontifícia Universidade Católica de São Paulo",
+            "UNIP - Universidade Paulista",
+            "UNISINOS - Universidade do Vale do Rio dos Sinos",
+            "Outra (Digitar manualmente)"
+        ];
+
+        // LÓGICA DE ABERTURA DOS ECRÃS DE SELEÇÃO
+        document.getElementById('btn-open-semester').addEventListener('click', () => {
+            renderSemesters();
+            screenSelectSemester.classList.remove('hidden-screen');
+        });
+
+        document.getElementById('btn-close-semester').addEventListener('click', () => {
+            screenSelectSemester.classList.add('hidden-screen');
+        });
+
+        document.getElementById('btn-open-university').addEventListener('click', () => {
+            document.getElementById('search-university').value = '';
+            renderUniversities('');
+            screenSelectUniversity.classList.remove('hidden-screen');
+            setTimeout(() => document.getElementById('search-university').focus(), 100);
+        });
+
+        document.getElementById('btn-close-university').addEventListener('click', () => {
+            screenSelectUniversity.classList.add('hidden-screen');
+        });
+
+        // Filtragem de Universidades
+        document.getElementById('search-university').addEventListener('input', (e) => {
+            renderUniversities(e.target.value);
+        });
+
+        // Funções de Renderização das Listas
+        function renderSemesters() {
+            const list = document.getElementById('semester-list');
+            list.innerHTML = semestersData.map(sem => `
+                <div class="p-4 rounded-xl hover:bg-surface-light dark:hover:bg-surface-dark cursor-pointer transition-colors border border-transparent hover:border-black/5 dark:hover:border-white/5" onclick="selectSemester('${sem}')">
+                    <span class="font-medium text-lg">${sem}</span>
+                </div>
+                <div class="h-px w-full bg-black/5 dark:bg-white/5 last:hidden"></div>
+            `).join('');
+        }
+
+        function renderUniversities(filterText) {
+            const list = document.getElementById('university-list');
+            const lowerFilter = filterText.toLowerCase();
+            const filtered = universitiesData.filter(uni => uni.toLowerCase().includes(lowerFilter));
+            
+            if (filtered.length === 0) {
+                list.innerHTML = `<p class="text-gray-500 text-center py-8">Nenhuma universidade encontrada.</p>`;
+                return;
+            }
+
+            list.innerHTML = filtered.map(uni => `
+                <div class="p-4 rounded-xl hover:bg-surface-light dark:hover:bg-surface-dark cursor-pointer transition-colors border border-transparent hover:border-black/5 dark:hover:border-white/5" onclick="selectUniversity('${uni.replace(/'/g, "\\'")}')">
+                    <span class="${uni === 'Outra (Digitar manualmente)' ? 'font-bold text-primary' : 'font-medium'} text-base">${uni}</span>
+                </div>
+                <div class="h-px w-full bg-black/5 dark:bg-white/5 last:hidden"></div>
+            `).join('');
+        }
+
+        // Funções de Seleção
+        window.selectSemester = function(sem) {
+            document.getElementById('setup-semester').value = sem;
+            document.getElementById('setup-semester-display').innerText = sem;
+            document.getElementById('setup-semester-display').classList.remove('text-gray-400');
+            document.getElementById('setup-semester-display').classList.add('text-content');
+            screenSelectSemester.classList.add('hidden-screen');
+            validateSetupForm();
+        };
+
+        window.selectUniversity = function(uni) {
+            document.getElementById('setup-university').value = uni;
+            document.getElementById('setup-university-display').innerText = uni;
+            document.getElementById('setup-university-display').classList.remove('text-gray-400');
+            document.getElementById('setup-university-display').classList.add('text-content');
+            
+            if (uni === "Outra (Digitar manualmente)") {
+                customUniContainer.classList.remove('hidden');
+            } else {
+                customUniContainer.classList.add('hidden');
+                document.getElementById('setup-custom-university').value = '';
+            }
+            
+            screenSelectUniversity.classList.add('hidden-screen');
+            validateSetupForm();
+        };
 
         // Observador de Autenticação
         onAuthStateChanged(auth, async (user) => {
@@ -439,19 +560,6 @@
                 alert("Falha ao iniciar sessão: " + error.message);
                 showScreen('login');
             }
-        });
-
-        // Lógica para o campo "Universidade Customizada"
-        const uniSelect = document.getElementById('setup-university');
-        const customUniContainer = document.getElementById('custom-university-container');
-        
-        uniSelect.addEventListener('change', (e) => {
-            if (e.target.value === "Outra (Digitar manualmente)") {
-                customUniContainer.classList.remove('hidden');
-            } else {
-                customUniContainer.classList.add('hidden');
-            }
-            validateSetupForm();
         });
 
         // Lógica de Validação de Nome de Utilizador (Debounce)
@@ -503,11 +611,13 @@
         function validateSetupForm() {
             const name = document.getElementById('setup-name').value.trim();
             const course = document.getElementById('setup-course').value.trim();
-            const uni = uniSelect.value;
+            const sem = document.getElementById('setup-semester').value;
+            const uni = document.getElementById('setup-university').value;
             const customUni = document.getElementById('setup-custom-university').value.trim();
             
             let isUniValid = uni !== "" && (uni !== "Outra (Digitar manualmente)" || customUni !== "");
-            let isValid = name && course && isUniValid && isUsernameValid;
+            let isSemValid = sem !== "";
+            let isValid = name && course && isUniValid && isSemValid && isUsernameValid;
             
             document.getElementById('btn-save-profile').disabled = !isValid;
         }
@@ -531,7 +641,8 @@
             const username = document.getElementById('setup-username').value.trim();
             const course = document.getElementById('setup-course').value.trim();
             const semester = document.getElementById('setup-semester').value;
-            let university = uniSelect.value;
+            let university = document.getElementById('setup-university').value;
+            
             if (university === "Outra (Digitar manualmente)") {
                 university = document.getElementById('setup-custom-university').value.trim();
             }
@@ -547,7 +658,6 @@
 
             try {
                 await setDoc(doc(db, "users", currentUser.uid), profileData);
-                // Força o onAuthStateChanged a reagir novamente ou muda direto
                 document.getElementById('welcome-message').innerText = `Bem-vindo, ${name.split(' ')[0]}!`;
                 document.getElementById('user-info-display').innerText = `@${username} • ${course}`;
                 showScreen('main');
