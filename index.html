@@ -2,10 +2,10 @@
 <html lang="pt-PT" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OrganizaEdu - Web</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OrganizaEdu</title>
     
-    <!-- Tailwind CSS para Estilização -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -13,23 +13,16 @@
             theme: {
                 extend: {
                     colors: {
-                        background: {
-                            light: '#FBFBFD',
-                            dark: '#050505'
-                        },
-                        surface: {
-                            light: '#F2F2F7',
-                            dark: '#1C1C1E'
-                        },
+                        background: { light: '#FBFBFD', dark: '#050505' },
+                        surface: { light: '#F2F2F7', dark: '#1C1C1E' },
                         primary: '#0A84FF',
                         accent: '#B14AE2',
                         success: '#32D74B',
                         danger: '#FF3B30',
-                        warning: '#xFFFF00'
+                        warning: '#xFFFF00',
+                        foco: '#00C7BE'
                     },
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    }
+                    fontFamily: { sans: ['Inter', 'sans-serif'] }
                 }
             }
         }
@@ -43,142 +36,122 @@
         body { 
             font-family: 'Inter', sans-serif; 
             transition: background-color 0.3s, color 0.3s;
+            overflow: hidden; /* Previne o scroll do body, forçando o scroll interno */
         }
         
-        /* Efeito Liquid Glass (Vidro Líquido) adaptável ao tema */
+        /* Efeito Liquid Glass (Vidro Líquido) */
         .liquid-glass {
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         }
-        
-        .dark .liquid-glass {
-            background: rgba(28, 28, 30, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
+        .dark .liquid-glass { background: rgba(28, 28, 30, 0.7); border: 1px solid rgba(255, 255, 255, 0.08); }
+        html:not(.dark) .liquid-glass { background: rgba(255, 255, 255, 0.7); border: 1px solid rgba(0, 0, 0, 0.05); }
 
-        html:not(.dark) .liquid-glass {
-            background: rgba(255, 255, 255, 0.6);
-            border: 1px solid rgba(0, 0, 0, 0.05);
-        }
-
-        /* Animações suaves para troca de ecrãs */
+        /* Animações */
         .fade-enter { animation: fadeIn 0.4s ease-out forwards; }
         .slide-up { animation: slideUp 0.3s ease-out forwards; }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); }
-            to { transform: translateY(0); }
-        }
-
-        /* Esconder ecrãs inativos */
+        /* Utilitários Ecrãs */
         .hidden-screen { display: none !important; }
-
-        /* Estilização da Scrollbar */
+        
+        /* Scrollbar Desktop */
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(150, 150, 150, 0.3); border-radius: 10px; }
+
+        /* Correção Scroll Mobile */
+        .scrollable {
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            overscroll-behavior-y: contain;
+        }
+
+        /* Estilos IA Chat */
+        .chat-user { background: linear-gradient(135deg, #B14AE2, #6A0DAD); color: white; border-radius: 20px 20px 4px 20px; }
+        .chat-ai { background: var(--surface-color); border-radius: 20px 20px 20px 4px; }
+        .dark .chat-ai { background: #1C1C1E; color: white; }
+        html:not(.dark) .chat-ai { background: #F2F2F7; color: black; }
     </style>
 </head>
-<body class="h-screen w-screen overflow-hidden flex items-center justify-center relative bg-background-light dark:bg-background-dark text-black dark:text-white">
+<body class="h-[100dvh] w-screen bg-background-light dark:bg-background-dark text-black dark:text-white">
 
-    <!-- Botão de Teste de Tema (Podes remover mais tarde) -->
-    <button id="btn-toggle-theme" class="absolute top-6 right-6 z-[100] liquid-glass p-3 rounded-full w-12 h-12 flex items-center justify-center hover:scale-105 transition-transform">
-        <i class="fa-solid fa-moon dark:hidden"></i>
-        <i class="fa-solid fa-sun hidden dark:block text-yellow-400"></i>
-    </button>
-
-    <!-- 1. ECRÃ DE CARREGAMENTO -->
-    <div id="loading-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-background-light dark:bg-background-dark z-50 flex">
+    <!-- 1. ECRÃ DE LOADING -->
+    <div id="loading-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-background-light dark:bg-background-dark z-[100] flex">
         <div class="relative flex items-center justify-center mb-6">
             <div class="absolute w-24 h-24 bg-primary rounded-full blur-xl opacity-40 animate-pulse"></div>
             <i class="fa-solid fa-graduation-cap text-6xl text-primary relative z-10 animate-bounce"></i>
         </div>
         <h1 class="text-4xl font-extrabold tracking-tight mb-2">OrganizaEdu</h1>
         <p class="text-gray-500 font-medium flex items-center gap-2">
-            <i class="fa-solid fa-circle-notch fa-spin text-primary"></i> A conectar aos servidores...
+            <i class="fa-solid fa-circle-notch fa-spin text-primary"></i> A ligar aos servidores...
         </p>
     </div>
 
     <!-- 2. ECRÃ DE LOGIN -->
-    <div id="login-screen" class="absolute inset-0 flex items-center justify-center bg-background-light dark:bg-background-dark z-40 hidden-screen overflow-hidden">
+    <div id="login-screen" class="absolute inset-0 flex flex-col items-center justify-center bg-background-light dark:bg-background-dark z-[90] hidden-screen overflow-hidden">
         <div class="absolute top-0 left-0 w-[500px] h-[500px] bg-primary/20 rounded-full blur-[120px] -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
         <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-accent/20 rounded-full blur-[120px] translate-x-1/2 translate-y-1/2 pointer-events-none"></div>
         
-        <div class="liquid-glass p-10 rounded-[32px] z-10 max-w-md w-full mx-4 flex flex-col items-center text-center fade-enter">
+        <div class="liquid-glass p-8 md:p-10 rounded-[32px] z-10 max-w-md w-full mx-4 flex flex-col items-center text-center fade-enter">
             <div class="w-20 h-20 bg-surface-light dark:bg-surface-dark rounded-2xl flex items-center justify-center mb-6 shadow-inner">
                 <i class="fa-solid fa-graduation-cap text-4xl text-primary"></i>
             </div>
-            
             <h2 class="text-3xl font-extrabold mb-3">Bem-vindo</h2>
-            <p class="text-gray-500 mb-10 text-sm leading-relaxed font-medium">
-                Aceda ao OrganizaEdu pelo navegador e mantenha os seus estudos sincronizados com o seu telemóvel.
-            </p>
-
-            <button id="btn-google-login" class="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-all shadow-lg">
-                <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="Google" class="w-5 h-5">
-                Continuar com o Google
+            <p class="text-gray-500 mb-10 text-sm leading-relaxed font-medium">Aceda ao OrganizaEdu e mantenha os seus estudos sincronizados em todos os dispositivos.</p>
+            <button id="btn-google-login" class="w-full bg-black dark:bg-white text-white dark:text-black font-bold py-4 px-6 rounded-2xl flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform shadow-lg">
+                <img src="https://cdn-icons-png.flaticon.com/512/2991/2991148.png" alt="Google" class="w-5 h-5"> Entrar com o Google
             </button>
         </div>
     </div>
 
-    <!-- 3. ECRÃ DE CONFIGURAÇÃO DE PERFIL (SETUP) -->
-    <div id="setup-screen" class="absolute inset-0 flex items-center justify-center bg-background-light dark:bg-background-dark z-30 hidden-screen overflow-y-auto py-10">
-        <div class="liquid-glass p-8 md:p-10 rounded-[32px] z-10 max-w-lg w-full mx-4 flex flex-col fade-enter my-auto relative">
+    <!-- 3. ECRÃ DE SETUP DE PERFIL -->
+    <div id="setup-screen" class="absolute inset-0 flex items-center justify-center bg-background-light dark:bg-background-dark z-[80] hidden-screen py-10 scrollable">
+        <div class="liquid-glass p-8 md:p-10 rounded-[32px] z-10 max-w-lg w-full mx-4 flex flex-col fade-enter my-auto">
             <h2 class="text-3xl font-extrabold mb-2 text-center">Complete o seu perfil</h2>
             <p class="text-gray-500 mb-8 text-center text-sm font-medium">Precisamos de alguns dados para personalizar a sua experiência.</p>
 
             <div class="flex flex-col gap-5">
-                <!-- Nome -->
                 <div>
                     <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Nome de Exibição</label>
                     <input type="text" id="setup-name" placeholder="Ex: João Silva" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
                 </div>
-
-                <!-- Username com Validação -->
                 <div>
                     <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Nome de Utilizador (@)</label>
                     <input type="text" id="setup-username" placeholder="Ex: joaosilva" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
                     <p id="username-status" class="text-xs font-semibold mt-2 ml-1 text-gray-500">Este nome deve ser único.</p>
                 </div>
-
-                <!-- Curso -->
                 <div>
                     <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Curso</label>
                     <input type="text" id="setup-course" placeholder="Qual o seu curso?" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
                 </div>
 
-                <!-- Semestre e Universidade (Usando botões que abrem modais/ecrãs) -->
+                <!-- Botões para abrir as seleções (Resolve o problema de scroll em telemóveis) -->
                 <div class="flex flex-col md:flex-row gap-5">
                     <div class="flex-1">
                         <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Semestre</label>
-                        <div id="btn-open-semester" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 flex justify-between items-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                            <span id="setup-semester-display" class="text-gray-400">Selecione o semestre...</span>
+                        <div id="btn-open-semester" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 flex justify-between items-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">
+                            <span id="setup-semester-display" class="text-gray-400">Selecione...</span>
                             <i class="fa-solid fa-chevron-down text-gray-500"></i>
                         </div>
                         <input type="hidden" id="setup-semester">
                     </div>
                 </div>
-
-                <!-- Universidade -->
                 <div>
                     <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Universidade</label>
-                    <div id="btn-open-university" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 flex justify-between items-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
-                        <span id="setup-university-display" class="text-gray-400 truncate pr-4">Selecione a universidade...</span>
+                    <div id="btn-open-university" class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 flex justify-between items-center cursor-pointer hover:bg-black/5 dark:hover:bg-white/5">
+                        <span id="setup-university-display" class="text-gray-400 truncate pr-4">Selecione...</span>
                         <i class="fa-solid fa-chevron-down text-gray-500"></i>
                     </div>
                     <input type="hidden" id="setup-university">
                 </div>
 
-                <!-- Campo de Universidade Customizada (Oculto inicialmente) -->
                 <div id="custom-university-container" class="hidden">
                     <label class="text-xs font-bold text-gray-500 uppercase tracking-wider ml-1">Qual o nome da universidade?</label>
-                    <input type="text" id="setup-custom-university" placeholder="Escreva o nome..." class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
+                    <input type="text" id="setup-custom-university" placeholder="Escreva o nome..." class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl p-4 mt-1 outline-none focus:ring-2 focus:ring-primary/50">
                 </div>
             </div>
 
@@ -189,69 +162,461 @@
         </div>
     </div>
 
-    <!-- ECRÃ DE SELEÇÃO DE SEMESTRE -->
-    <div id="screen-select-semester" class="absolute inset-0 bg-background-light dark:bg-background-dark z-50 hidden-screen flex-col slide-up">
-        <div class="px-6 pt-10 pb-4 flex items-center gap-4 border-b border-black/5 dark:border-white/5 sticky top-0 bg-background-light dark:bg-background-dark z-10">
-            <button id="btn-close-semester" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-light dark:bg-surface-dark hover:bg-black/10 dark:hover:bg-white/10 transition">
-                <i class="fa-solid fa-arrow-left"></i>
-            </button>
-            <h2 class="text-2xl font-bold">Escolha o Semestre</h2>
+    <!-- Modais de Seleção para Setup (Scroll resolvido aqui) -->
+    <div id="screen-select-semester" class="absolute inset-0 bg-background-light dark:bg-background-dark z-[90] hidden-screen flex-col slide-up">
+        <div class="px-6 pt-10 pb-4 flex items-center gap-4 border-b border-black/5 dark:border-white/5 bg-background-light dark:bg-background-dark shrink-0">
+            <button id="btn-close-semester" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-light dark:bg-surface-dark"><i class="fa-solid fa-arrow-left"></i></button>
+            <h2 class="text-2xl font-bold">Semestre</h2>
         </div>
-        <div class="flex-1 overflow-y-auto p-6">
-            <div class="max-w-2xl mx-auto flex flex-col gap-2" id="semester-list">
-                <!-- Preenchido via JS -->
-            </div>
+        <div class="flex-1 scrollable p-6">
+            <div class="max-w-2xl mx-auto flex flex-col gap-2 pb-20" id="semester-list"></div>
         </div>
     </div>
 
-    <!-- ECRÃ DE SELEÇÃO DE UNIVERSIDADE -->
-    <div id="screen-select-university" class="absolute inset-0 bg-background-light dark:bg-background-dark z-50 hidden-screen flex-col slide-up">
-        <div class="px-6 pt-10 pb-4 flex flex-col gap-4 border-b border-black/5 dark:border-white/5 sticky top-0 bg-background-light dark:bg-background-dark z-10">
+    <div id="screen-select-university" class="absolute inset-0 bg-background-light dark:bg-background-dark z-[90] hidden-screen flex-col slide-up">
+        <div class="px-6 pt-10 pb-4 flex flex-col gap-4 border-b border-black/5 dark:border-white/5 bg-background-light dark:bg-background-dark shrink-0">
             <div class="flex items-center gap-4">
-                <button id="btn-close-university" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-light dark:bg-surface-dark hover:bg-black/10 dark:hover:bg-white/10 transition">
-                    <i class="fa-solid fa-arrow-left"></i>
-                </button>
-                <h2 class="text-2xl font-bold">Procurar Universidade</h2>
+                <button id="btn-close-university" class="w-10 h-10 flex items-center justify-center rounded-full bg-surface-light dark:bg-surface-dark"><i class="fa-solid fa-arrow-left"></i></button>
+                <h2 class="text-2xl font-bold">Universidade</h2>
             </div>
-            
-            <!-- Barra de Pesquisa -->
             <div class="relative w-full max-w-2xl mx-auto mt-2">
                 <i class="fa-solid fa-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"></i>
-                <input type="text" id="search-university" placeholder="Ex: USP, Ceará, Bahia..." class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-primary/50 transition-shadow">
+                <input type="text" id="search-university" placeholder="Ex: USP, UFRB, Bahia..." class="w-full bg-surface-light dark:bg-surface-dark rounded-2xl py-4 pl-12 pr-4 outline-none focus:ring-2 focus:ring-primary/50">
             </div>
         </div>
+        <div class="flex-1 scrollable p-6">
+            <div class="max-w-2xl mx-auto flex flex-col gap-2 pb-20" id="university-list"></div>
+        </div>
+    </div>
+
+
+    <!-- ================= 4. APP PRINCIPAL RESPONSIVA ================= -->
+    <div id="main-app-screen" class="absolute inset-0 bg-background-light dark:bg-background-dark z-20 hidden-screen flex flex-row h-[100dvh] w-full">
         
-        <div class="flex-1 overflow-y-auto p-6">
-            <div class="max-w-2xl mx-auto flex flex-col gap-2" id="university-list">
-                <!-- Preenchido via JS -->
+        <!-- SIDEBAR (Apenas Desktop: ecrãs médios e grandes) -->
+        <aside class="hidden md:flex w-72 h-full bg-surface-light dark:bg-surface-dark border-r border-black/5 dark:border-white/5 flex-col shrink-0">
+            <div class="p-8 flex items-center gap-4 border-b border-black/5 dark:border-white/5">
+                <div class="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center shadow-lg"><i class="fa-solid fa-graduation-cap text-xl"></i></div>
+                <span class="font-extrabold text-2xl tracking-tight">OrganizaEdu</span>
+            </div>
+            
+            <nav class="flex-1 scrollable p-4 flex flex-col gap-2">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 ml-4 mt-2">Navegação</p>
+                
+                <button onclick="nav('home')" class="nav-item active flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="home">
+                    <i class="fa-solid fa-border-all w-5 text-lg"></i> Painel Inicial
+                </button>
+                <button onclick="nav('aulas')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="aulas">
+                    <i class="fa-solid fa-calendar-days w-5 text-lg"></i> As Minhas Aulas
+                </button>
+                <button onclick="nav('tarefas')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="tarefas">
+                    <i class="fa-solid fa-list-check w-5 text-lg"></i> Tarefas
+                </button>
+                <button onclick="nav('ia')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="ia">
+                    <i class="fa-solid fa-wand-magic-sparkles w-5 text-lg"></i> Organiza IA
+                </button>
+                
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-2 mt-6 ml-4">Ferramentas</p>
+                <button onclick="nav('financas')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="financas">
+                    <i class="fa-solid fa-dollar-sign w-5 text-lg"></i> Finanças
+                </button>
+                <button onclick="nav('anotacoes')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="anotacoes">
+                    <i class="fa-solid fa-note-sticky w-5 text-lg"></i> Anotações
+                </button>
+                <button onclick="nav('foco')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="foco">
+                    <i class="fa-solid fa-stopwatch w-5 text-lg"></i> Modo Foco
+                </button>
+                <button onclick="nav('calculadora')" class="nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="calculadora">
+                    <i class="fa-solid fa-calculator w-5 text-lg"></i> Calculadora
+                </button>
+                
+                <button id="sidebar-circular" onclick="nav('circular')" class="hidden nav-item flex items-center gap-4 px-4 py-3 rounded-xl font-semibold transition-all hover:bg-black/5 dark:hover:bg-white/5" data-view="circular">
+                    <i class="fa-solid fa-bus w-5 text-lg"></i> Circular UFRB
+                </button>
+            </nav>
+
+            <div class="p-4 border-t border-black/5 dark:border-white/5 flex flex-col gap-2">
+                <button onclick="toggleTheme()" class="flex items-center justify-between px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-colors">
+                    <span class="flex items-center gap-3"><i class="fa-solid fa-moon dark:hidden w-5 text-lg"></i><i class="fa-solid fa-sun hidden dark:inline w-5 text-lg"></i> Tema</span>
+                </button>
+                <div onclick="nav('profile')" class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 font-semibold transition-colors cursor-pointer" data-view="profile">
+                    <img id="desk-avatar" src="" class="w-10 h-10 rounded-full object-cover border border-primary">
+                    <div class="flex flex-col overflow-hidden">
+                        <span id="desk-greeting" class="text-sm font-bold truncate">Estudante</span>
+                        <span class="text-xs text-gray-500">Ver Perfil</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- ÁREA DE CONTEÚDO (Para Mobile e Desktop) -->
+        <main class="flex-1 h-[100dvh] flex flex-col relative w-full overflow-hidden bg-background-light dark:bg-background-dark">
+            
+            <!-- HEADER MOBILE -->
+            <header id="mobile-header" class="md:hidden w-full px-6 pt-12 pb-4 flex justify-between items-center bg-background-light dark:bg-background-dark shrink-0 z-10">
+                <h2 class="text-2xl font-bold" id="mob-greeting">Olá, Estudante</h2>
+                <img id="mob-avatar" src="" class="w-12 h-12 rounded-full object-cover border border-primary cursor-pointer" onclick="nav('profile')">
+            </header>
+
+            <!-- VIEWS CONTAINER -->
+            <div class="flex-1 w-full relative overflow-hidden">
+                
+                <!-- HOME -->
+                <div id="view-home" class="view-section active-view scrollable h-full px-6 md:p-10 pb-32 md:pb-10">
+                    <div class="max-w-6xl mx-auto w-full">
+                        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">O Teu Painel</h1>
+                        <p class="text-gray-500 font-medium mb-8" id="current-date"></p>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12" id="home-widgets"></div>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                            <div>
+                                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fa-solid fa-list-check text-primary"></i> Próximas Tarefas</h2>
+                                <div id="home-tasks-list" class="flex flex-col gap-4"></div>
+                            </div>
+                            <div>
+                                <h2 class="text-2xl font-bold mb-6 flex items-center gap-3"><i class="fa-solid fa-calendar-day text-danger"></i> Aulas de Hoje</h2>
+                                <div id="home-aulas-list" class="flex flex-col gap-4"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AULAS -->
+                <div id="view-aulas" class="view-section scrollable h-full px-6 md:p-10 pb-32 md:pb-10">
+                    <div class="max-w-5xl mx-auto w-full">
+                        <div class="flex justify-between items-center mb-8">
+                            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">As Tuas Aulas</h1>
+                            <button onclick="openModal('modal-aula')" class="hidden md:flex bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition items-center gap-2 shadow-lg">
+                                <i class="fa-solid fa-plus"></i> Adicionar
+                            </button>
+                        </div>
+                        <div id="aulas-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                    </div>
+                    <button onclick="openModal('modal-aula')" class="md:hidden fixed bottom-28 right-6 w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg z-30"><i class="fa-solid fa-plus text-2xl"></i></button>
+                </div>
+
+                <!-- TAREFAS -->
+                <div id="view-tarefas" class="view-section scrollable h-full px-6 md:p-10 pb-32 md:pb-10">
+                    <div class="max-w-5xl mx-auto w-full">
+                        <div class="flex justify-between items-center mb-8">
+                            <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Tarefas</h1>
+                            <button onclick="openModal('modal-tarefa')" class="hidden md:flex bg-primary text-white px-6 py-3 rounded-xl font-bold hover:bg-blue-600 transition items-center gap-2 shadow-lg">
+                                <i class="fa-solid fa-plus"></i> Nova Tarefa
+                            </button>
+                        </div>
+                        <div class="flex gap-4 mb-8 bg-surface-light dark:bg-surface-dark p-2 rounded-2xl w-fit">
+                            <button class="px-6 py-2 rounded-xl bg-background-light dark:bg-background-dark font-bold shadow-sm" id="tab-t-pendentes" onclick="filterTasks('pendentes')">Pendentes</button>
+                            <button class="px-6 py-2 rounded-xl text-gray-500 font-bold hover:text-black dark:hover:text-white transition" id="tab-t-concluidas" onclick="filterTasks('concluidas')">Concluídas</button>
+                        </div>
+                        <div id="lista-tarefas" class="flex flex-col gap-4"></div>
+                    </div>
+                    <button onclick="openModal('modal-tarefa')" class="md:hidden fixed bottom-28 right-6 w-16 h-16 bg-primary text-white rounded-2xl flex items-center justify-center shadow-lg z-30"><i class="fa-solid fa-plus text-2xl"></i></button>
+                </div>
+
+                <!-- IA CHAT -->
+                <div id="view-ia" class="view-section h-full flex flex-col relative bg-surface-light dark:bg-surface-dark">
+                    <div class="px-6 md:px-10 py-6 border-b border-black/5 dark:border-white/5 flex items-center justify-between shrink-0 bg-surface-light dark:bg-surface-dark sticky top-0 z-10 pt-12 md:pt-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-full bg-accent text-white flex items-center justify-center shadow-lg"><i class="fa-solid fa-wand-magic-sparkles text-xl"></i></div>
+                            <div>
+                                <h2 class="text-2xl font-extrabold">Organiza IA</h2>
+                                <p class="text-sm font-bold text-success" id="ia-status"><i class="fa-solid fa-circle text-[10px] mr-1"></i> Sempre online (Groq LLaMA 3)</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="ia-chat" class="flex-1 scrollable p-6 md:p-10 flex flex-col gap-6 bg-background-light dark:bg-background-dark pb-32 md:pb-32"></div>
+                    <div class="absolute bottom-[90px] md:bottom-0 w-full p-4 md:p-6 bg-surface-light dark:bg-surface-dark border-t border-black/5 dark:border-white/5 shrink-0 z-20">
+                        <div class="max-w-4xl mx-auto relative flex items-center bg-background-light dark:bg-background-dark rounded-2xl border border-black/10 dark:border-white/10 p-2">
+                            <input type="text" id="ia-input" placeholder="Pede à IA para criar algo..." class="w-full bg-transparent py-3 pl-4 pr-16 outline-none text-lg">
+                            <button id="btn-ia-send" class="absolute right-2 w-12 h-12 bg-accent rounded-xl flex items-center justify-center text-white shadow-lg"><i class="fa-solid fa-paper-plane"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MENU MOBILE (FERRAMENTAS) -->
+                <div id="view-ferramentas" class="view-section scrollable h-full px-6 pt-10 pb-32 md:hidden">
+                    <h1 class="text-3xl font-extrabold tracking-tight mb-2">Menu de Extras</h1>
+                    <p class="text-gray-500 mb-6">Tudo o que precisas para o teu dia a dia.</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="nav('financas')">
+                            <div class="w-14 h-14 rounded-full bg-success/10 flex items-center justify-center"><i class="fa-solid fa-dollar-sign text-success text-2xl"></i></div>
+                            <span class="font-bold text-sm">Finanças</span>
+                        </div>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="nav('anotacoes')">
+                            <div class="w-14 h-14 rounded-full bg-accent/10 flex items-center justify-center"><i class="fa-solid fa-note-sticky text-accent text-2xl"></i></div>
+                            <span class="font-bold text-sm">Anotações</span>
+                        </div>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="nav('foco')">
+                            <div class="w-14 h-14 rounded-full bg-foco/10 flex items-center justify-center"><i class="fa-solid fa-stopwatch text-foco text-2xl"></i></div>
+                            <span class="font-bold text-sm">Modo Foco</span>
+                        </div>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="nav('calculadora')">
+                            <div class="w-14 h-14 rounded-full bg-[#B14AE2]/10 flex items-center justify-center"><i class="fa-solid fa-calculator text-[#B14AE2] text-2xl"></i></div>
+                            <span class="font-bold text-sm">Calculadora</span>
+                        </div>
+                        <div id="mob-menu-circular" class="hidden bg-surface-light dark:bg-surface-dark rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="nav('circular')">
+                            <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center"><i class="fa-solid fa-bus text-primary text-2xl"></i></div>
+                            <span class="font-bold text-sm">Circular</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TELA: FINANÇAS -->
+                <div id="view-financas" class="view-section scrollable h-full px-6 md:p-10 pb-32 md:pb-10">
+                    <div class="max-w-5xl mx-auto w-full">
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="flex items-center gap-4">
+                                <button class="md:hidden w-10 h-10 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center" onclick="nav('ferramentas')"><i class="fa-solid fa-arrow-left"></i></button>
+                                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Finanças</h1>
+                            </div>
+                            <button onclick="openModal('modal-financa')" class="hidden md:flex bg-success text-white px-6 py-3 rounded-xl font-bold hover:bg-green-600 transition items-center gap-2 shadow-lg">
+                                <i class="fa-solid fa-plus"></i> Transação
+                            </button>
+                        </div>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-[32px] p-8 mb-8 border border-black/5 dark:border-white/5 flex flex-col md:flex-row md:justify-between md:items-center gap-6">
+                            <div><p class="text-gray-500 font-bold tracking-wider uppercase text-sm mb-1">Saldo Atual</p><h1 class="text-5xl font-extrabold" id="fin-saldo">R$ 0,00</h1></div>
+                            <div class="flex gap-8">
+                                <div><p class="text-success font-bold text-sm mb-1"><i class="fa-solid fa-arrow-up"></i> Receitas</p><p class="text-2xl font-bold" id="fin-receitas">R$ 0,00</p></div>
+                                <div><p class="text-danger font-bold text-sm mb-1"><i class="fa-solid fa-arrow-down"></i> Despesas</p><p class="text-2xl font-bold" id="fin-despesas">R$ 0,00</p></div>
+                            </div>
+                        </div>
+                        <h2 class="text-xl font-bold mb-4">Histórico</h2>
+                        <div id="lista-financas" class="flex flex-col gap-3"></div>
+                    </div>
+                    <button onclick="openModal('modal-financa')" class="md:hidden fixed bottom-28 right-6 w-16 h-16 bg-success text-white rounded-2xl flex items-center justify-center shadow-lg z-30"><i class="fa-solid fa-plus text-2xl"></i></button>
+                </div>
+
+                <!-- SUB-TELA: ANOTAÇÕES -->
+                <div id="view-anotacoes" class="view-section scrollable h-full px-6 md:p-10 pb-32 md:pb-10">
+                    <div class="max-w-6xl mx-auto w-full">
+                        <div class="flex justify-between items-center mb-8">
+                            <div class="flex items-center gap-4">
+                                <button class="md:hidden w-10 h-10 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center" onclick="nav('ferramentas')"><i class="fa-solid fa-arrow-left"></i></button>
+                                <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight">Anotações</h1>
+                            </div>
+                            <button onclick="openModal('modal-nota')" class="hidden md:flex bg-accent text-white px-6 py-3 rounded-xl font-bold transition items-center gap-2 shadow-lg"><i class="fa-solid fa-plus"></i> Nova Nota</button>
+                        </div>
+                        <div class="columns-1 sm:columns-2 lg:columns-3 gap-6 space-y-6" id="lista-notas"></div>
+                    </div>
+                    <button onclick="openModal('modal-nota')" class="md:hidden fixed bottom-28 right-6 w-16 h-16 bg-accent text-white rounded-2xl flex items-center justify-center shadow-lg z-30"><i class="fa-solid fa-plus text-2xl"></i></button>
+                </div>
+
+                <!-- SUB-TELA: MODO FOCO -->
+                <div id="view-foco" class="view-section scrollable h-full flex flex-col justify-center items-center pb-32 md:pb-10 relative">
+                    <button class="md:hidden absolute top-12 left-6 w-10 h-10 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center" onclick="nav('ferramentas')"><i class="fa-solid fa-arrow-left"></i></button>
+                    <h1 class="text-4xl font-extrabold tracking-tight mb-12">Modo Foco</h1>
+                    <div class="relative w-72 h-72 md:w-96 md:h-96 rounded-full border-[16px] md:border-[20px] border-surface-light dark:border-surface-dark flex items-center justify-center mb-12 shadow-2xl">
+                        <div class="flex flex-col items-center">
+                            <i class="fa-solid fa-stopwatch text-foco text-5xl mb-4"></i>
+                            <span id="foco-timer" class="text-7xl md:text-8xl font-light tracking-tighter">25:00</span>
+                        </div>
+                    </div>
+                    <div class="flex gap-4 mb-12 w-full max-w-xs md:max-w-md px-6">
+                        <button class="flex-1 py-3 md:py-4 rounded-2xl bg-surface-light dark:bg-surface-dark font-bold hover:bg-foco hover:text-white transition" onclick="setFoco(15)">15 m</button>
+                        <button class="flex-1 py-3 md:py-4 rounded-2xl bg-foco text-white font-bold shadow-lg shadow-foco/30" onclick="setFoco(25)">25 m</button>
+                        <button class="flex-1 py-3 md:py-4 rounded-2xl bg-surface-light dark:bg-surface-dark font-bold hover:bg-foco hover:text-white transition" onclick="setFoco(50)">50 m</button>
+                    </div>
+                    <div class="flex gap-8 items-center">
+                        <button onclick="resetFoco()" class="w-16 h-16 md:w-20 md:h-20 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-800 transition"><i class="fa-solid fa-stop text-2xl md:text-3xl"></i></button>
+                        <button id="btn-play-foco" class="w-24 h-24 md:w-32 md:h-32 rounded-full bg-gradient-to-r from-foco to-[#00A29A] flex items-center justify-center shadow-2xl hover:scale-105 transition-transform">
+                            <i class="fa-solid fa-play text-white text-4xl md:text-5xl ml-1 md:ml-2" id="foco-icon"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-TELA: CALCULADORA -->
+                <div id="view-calculadora" class="view-section scrollable h-full flex flex-col justify-center items-center pb-32 md:pb-10 relative">
+                    <button class="md:hidden absolute top-12 left-6 w-10 h-10 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center" onclick="nav('ferramentas')"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div class="w-full max-w-sm md:max-w-md bg-surface-light dark:bg-surface-dark p-6 md:p-8 rounded-[40px] shadow-2xl border border-black/5 dark:border-white/5">
+                        <h2 class="text-lg md:text-xl font-bold mb-4 md:mb-6 text-center text-gray-500 uppercase tracking-widest">Calculadora Pro</h2>
+                        <div class="flex flex-col justify-end items-end mb-6 md:mb-8 bg-background-light dark:bg-background-dark p-4 md:p-6 rounded-3xl h-24 md:h-32 border border-black/5 dark:border-white/5 overflow-hidden">
+                            <p id="calc-exp" class="text-lg md:text-xl font-medium text-gray-400 break-all"></p>
+                            <p id="calc-res" class="text-4xl md:text-5xl font-bold text-primary mt-1 break-all">0</p>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3 md:gap-4">
+                            <button class="py-4 bg-danger/10 text-danger rounded-2xl text-xl md:text-2xl font-bold" onclick="calc('C')">C</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-xl md:text-2xl font-bold" onclick="calc('(')">(</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-xl md:text-2xl font-bold" onclick="calc(')')">)</button>
+                            <button class="py-4 bg-primary/10 text-primary rounded-2xl text-2xl md:text-3xl font-bold" onclick="calc('/')">÷</button>
+                            
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('7')">7</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('8')">8</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('9')">9</button>
+                            <button class="py-4 bg-primary/10 text-primary rounded-2xl text-2xl md:text-3xl font-bold" onclick="calc('*')">×</button>
+                            
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('4')">4</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('5')">5</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('6')">6</button>
+                            <button class="py-4 bg-primary/10 text-primary rounded-2xl text-3xl md:text-4xl font-bold" onclick="calc('-')">-</button>
+                            
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('1')">1</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('2')">2</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('3')">3</button>
+                            <button class="py-4 bg-primary/10 text-primary rounded-2xl text-2xl md:text-3xl font-bold" onclick="calc('+')">+</button>
+                            
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('0')">0</button>
+                            <button class="py-4 bg-background-light dark:bg-background-dark rounded-2xl text-2xl font-bold" onclick="calc('.')">.</button>
+                            <button class="py-4 bg-danger/10 text-danger rounded-2xl text-xl md:text-2xl font-bold" onclick="calc('DEL')">⌫</button>
+                            <button class="py-4 bg-primary text-white rounded-2xl text-2xl md:text-3xl font-bold shadow-lg" onclick="calc('=')">=</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SUB-TELA: PERFIL -->
+                <div id="view-profile" class="view-section scrollable h-full px-6 md:p-10 pb-32 md:pb-10 relative">
+                    <button class="md:hidden absolute top-12 left-6 w-10 h-10 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center" onclick="nav('home')"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div class="max-w-2xl mx-auto w-full mt-10 md:mt-0">
+                        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-10 text-center">Meu Perfil</h1>
+                        <div class="bg-surface-light dark:bg-surface-dark rounded-[32px] p-10 flex flex-col items-center border border-black/5 dark:border-white/5 shadow-sm mb-8">
+                            <img id="prof-avatar-large" src="" class="w-32 h-32 md:w-40 md:h-40 rounded-full border-4 border-primary object-cover mb-6 shadow-xl">
+                            <h2 class="text-2xl md:text-3xl font-extrabold mb-2 text-center" id="prof-name-large">Nome</h2>
+                            <p class="text-md md:text-lg text-gray-500 font-medium mb-1 text-center" id="prof-uni-large">Universidade</p>
+                            <p class="text-sm md:text-md text-gray-400 font-medium text-center" id="prof-course-large">Curso - Semestre</p>
+                        </div>
+                        <button onclick="logout()" class="w-full bg-danger/10 text-danger hover:bg-danger hover:text-white transition font-bold py-4 rounded-2xl text-lg flex items-center justify-center gap-3">
+                            <i class="fa-solid fa-right-from-bracket"></i> Terminar Sessão
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SUB-TELA: CIRCULAR -->
+                <div id="view-circular" class="view-section scrollable h-full px-6 md:p-10 pb-32 md:pb-10 relative">
+                    <button class="md:hidden absolute top-12 left-6 w-10 h-10 rounded-full bg-surface-light dark:bg-surface-dark flex items-center justify-center" onclick="nav('ferramentas')"><i class="fa-solid fa-arrow-left"></i></button>
+                    <div class="max-w-4xl mx-auto w-full mt-10 md:mt-0">
+                        <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight mb-2">Circular UFRB</h1>
+                        <p class="text-gray-500 mb-10">Acompanhe os horários dos ônibus no campus Cruz das Almas.</p>
+                        <div id="circular-list" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- BOTTOM NAVIGATION (Apenas Mobile) -->
+            <nav id="mobile-nav" class="md:hidden fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[95%] liquid-glass rounded-[32px] flex justify-around items-center py-3 z-40">
+                <button onclick="nav('home')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-100 transition-opacity" data-view="home">
+                    <i class="fa-solid fa-border-all text-2xl"></i><span class="text-[10px] font-bold">Início</span>
+                </button>
+                <button onclick="nav('aulas')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 transition-opacity" data-view="aulas">
+                    <i class="fa-solid fa-calendar-days text-2xl"></i><span class="text-[10px] font-bold">Aulas</span>
+                </button>
+                <button onclick="nav('ia')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 transition-opacity" data-view="ia">
+                    <i class="fa-solid fa-wand-magic-sparkles text-2xl"></i><span class="text-[10px] font-bold">IA</span>
+                </button>
+                <button onclick="nav('ferramentas')" class="nav-btn text-content flex flex-col items-center gap-1 opacity-40 transition-opacity" data-view="ferramentas">
+                    <i class="fa-solid fa-layer-group text-2xl"></i><span class="text-[10px] font-bold">Menu</span>
+                </button>
+            </nav>
+
+        </main>
+    </div>
+
+    <!-- ================= MODAIS DE AÇÃO ================= -->
+    
+    <!-- Modal Tarefa -->
+    <div id="modal-tarefa" class="hidden fixed inset-0 bg-black/60 z-[100] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg rounded-[32px] p-6 shadow-2xl border border-black/10 dark:border-white/10">
+            <h3 class="text-2xl font-extrabold mb-6">Nova Tarefa</h3>
+            <input type="text" id="t-titulo" placeholder="O que precisas de fazer?" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mb-4 outline-none">
+            <input type="text" id="t-desc" placeholder="Descrição (Opcional)" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mb-4 outline-none">
+            <div class="flex gap-4 mb-6">
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Prioridade</label>
+                    <select id="t-prio" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mt-1 outline-none">
+                        <option value="Baixa">Baixa</option>
+                        <option value="Média" selected>Média</option>
+                        <option value="Alta">Alta</option>
+                    </select>
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Data</label>
+                    <input type="date" id="t-data" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mt-1 outline-none">
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-tarefa')" class="flex-1 bg-background-light dark:bg-background-dark py-4 rounded-xl font-bold">Cancelar</button>
+                <button onclick="saveTarefa()" class="flex-1 bg-primary text-white py-4 rounded-xl font-bold shadow-lg">Guardar</button>
             </div>
         </div>
     </div>
 
-    <!-- 4. TELA PRINCIPAL (Painel Base Provisório) -->
-    <div id="main-app-screen" class="absolute inset-0 bg-background-light dark:bg-background-dark z-20 hidden-screen flex flex-col items-center justify-center">
-        <div class="liquid-glass p-10 rounded-3xl text-center">
-            <h1 class="text-3xl font-extrabold text-success mb-4"><i class="fa-solid fa-check-circle mr-2"></i>Tudo Pronto!</h1>
-            <p class="text-gray-500 mb-2 text-lg" id="welcome-message">Carregando...</p>
-            <p class="text-sm font-bold text-primary mb-8" id="user-info-display">@usuario • Curso</p>
-            
-            <button id="btn-logout" class="bg-surface-light dark:bg-surface-dark border border-black/5 dark:border-white/5 px-6 py-3 rounded-xl font-bold hover:bg-danger/10 hover:text-danger transition-colors">
-                <i class="fa-solid fa-right-from-bracket mr-2"></i>Sair da conta
-            </button>
+    <!-- Modal Aula -->
+    <div id="modal-aula" class="hidden fixed inset-0 bg-black/60 z-[100] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg rounded-[32px] p-6 shadow-2xl border border-black/10 dark:border-white/10 scrollable max-h-[90vh]">
+            <h3 class="text-2xl font-extrabold mb-6">Adicionar Aula</h3>
+            <input type="text" id="a-mat" placeholder="Matéria (Ex: Cálculo I)" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mb-4 outline-none">
+            <div class="flex gap-4 mb-4">
+                <input type="text" id="a-prof" placeholder="Professor" class="flex-1 bg-background-light dark:bg-background-dark rounded-xl p-4 outline-none w-1/2">
+                <input type="text" id="a-loc" placeholder="Sala" class="flex-1 bg-background-light dark:bg-background-dark rounded-xl p-4 outline-none w-1/2">
+            </div>
+            <div class="flex flex-wrap md:flex-nowrap gap-4 mb-6">
+                <div class="w-full md:flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Dia</label>
+                    <select id="a-dia" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mt-1 outline-none">
+                        <option value="Seg">Segunda</option><option value="Ter">Terça</option><option value="Qua">Quarta</option>
+                        <option value="Qui">Quinta</option><option value="Sex">Sexta</option><option value="Sáb">Sábado</option>
+                    </select>
+                </div>
+                <div class="w-[45%] md:w-auto md:flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Início</label>
+                    <input type="time" id="a-ini" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mt-1 outline-none" value="08:00">
+                </div>
+                <div class="w-[45%] md:w-auto md:flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Fim</label>
+                    <input type="time" id="a-fim" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mt-1 outline-none" value="10:00">
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-aula')" class="flex-1 bg-background-light dark:bg-background-dark py-4 rounded-xl font-bold">Cancelar</button>
+                <button onclick="saveAula()" class="flex-1 bg-black dark:bg-white text-white dark:text-black py-4 rounded-xl font-bold">Guardar</button>
+            </div>
         </div>
     </div>
 
-    <!-- FIREBASE E LÓGICA -->
+    <!-- Modal Finanças -->
+    <div id="modal-financa" class="hidden fixed inset-0 bg-black/60 z-[100] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg rounded-[32px] p-6 shadow-2xl border border-black/10 dark:border-white/10">
+            <h3 class="text-2xl font-extrabold mb-6">Nova Transação</h3>
+            <input type="text" id="f-tit" placeholder="Título (Ex: Almoço)" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mb-4 outline-none">
+            <div class="flex gap-4 mb-6">
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Valor (R$)</label>
+                    <input type="number" id="f-val" placeholder="0.00" step="0.01" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mt-1 outline-none">
+                </div>
+                <div class="flex-1">
+                    <label class="text-xs font-bold text-gray-500 uppercase ml-1">Tipo</label>
+                    <select id="f-tip" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mt-1 outline-none">
+                        <option value="Despesa">Despesa (-)</option><option value="Receita">Receita (+)</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-financa')" class="flex-1 bg-background-light dark:bg-background-dark py-4 rounded-xl font-bold">Cancelar</button>
+                <button onclick="saveFinanca()" class="flex-1 bg-success text-white py-4 rounded-xl font-bold shadow-lg">Registar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Anotações -->
+    <div id="modal-nota" class="hidden fixed inset-0 bg-black/60 z-[100] flex justify-center items-center backdrop-blur-sm p-4">
+        <div class="bg-surface-light dark:bg-surface-dark w-full max-w-2xl rounded-[32px] p-6 shadow-2xl border border-black/10 dark:border-white/10">
+            <h3 class="text-2xl font-extrabold mb-6">Nova Anotação</h3>
+            <input type="text" id="n-tit" placeholder="Título" class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mb-4 outline-none font-bold text-lg">
+            <textarea id="n-txt" placeholder="Escreve o que te vier à cabeça..." class="w-full bg-background-light dark:bg-background-dark rounded-xl p-4 mb-6 outline-none h-48 md:h-64 resize-none"></textarea>
+            <div class="flex gap-4">
+                <button onclick="closeModal('modal-nota')" class="flex-1 bg-background-light dark:bg-background-dark py-4 rounded-xl font-bold">Cancelar</button>
+                <button onclick="saveNota()" class="flex-1 bg-accent text-white py-4 rounded-xl font-bold shadow-lg">Guardar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- FIREBASE E LÓGICA JAVASCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-        import { 
-            getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut 
-        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
-        import { 
-            getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs 
-        } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, collection, query, where, getDocs, onSnapshot, orderBy, addDoc, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-        // Configuração do Firebase fornecida
         const firebaseConfig = {
             apiKey: "AIzaSyA3g9gmFn-Uc_SoLHsVhH7eIwgzMOYmIAQ",
             authDomain: "organizaedu.firebaseapp.com",
@@ -262,423 +627,354 @@
             measurementId: "G-N1GS8DXP4Q"
         };
 
-        // Inicialização
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
         const provider = new GoogleAuthProvider();
 
-        let currentUser = null;
-        let isUsernameValid = false;
-
-        // Referências DOM - Ecrãs Principais
-        const screens = {
-            loading: document.getElementById('loading-screen'),
-            login: document.getElementById('login-screen'),
-            setup: document.getElementById('setup-screen'),
-            main: document.getElementById('main-app-screen')
+        window.state = {
+            user: null, profile: null, groqKey: "",
+            tarefas: [], aulas: [], financas: [], anotacoes: [],
+            taskFilter: 'pendentes'
         };
 
-        // Referências DOM - Ecrãs de Seleção
-        const screenSelectSemester = document.getElementById('screen-select-semester');
-        const screenSelectUniversity = document.getElementById('screen-select-university');
-        const customUniContainer = document.getElementById('custom-university-container');
-
-        // Função para trocar de ecrã principal
-        function showScreen(screenName) {
-            Object.values(screens).forEach(s => s.classList.add('hidden-screen'));
-            screens[screenName].classList.remove('hidden-screen');
-        }
-
-        // Lógica do Tema (Claro/Escuro)
-        const themeBtn = document.getElementById('btn-toggle-theme');
-        themeBtn.addEventListener('click', () => {
-            const html = document.documentElement;
-            if (html.classList.contains('dark')) {
-                html.classList.remove('dark');
-                localStorage.setItem('theme', 'light');
+        // --- SISTEMA DE NAVEGAÇÃO RESPONSIVA ---
+        window.nav = function(viewId) {
+            // Esconde tudo
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            // Mostra o alvo
+            document.getElementById('view-' + viewId).classList.add('active-view');
+            
+            // Header e Nav Mobile Logic
+            const mobHeader = document.getElementById('mobile-header');
+            if (viewId === 'ia' || viewId === 'foco' || viewId === 'calculadora' || viewId === 'profile' || viewId === 'circular' || viewId === 'financas' || viewId === 'anotacoes') {
+                mobHeader.style.display = 'none';
             } else {
-                html.classList.add('dark');
-                localStorage.setItem('theme', 'dark');
-            }
-        });
-        if (localStorage.getItem('theme') === 'light') {
-            document.documentElement.classList.remove('dark');
-        }
-
-        // DADOS PARA OS MENUS DE SELEÇÃO
-        const semestersData = [
-            "1º Semestre", "2º Semestre", "3º Semestre", "4º Semestre", 
-            "5º Semestre", "6º Semestre", "7º Semestre", "8º Semestre", 
-            "9º Semestre", "10º Semestre", "11º Semestre", "12º Semestre"
-        ];
-
-        const universitiesData = [
-            "UFRB - Universidade Federal do Recôncavo da Bahia",
-            "UFBA - Universidade Federal da Bahia",
-            "UFOB - Universidade Federal do Oeste da Bahia",
-            "UFSB - Universidade Federal do Sul da Bahia",
-            "UNIVASF - Universidade Federal do Vale do São Francisco",
-            "UNEB - Universidade do Estado da Bahia",
-            "UEFS - Universidade Estadual de Feira de Santana",
-            "UESB - Universidade Estadual do Sudoeste da Bahia",
-            "UESC - Universidade Estadual de Santa Cruz",
-            "IFBA - Instituto Federal da Bahia",
-            "IF Baiano - Instituto Federal Baiano",
-            "UFAC - Universidade Federal do Acre",
-            "UFAL - Universidade Federal de Alagoas",
-            "UNIFAP - Universidade Federal do Amapá",
-            "UFAM - Universidade Federal do Amazonas",
-            "UNILAB - Universidade da Integração Internacional da Lusofonia Afro-Brasileira",
-            "UFC - Universidade Federal do Ceará",
-            "UFCA - Universidade Federal do Cariri",
-            "UnB - Universidade de Brasília",
-            "UFES - Universidade Federal do Espírito Santo",
-            "UFG - Universidade Federal de Goiás",
-            "UFCAT - Universidade Federal de Catalão",
-            "UFJ - Universidade Federal de Jataí",
-            "UFMA - Universidade Federal do Maranhão",
-            "UFMT - Universidade Federal de Mato Grosso",
-            "UFR - Universidade Federal de Rondonópolis",
-            "UFMS - Universidade Federal de Mato Grosso do Sul",
-            "UFGD - Universidade Federal da Grande Dourados",
-            "UFMG - Universidade Federal de Minas Gerais",
-            "UFOP - Universidade Federal de Ouro Preto",
-            "UFLA - Universidade Federal de Lavras",
-            "UFV - Universidade Federal de Viçosa",
-            "UNIFAL - Universidade Federal de Alfenas",
-            "UNIFEI - Universidade Federal de Itajubá",
-            "UFJF - Universidade Federal de Juiz de Fora",
-            "UFSJ - Universidade Federal de São João del-Rei",
-            "UFU - Universidade Federal de Uberlândia",
-            "UFVJM - Universidade Federal dos Vales do Jequitinhonha e Mucuri",
-            "UFTM - Universidade Federal do Triângulo Mineiro",
-            "UFPA - Universidade Federal do Pará",
-            "UNIFESSPA - Universidade Federal do Sul e Sudeste do Pará",
-            "UFOPA - Universidade Federal do Oeste do Pará",
-            "UFPB - Universidade Federal da Paraíba",
-            "UFCG - Universidade Federal de Campina Grande",
-            "UFPR - Universidade Federal do Paraná",
-            "UTFPR - Universidade Tecnológica Federal do Paraná",
-            "UNILA - Universidade Federal da Integração Latino-Americana",
-            "UFPE - Universidade Federal de Pernambuco",
-            "UFRPE - Universidade Federal Rural de Pernambuco",
-            "UFAPE - Universidade Federal do Agreste de Pernambuco",
-            "UFPI - Universidade Federal do Piauí",
-            "UFDPar - Universidade Federal do Delta do Parnaíba",
-            "UFRJ - Universidade Federal do Rio de Janeiro",
-            "UFF - Universidade Federal Fluminense",
-            "UFRRJ - Universidade Federal Rural do Rio de Janeiro",
-            "UNIRIO - Universidade Federal do Estado do Rio de Janeiro",
-            "UFRN - Universidade Federal do Rio Grande do Norte",
-            "UFERSA - Universidade Federal Rural do Semi-Árido",
-            "UFRGS - Universidade Federal do Rio Grande do Sul",
-            "UFSM - Universidade Federal de Santa Maria",
-            "UFPel - Universidade Federal de Pelotas",
-            "UNIPAMPA - Universidade Federal do Pampa",
-            "UFCSPA - Universidade Federal de Ciências da Saúde de Porto Alegre",
-            "UFFS - Universidade Federal da Fronteira Sul",
-            "UNIR - Universidade Federal de Rondônia",
-            "UFRR - Universidade Federal de Roraima",
-            "UFSC - Universidade Federal de Santa Catarina",
-            "UNIFESP - Universidade Federal de São Paulo",
-            "UFSCar - Universidade Federal de São Carlos",
-            "UFABC - Universidade Federal do ABC",
-            "UFS - Universidade Federal de Sergipe",
-            "UFT - Universidade Federal do Tocantins",
-            "UFNT - Universidade Federal do Norte do Tocantins",
-            "USP - Universidade de São Paulo",
-            "UNICAMP - Universidade Estadual de Campinas",
-            "UNESP - Universidade Estadual Paulista",
-            "UERJ - Universidade do Estado do Rio de Janeiro",
-            "UEL - Universidade Estadual de Londrina",
-            "UEM - Universidade Estadual de Maringá",
-            "UENF - Universidade Estadual do Norte Fluminense",
-            "UECE - Universidade Estadual do Ceará",
-            "UVA - Universidade Estadual Vale do Acaraú",
-            "URCA - Universidade Regional do Cariri",
-            "UEMG - Universidade do Estado de Minas Gerais",
-            "UNIMONTES - Universidade Estadual de Montes Claros",
-            "UEG - Universidade Estadual de Goiás",
-            "UEMA - Universidade Estadual do Maranhão",
-            "UEPB - Universidade Estadual da Paraíba",
-            "UEPG - Universidade Estadual de Ponta Grossa",
-            "UNIOESTE - Universidade Estadual do Oeste do Paraná",
-            "UNICENTRO - Universidade Estadual do Centro-Oeste",
-            "UENP - Universidade Estadual do Norte do Paraná",
-            "IFCE - Instituto Federal do Ceará",
-            "IFMG - Instituto Federal de Minas Gerais",
-            "IFPB - Instituto Federal da Paraíba",
-            "IFPE - Instituto Federal de Pernambuco",
-            "IFPI - Instituto Federal do Piauí",
-            "IFPR - Instituto Federal do Paraná",
-            "IFRJ - Instituto Federal do Rio de Janeiro",
-            "IFRN - Instituto Federal do Rio Grande do Norte",
-            "IFRS - Instituto Federal do Rio Grande do Sul",
-            "IFSC - Instituto Federal de Santa Catarina",
-            "IFSP - Instituto Federal de São Paulo",
-            "Anhanguera",
-            "Anhembi Morumbi",
-            "Cruzeiro do Sul",
-            "ESPM - Escola Superior de Propaganda e Marketing",
-            "Estácio",
-            "FGV - Fundação Getulio Vargas",
-            "FMU - Faculdades Metropolitanas Unidas",
-            "Ibmec",
-            "Insper",
-            "Mackenzie - Universidade Presbiteriana Mackenzie",
-            "PUC-Campinas - Pontifícia Universidade Católica de Campinas",
-            "PUC-MG - Pontifícia Universidade Católica de Minas Gerais",
-            "PUC-PR - Pontifícia Universidade Católica do Paraná",
-            "PUC-RJ - Pontifícia Universidade Católica do Rio de Janeiro",
-            "PUC-RS - Pontifícia Universidade Católica do Rio Grande do Sul",
-            "PUC-SP - Pontifícia Universidade Católica de São Paulo",
-            "UNIP - Universidade Paulista",
-            "UNISINOS - Universidade do Vale do Rio dos Sinos",
-            "Outra (Digitar manualmente)"
-        ];
-
-        // LÓGICA DE ABERTURA DOS ECRÃS DE SELEÇÃO
-        document.getElementById('btn-open-semester').addEventListener('click', () => {
-            renderSemesters();
-            screenSelectSemester.classList.remove('hidden-screen');
-        });
-
-        document.getElementById('btn-close-semester').addEventListener('click', () => {
-            screenSelectSemester.classList.add('hidden-screen');
-        });
-
-        document.getElementById('btn-open-university').addEventListener('click', () => {
-            document.getElementById('search-university').value = '';
-            renderUniversities('');
-            screenSelectUniversity.classList.remove('hidden-screen');
-            setTimeout(() => document.getElementById('search-university').focus(), 100);
-        });
-
-        document.getElementById('btn-close-university').addEventListener('click', () => {
-            screenSelectUniversity.classList.add('hidden-screen');
-        });
-
-        // Filtragem de Universidades
-        document.getElementById('search-university').addEventListener('input', (e) => {
-            renderUniversities(e.target.value);
-        });
-
-        // Funções de Renderização das Listas
-        function renderSemesters() {
-            const list = document.getElementById('semester-list');
-            list.innerHTML = semestersData.map(sem => `
-                <div class="p-4 rounded-xl hover:bg-surface-light dark:hover:bg-surface-dark cursor-pointer transition-colors border border-transparent hover:border-black/5 dark:hover:border-white/5" onclick="selectSemester('${sem}')">
-                    <span class="font-medium text-lg">${sem}</span>
-                </div>
-                <div class="h-px w-full bg-black/5 dark:bg-white/5 last:hidden"></div>
-            `).join('');
-        }
-
-        function renderUniversities(filterText) {
-            const list = document.getElementById('university-list');
-            const lowerFilter = filterText.toLowerCase();
-            const filtered = universitiesData.filter(uni => uni.toLowerCase().includes(lowerFilter));
-            
-            if (filtered.length === 0) {
-                list.innerHTML = `<p class="text-gray-500 text-center py-8">Nenhuma universidade encontrada.</p>`;
-                return;
+                mobHeader.style.display = 'flex';
             }
 
-            list.innerHTML = filtered.map(uni => `
-                <div class="p-4 rounded-xl hover:bg-surface-light dark:hover:bg-surface-dark cursor-pointer transition-colors border border-transparent hover:border-black/5 dark:hover:border-white/5" onclick="selectUniversity('${uni.replace(/'/g, "\\'")}')">
-                    <span class="${uni === 'Outra (Digitar manualmente)' ? 'font-bold text-primary' : 'font-medium'} text-base">${uni}</span>
-                </div>
-                <div class="h-px w-full bg-black/5 dark:bg-white/5 last:hidden"></div>
-            `).join('');
-        }
+            // Oculta Bottom Nav na IA e Subtelas (Mobile Focus)
+            const mobNav = document.getElementById('mobile-nav');
+            if(window.innerWidth < 768) {
+                if (['foco', 'calculadora', 'profile', 'circular', 'financas', 'anotacoes'].includes(viewId)) {
+                    mobNav.style.display = 'none';
+                } else {
+                    mobNav.style.display = 'flex';
+                }
+            }
 
-        // Funções de Seleção
-        window.selectSemester = function(sem) {
-            document.getElementById('setup-semester').value = sem;
-            document.getElementById('setup-semester-display').innerText = sem;
-            document.getElementById('setup-semester-display').classList.remove('text-gray-400');
-            document.getElementById('setup-semester-display').classList.add('text-content');
-            screenSelectSemester.classList.add('hidden-screen');
-            validateSetupForm();
+            // Atualiza active state nos botões (Desktop e Mobile)
+            document.querySelectorAll('.nav-item').forEach(btn => {
+                if(btn.dataset.view === viewId) btn.classList.add('active', 'bg-black/5', 'dark:bg-white/5'); 
+                else btn.classList.remove('active', 'bg-black/5', 'dark:bg-white/5');
+            });
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.view === viewId) { btn.classList.add('opacity-100'); btn.classList.remove('opacity-40'); }
+                else { btn.classList.add('opacity-40'); btn.classList.remove('opacity-100'); }
+            });
         };
 
-        window.selectUniversity = function(uni) {
-            document.getElementById('setup-university').value = uni;
-            document.getElementById('setup-university-display').innerText = uni;
-            document.getElementById('setup-university-display').classList.remove('text-gray-400');
-            document.getElementById('setup-university-display').classList.add('text-content');
-            
-            if (uni === "Outra (Digitar manualmente)") {
-                customUniContainer.classList.remove('hidden');
-            } else {
-                customUniContainer.classList.add('hidden');
-                document.getElementById('setup-custom-university').value = '';
-            }
-            
-            screenSelectUniversity.classList.add('hidden-screen');
-            validateSetupForm();
-        };
+        function showScreen(id) {
+            ['loading-screen', 'login-screen', 'setup-screen', 'main-app-screen', 'screen-select-semester', 'screen-select-university'].forEach(s => {
+                document.getElementById(s).classList.add('hidden-screen');
+            });
+            document.getElementById(id).classList.remove('hidden-screen');
+        }
 
-        // Observador de Autenticação
+        // --- AUTENTICAÇÃO E INIT ---
         onAuthStateChanged(auth, async (user) => {
             if (user) {
-                currentUser = user;
+                state.user = user;
                 try {
-                    // Verificar se o utilizador já tem perfil na base de dados
-                    const docRef = doc(db, "users", user.uid);
-                    const docSnap = await getDoc(docRef);
+                    const docSnap = await getDoc(doc(db, "users", user.uid));
+                    if (docSnap.exists()) {
+                        state.profile = docSnap.data();
+                        
+                        const fname = state.profile.displayName.split(' ')[0];
+                        const avatar = state.profile.profileImageUrl || `https://ui-avatars.com/api/?name=${state.profile.displayName}&background=0A84FF&color=fff`;
+                        
+                        document.getElementById('mob-greeting').innerText = `Olá, ${fname}`;
+                        document.getElementById('desk-greeting').innerText = fname;
+                        document.getElementById('mob-avatar').src = avatar;
+                        document.getElementById('desk-avatar').src = avatar;
+                        document.getElementById('prof-avatar-large').src = avatar;
+                        document.getElementById('prof-name-large').innerText = state.profile.displayName;
+                        document.getElementById('prof-uni-large').innerText = state.profile.university;
+                        document.getElementById('prof-course-large').innerText = `${state.profile.course} • ${state.profile.semester}`;
 
-                    setTimeout(() => {
-                        if (docSnap.exists()) {
-                            // Perfil existe, vai para a app principal
-                            const userData = docSnap.data();
-                            document.getElementById('welcome-message').innerText = `Bem-vindo de volta, ${userData.displayName.split(' ')[0]}!`;
-                            document.getElementById('user-info-display').innerText = `@${userData.username} • ${userData.course}`;
-                            showScreen('main');
-                        } else {
-                            // Primeiro login, vai para a configuração de perfil
-                            document.getElementById('setup-name').value = user.displayName || "";
-                            showScreen('setup');
+                        if (state.profile.university.includes("UFRB")) {
+                            document.getElementById('sidebar-circular').classList.remove('hidden');
+                            document.getElementById('mob-menu-circular').classList.remove('hidden');
+                            renderCircular();
                         }
-                    }, 1000);
-                } catch (error) {
-                    console.error("Erro ao verificar utilizador:", error);
-                    showScreen('login');
-                }
-            } else {
-                setTimeout(() => showScreen('login'), 1000);
-            }
-        });
 
-        // Ação de Login
-        document.getElementById('btn-google-login').addEventListener('click', async () => {
-            try {
-                showScreen('loading'); 
-                await signInWithPopup(auth, provider);
-            } catch (error) {
-                alert("Falha ao iniciar sessão: " + error.message);
-                showScreen('login');
-            }
-        });
-
-        // Lógica de Validação de Nome de Utilizador (Debounce)
-        const usernameInput = document.getElementById('setup-username');
-        const usernameStatus = document.getElementById('username-status');
-        let usernameTimeout = null;
-
-        usernameInput.addEventListener('input', (e) => {
-            // Formatar: sem espaços, minúsculas
-            let val = e.target.value.replace(/\s+/g, '').toLowerCase();
-            e.target.value = val;
-            
-            isUsernameValid = false;
-            validateSetupForm();
-
-            if (val.length < 3) {
-                usernameStatus.innerText = "Mínimo de 3 caracteres.";
-                usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-danger";
-                return;
-            }
-
-            usernameStatus.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> A verificar...';
-            usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-primary";
-
-            clearTimeout(usernameTimeout);
-            usernameTimeout = setTimeout(async () => {
-                try {
-                    const q = query(collection(db, "users"), where("username", "==", val));
-                    const querySnapshot = await getDocs(q);
-                    
-                    if (querySnapshot.empty) {
-                        usernameStatus.innerHTML = '<i class="fa-solid fa-check"></i> Nome disponível!';
-                        usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-success";
-                        isUsernameValid = true;
+                        showScreen('main-app-screen');
+                        initDataListeners();
                     } else {
-                        usernameStatus.innerHTML = '<i class="fa-solid fa-xmark"></i> Nome já em uso.';
-                        usernameStatus.className = "text-xs font-semibold mt-2 ml-1 text-danger";
-                        isUsernameValid = false;
+                        document.getElementById('setup-name').value = user.displayName || "";
+                        showScreen('setup-screen');
                     }
-                    validateSetupForm();
-                } catch (error) {
-                    console.error("Erro na validação:", error);
-                    usernameStatus.innerText = "Erro ao verificar.";
-                }
-            }, 800); // 800ms delay
+                } catch (e) { showScreen('login-screen'); }
+            } else {
+                setTimeout(() => showScreen('login-screen'), 1500);
+            }
         });
 
-        // Validação do Formulário Completo
-        function validateSetupForm() {
-            const name = document.getElementById('setup-name').value.trim();
-            const course = document.getElementById('setup-course').value.trim();
-            const sem = document.getElementById('setup-semester').value;
-            const uni = document.getElementById('setup-university').value;
-            const customUni = document.getElementById('setup-custom-university').value.trim();
-            
-            let isUniValid = uni !== "" && (uni !== "Outra (Digitar manualmente)" || customUni !== "");
-            let isSemValid = sem !== "";
-            let isValid = name && course && isUniValid && isSemValid && isUsernameValid;
-            
-            document.getElementById('btn-save-profile').disabled = !isValid;
+        document.getElementById('btn-google-login').addEventListener('click', () => {
+            showScreen('loading-screen');
+            signInWithPopup(auth, provider).catch(e => { alert("Erro: " + e.message); showScreen('login-screen'); });
+        });
+        window.logout = () => { if(confirm("Terminar sessão?")) signOut(auth); };
+
+        // --- FIRESTORE LISTENERS E RENDERS ---
+        function initDataListeners() {
+            getDoc(doc(db, "app_config", "keys")).then(d => { if(d.exists()) state.groqKey = d.data().groq || ""; });
+
+            onSnapshot(query(collection(db, "users", state.user.uid, "tarefas"), orderBy("timestamp", "desc")), snap => {
+                state.tarefas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderTarefas(); renderHome();
+            });
+            onSnapshot(collection(db, "users", state.user.uid, "aulas"), snap => {
+                state.aulas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAulas(); renderHome();
+            });
+            onSnapshot(query(collection(db, "users", state.user.uid, "financas"), orderBy("timestamp", "desc")), snap => {
+                state.financas = snap.docs.map(d => ({id: d.id, ...d.data()})); renderFinancas();
+            });
+            onSnapshot(query(collection(db, "users", state.user.uid, "anotacoes"), orderBy("timestamp", "desc")), snap => {
+                state.anotacoes = snap.docs.map(d => ({id: d.id, ...d.data()})); renderAnotacoes();
+            });
         }
 
-        // Adicionar eventos de validação aos outros campos
-        ['setup-name', 'setup-course', 'setup-custom-university'].forEach(id => {
-            document.getElementById(id).addEventListener('input', validateSetupForm);
+        function renderHome() {
+            const pendentes = state.tarefas.filter(t=>!t.concluida).length;
+            document.getElementById('home-widgets').innerHTML = `
+                <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 cursor-pointer hover:scale-[1.02] transition-transform shadow-sm" onclick="nav('tarefas')">
+                    <div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center text-primary text-xl mb-4"><i class="fa-solid fa-list-check"></i></div>
+                    <h3 class="text-3xl font-extrabold mb-1">${pendentes}</h3><p class="text-gray-500 font-medium">Tarefas Pendentes</p>
+                </div>
+                <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 cursor-pointer hover:scale-[1.02] transition-transform shadow-sm" onclick="nav('aulas')">
+                    <div class="w-12 h-12 rounded-xl bg-danger/10 flex items-center justify-center text-danger text-xl mb-4"><i class="fa-solid fa-calendar-day"></i></div>
+                    <h3 class="text-3xl font-extrabold mb-1">${state.aulas.length}</h3><p class="text-gray-500 font-medium">Aulas na Agenda</p>
+                </div>
+                <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 cursor-pointer hover:scale-[1.02] transition-transform shadow-sm" onclick="nav('foco')">
+                    <div class="w-12 h-12 rounded-xl bg-foco/10 flex items-center justify-center text-foco text-xl mb-4"><i class="fa-solid fa-stopwatch"></i></div>
+                    <h3 class="text-2xl font-extrabold mb-1 mt-1">Iniciar Estudo</h3><p class="text-gray-500 font-medium">Modo Foco</p>
+                </div>
+            `;
+            
+            document.getElementById('home-tasks-list').innerHTML = state.tarefas.filter(t=>!t.concluida).slice(0,4).map(t => `
+                <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl flex items-center gap-4"><div class="w-3 h-3 rounded-full ${t.prioridade==='Alta'?'bg-danger':(t.prioridade==='Média'?'bg-warning':'bg-success')}"></div><span class="font-bold flex-1 truncate">${t.titulo}</span></div>
+            `).join('') || '<p class="text-gray-500">Tudo em dia!</p>';
+
+            document.getElementById('home-aulas-list').innerHTML = state.aulas.slice(0,4).map(a => `
+                <div class="bg-surface-light dark:bg-surface-dark p-4 rounded-2xl flex items-center gap-4"><div class="w-1.5 h-10 rounded-full" style="background-color: ${a.corHex}"></div><div><p class="font-bold text-sm" style="color: ${a.corHex}">${a.inicio} - ${a.fim}</p><p class="font-bold">${a.materia}</p></div></div>
+            `).join('') || '<p class="text-gray-500">Nenhuma aula registada.</p>';
+        }
+
+        window.filterTasks = (type) => {
+            state.taskFilter = type;
+            const pendBtn = document.getElementById('tab-t-pendentes');
+            const concBtn = document.getElementById('tab-t-concluidas');
+            if(type === 'pendentes') {
+                pendBtn.className = "px-6 py-2 rounded-xl bg-background-light dark:bg-background-dark font-bold shadow-sm";
+                concBtn.className = "px-6 py-2 rounded-xl text-gray-500 font-bold hover:text-black dark:hover:text-white transition";
+            } else {
+                concBtn.className = "px-6 py-2 rounded-xl bg-background-light dark:bg-background-dark font-bold shadow-sm";
+                pendBtn.className = "px-6 py-2 rounded-xl text-gray-500 font-bold hover:text-black dark:hover:text-white transition";
+            }
+            renderTarefas();
+        };
+
+        function renderTarefas() {
+            const list = state.tarefas.filter(t => state.taskFilter === 'pendentes' ? !t.concluida : t.concluida);
+            document.getElementById('lista-tarefas').innerHTML = list.map(t => `
+                <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-5 flex items-center gap-5 group">
+                    <i class="fa-${t.concluida ? 'solid fa-circle-check text-success' : 'regular fa-circle text-gray-400'} text-3xl cursor-pointer" onclick="toggleTask('${t.id}', ${t.concluida})"></i>
+                    <div class="flex-1 ${t.concluida ? 'opacity-40 line-through' : ''}">
+                        <h4 class="font-bold text-lg">${t.titulo}</h4>
+                        <div class="flex items-center gap-2 mt-1">
+                            <span class="text-[10px] font-bold px-2 py-1 rounded bg-background-light dark:bg-background-dark ${t.prioridade==='Alta'?'text-danger':(t.prioridade==='Média'?'text-warning':'text-success')} uppercase">${t.prioridade}</span>
+                            ${t.data ? `<span class="text-xs text-gray-500"><i class="fa-regular fa-calendar mr-1"></i>${t.data}</span>` : ''}
+                        </div>
+                    </div>
+                    <button onclick="deleteTask('${t.id}')" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-danger hover:bg-danger/10 md:opacity-0 md:group-hover:opacity-100 transition-all"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('') || `<div class="text-center mt-10"><h3 class="text-xl font-bold text-gray-500">Nada para ver aqui.</h3></div>`;
+        }
+
+        function renderAulas() {
+            document.getElementById('aulas-list').innerHTML = state.aulas.map(a => `
+                <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-6 flex gap-5 items-center group">
+                    <div class="w-2 h-16 rounded-full" style="background-color: ${a.corHex || '#0A84FF'}"></div>
+                    <div class="flex-1">
+                        <p class="text-xs font-bold uppercase tracking-widest mb-1" style="color: ${a.corHex || '#0A84FF'}">${a.dia} &bull; ${a.inicio} - ${a.fim}</p>
+                        <h4 class="font-extrabold text-xl mb-1">${a.materia}</h4>
+                        <p class="text-gray-500 text-sm font-medium"><i class="fa-solid fa-user-tie mr-1"></i> ${a.professor} &bull; <i class="fa-solid fa-location-dot mx-1"></i> ${a.local}</p>
+                    </div>
+                    <button onclick="deleteAula('${a.id}')" class="w-10 h-10 rounded-full flex items-center justify-center text-gray-400 hover:text-danger md:opacity-0 md:group-hover:opacity-100 transition-all"><i class="fa-solid fa-trash"></i></button>
+                </div>
+            `).join('');
+        }
+
+        function renderFinancas() {
+            let s=0, r=0, d=0;
+            document.getElementById('lista-financas').innerHTML = state.financas.map(f => {
+                const isR = f.tipo === "Receita";
+                if(isR){ s+=f.valor; r+=f.valor; } else { s-=f.valor; d+=f.valor; }
+                return `
+                <div class="bg-surface-light dark:bg-surface-dark rounded-2xl p-4 flex justify-between items-center group">
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl flex items-center justify-center bg-${isR?'success':'danger'}/10"><i class="fa-solid fa-arrow-${isR?'up text-success':'down text-danger'}"></i></div>
+                        <div><h4 class="font-bold">${f.titulo}</h4><p class="text-xs font-semibold text-gray-500">${new Date(f.timestamp).toLocaleDateString()}</p></div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold text-${isR?'success':'content'}">${isR?'+':'-'}R$ ${f.valor.toFixed(2)}</span>
+                        <i class="fa-solid fa-trash text-gray-400 hover:text-danger cursor-pointer md:opacity-0 md:group-hover:opacity-100 transition" onclick="deleteFinanca('${f.id}')"></i>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('fin-saldo').innerText = `R$ ${s.toFixed(2)}`;
+            document.getElementById('fin-saldo').className = `text-4xl md:text-5xl font-extrabold ${s>=0?'text-content':'text-danger'}`;
+            document.getElementById('fin-receitas').innerText = `R$ ${r.toFixed(2)}`;
+            document.getElementById('fin-despesas').innerText = `R$ ${d.toFixed(2)}`;
+        }
+
+        function renderAnotacoes() {
+            document.getElementById('lista-notas').innerHTML = state.anotacoes.map(n => {
+                const bg = n.corHex === '#1C1C1E' || n.corHex === '#F2F2F7' || n.corHex === '#FFFFFF' ? 'var(--surface-color)' : n.corHex;
+                const tc = n.corHex === '#1C1C1E' || n.corHex === '#F2F2F7' || n.corHex === '#FFFFFF' ? 'var(--content-color)' : '#000';
+                return `
+                <div class="rounded-3xl p-6 relative shadow-sm group break-inside-avoid" style="background-color: ${bg}; color: ${tc}">
+                    <h4 class="font-extrabold text-lg mb-2 pr-6">${n.titulo}</h4>
+                    <p class="text-sm opacity-80 whitespace-pre-wrap">${n.conteudo}</p>
+                    <button onclick="deleteAnotacao('${n.id}')" class="absolute top-4 right-4 text-black/40 hover:text-danger dark:text-white/40 opacity-100 md:opacity-0 md:group-hover:opacity-100 transition"><i class="fa-solid fa-trash"></i></button>
+                </div>`;
+            }).join('');
+        }
+
+        const busSchedule = [
+            { routeName: "Saída Garagem p/ Campus", start: "06:25", end: "06:50" }, { routeName: "Circulando no Campus", start: "06:50", end: "07:10" },
+            { routeName: "Recolhe para Garagem", start: "07:55", end: "08:20" }, { routeName: "Saída Garagem p/ Campus", start: "11:30", end: "11:55" },
+            { routeName: "Circulando no Campus", start: "11:55", end: "12:20" }, { routeName: "Recolhe para Garagem", start: "12:20", end: "12:45" },
+            { routeName: "Saída Garagem p/ Campus", start: "17:30", end: "17:55" }, { routeName: "Circulando no Campus", start: "17:55", end: "18:15" },
+            { routeName: "Recolhe para Garagem", start: "22:30", end: "22:50" }
+        ];
+        function renderCircular() {
+            document.getElementById('circular-list').innerHTML = busSchedule.map(b => `
+                <div class="bg-surface-light dark:bg-surface-dark rounded-3xl p-5 border border-black/5 dark:border-white/5 flex items-center gap-5">
+                    <div class="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary text-2xl"><i class="fa-solid fa-bus-simple"></i></div>
+                    <div><span class="text-primary font-bold text-xs uppercase">${b.start} às ${b.end}</span><h3 class="text-lg font-extrabold">${b.routeName}</h3></div>
+                </div>
+            `).join('');
+        }
+
+        // CRUD FIREBASE
+        window.saveTarefa = async () => {
+            const tit = document.getElementById('t-titulo').value;
+            if(!tit) return;
+            await addDoc(collection(db, "users", state.user.uid, "tarefas"), { titulo: tit, descricao: document.getElementById('t-desc').value, data: document.getElementById('t-data').value, prioridade: document.getElementById('t-prio').value, concluida: false, timestamp: Date.now() });
+            closeModal('modal-tarefa'); document.getElementById('t-titulo').value=''; document.getElementById('t-desc').value='';
+        };
+        window.toggleTask = async (id, s) => await updateDoc(doc(db, "users", state.user.uid, "tarefas", id), { concluida: !s });
+        window.deleteTask = async id => await deleteDoc(doc(db, "users", state.user.uid, "tarefas", id));
+
+        window.saveAula = async () => {
+            const mat = document.getElementById('a-mat').value;
+            if(!mat) return;
+            const cores = ['#0A84FF', '#FF3B30', '#32D74B', '#FF9F0A', '#B14AE2'];
+            await addDoc(collection(db, "users", state.user.uid, "aulas"), { materia: mat, professor: document.getElementById('a-prof').value, local: document.getElementById('a-loc').value, dia: document.getElementById('a-dia').value, inicio: document.getElementById('a-ini').value, fim: document.getElementById('a-fim').value, corHex: cores[Math.floor(Math.random()*cores.length)] });
+            closeModal('modal-aula'); document.getElementById('a-mat').value='';
+        };
+        window.deleteAula = async id => await deleteDoc(doc(db, "users", state.user.uid, "aulas", id));
+
+        window.saveFinanca = async () => {
+            const tit = document.getElementById('f-tit').value; const val = parseFloat(document.getElementById('f-val').value);
+            if(!tit || isNaN(val)) return;
+            await addDoc(collection(db, "users", state.user.uid, "financas"), { titulo: tit, valor: val, tipo: document.getElementById('f-tip').value, timestamp: Date.now() });
+            closeModal('modal-financa'); document.getElementById('f-tit').value=''; document.getElementById('f-val').value='';
+        };
+        window.deleteFinanca = async id => await deleteDoc(doc(db, "users", state.user.uid, "financas", id));
+
+        window.saveNota = async () => {
+            const tit = document.getElementById('n-tit').value; const txt = document.getElementById('n-txt').value;
+            if(!tit && !txt) return;
+            const cores = ['#FFD8D8', '#FFE4C4', '#FFF5BA', '#E2F6D8', '#D4F1F4', '#E6E6FA', 'var(--surface-color)'];
+            await addDoc(collection(db, "users", state.user.uid, "anotacoes"), { titulo: tit, conteudo: txt, corHex: cores[Math.floor(Math.random()*cores.length)], timestamp: Date.now() });
+            closeModal('modal-nota'); document.getElementById('n-tit').value=''; document.getElementById('n-txt').value='';
+        };
+        window.deleteAnotacao = async id => await deleteDoc(doc(db, "users", state.user.uid, "anotacoes", id));
+
+        // MODO FOCO & CALC
+        let fTimer; let fLeft = 25*60; let fRun = false;
+        window.setFoco = m => { clearInterval(fTimer); fRun=false; fLeft=m*60; updateF(); document.getElementById('foco-icon').classList.replace('fa-pause','fa-play'); };
+        window.resetFoco = () => setFoco(25);
+        function updateF() { document.getElementById('foco-timer').innerText = `${Math.floor(fLeft/60).toString().padStart(2,'0')}:${(fLeft%60).toString().padStart(2,'0')}`; }
+        document.getElementById('btn-play-foco').addEventListener('click', () => {
+            const ic = document.getElementById('foco-icon');
+            if(fRun) { clearInterval(fTimer); ic.classList.replace('fa-pause','fa-play'); } 
+            else { ic.classList.replace('fa-play','fa-pause'); fTimer = setInterval(()=>{ if(fLeft>0){fLeft--;updateF();}else{clearInterval(fTimer);alert("Concluído! Bom trabalho.");} },1000); }
+            fRun = !fRun;
         });
 
-        // Salvar Perfil
-        document.getElementById('btn-save-profile').addEventListener('click', async () => {
-            const btn = document.getElementById('btn-save-profile');
-            const spinner = document.getElementById('save-btn-spinner');
-            const btnText = document.getElementById('save-btn-text');
+        let calcExp = "";
+        window.calc = (val) => {
+            const res = document.getElementById('calc-res'); const exp = document.getElementById('calc-exp');
+            if(val === 'C') { calcExp = ""; res.innerText = "0"; exp.innerText = ""; return; }
+            if(val === 'DEL') { calcExp = calcExp.slice(0, -1); res.innerText = calcExp || "0"; return; }
+            if(val === '=') { try { res.innerText = eval(calcExp.replace(/×/g, '*').replace(/÷/g, '/')); exp.innerText = calcExp; calcExp = res.innerText; } catch { res.innerText="Erro"; } return; }
+            calcExp += val; res.innerText = calcExp;
+        };
 
-            btn.disabled = true;
-            spinner.classList.remove('hidden');
-            btnText.innerText = "A guardar...";
+        // GROQ IA
+        document.getElementById('btn-ia-send').addEventListener('click', sendIA);
+        document.getElementById('ia-input').addEventListener('keypress', e => { if(e.key === 'Enter') sendIA(); });
 
-            const name = document.getElementById('setup-name').value.trim();
-            const username = document.getElementById('setup-username').value.trim();
-            const course = document.getElementById('setup-course').value.trim();
-            const semester = document.getElementById('setup-semester').value;
-            let university = document.getElementById('setup-university').value;
-            
-            if (university === "Outra (Digitar manualmente)") {
-                university = document.getElementById('setup-custom-university').value.trim();
-            }
+        async function sendIA() {
+            const inp = document.getElementById('ia-input'); const txt = inp.value.trim();
+            if(!txt) return; inp.value = '';
+            if(!state.groqKey) return alert("Chave Groq não configurada no Firebase.");
 
-            const profileData = {
-                displayName: name,
-                username: username,
-                course: course,
-                semester: semester,
-                university: university,
-                profileImageUrl: currentUser.photoURL || ""
-            };
+            addChat(txt, true);
+            document.getElementById('ia-status').innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> A pensar...';
+
+            const ctx = `És a Organiza IA. REGRAS OBRIGATÓRIAS: NUNCA mostres UUIDs. Sê curta. 
+Se pedirem para criar resumo/texto, responde normalmente E SALVA NAS ANOTAÇÕES via JSON.
+Contexto: Tarefas: ${JSON.stringify(state.tarefas.map(t=>({id:t.id, titulo:t.titulo, status: t.concluida?"Feita":"Pendente"})))}
+Ações: ADD_TAREFA(titulo, prioridade), DELETE_TAREFA(id), CONCLUIR_TAREFA(id), ADD_AULA(materia, dia, inicio, fim, corHex), DELETE_AULA(id), ADD_NOTA(titulo, conteudo), CHANGE_THEME(theme).
+Para ações, insere no FINAL: {"action":"NOME_ACAO", "params":{"chave":"val"}}`;
 
             try {
-                await setDoc(doc(db, "users", currentUser.uid), profileData);
-                document.getElementById('welcome-message').innerText = `Bem-vindo, ${name.split(' ')[0]}!`;
-                document.getElementById('user-info-display').innerText = `@${username} • ${course}`;
-                showScreen('main');
-            } catch (error) {
-                console.error("Erro ao guardar perfil:", error);
-                alert("Ocorreu um erro ao guardar o seu perfil.");
-            } finally {
-                btn.disabled = false;
-                spinner.classList.add('hidden');
-                btnText.innerText = "Finalizar Perfil";
-            }
-        });
+                const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                    method: "POST", headers: { "Content-Type": "application/json", "Authorization": `Bearer ${state.groqKey}` },
+                    body: JSON.stringify({ model: "llama-3.3-70b-versatile", messages: [{role:"system", content: ctx}, {role:"user", content: txt}] })
+                });
+                const data = await res.json();
+                let iaTxt = data.choices[0].message.content;
 
-        // Ação de Logout
-        document.getElementById('btn-logout').addEventListener('click', () => {
-            showScreen('loading');
-            signOut(auth).catch(error => {
-                console.error("Erro ao sair:", error);
-                showScreen('main');
-            });
-        });
+                const sIdx = iaTxt.indexOf('{'); const eIdx = iaTxt.lastIndexOf('}');
+                let executed = false;
+                if(sIdx !== -1 && eIdx !== -1) {
+                    try {
+                        const act = JSON.parse(iaTxt.substring(sIdx, eIdx+1));
+                        if(act.action === "ADD_TAREFA") addDoc(collection(db, "users", state.user.uid, "tarefas"), {titulo: act.params.titulo, concluida: false, prioridade: act.params.prioridade || "Média", timestamp: Date.now()});
+                        if(act.action === "DELETE_TAREFA") deleteDoc(doc(db, "users", state.user.uid, "tarefas", act.params.id));
+                        if(act.action === "CONCLUIR_TAREFA") updateDoc(doc(db, "users", state.user.uid, "tarefas", act.params.id), {concluida: true});
+                        if(act.action === "ADD_NOTA") addDoc(collection(db, "users", state.user.uid, "anotacoes"), {titulo: act.params.titulo, conteudo: act.params.conteudo, corHex: "var(--surface-color)", timestamp: Date.now()});
+                        if(act.action === "CHANGE_THEME") window.setTheme(act.params.theme);
+                        iaTxt = iaTxt.replace(iaTxt.substring(sIdx, eIdx+1), "").trim();
+                        executed = true;
+                    } catch(e) {}
+                }
+                addChat(iaTxt, false, executed);
+            } catch(e) { addChat("Erro de ligação à IA.", false); }
+            document.getElementById('ia-status').innerHTML = '<i class="fa-solid fa-circle text-[10px] mr-1"></i> Sempre online (Groq)';
+        }
+
+        function addChat(msg, isUser, exec = false) {
+            const c = document.getElementById('ia-chat');
+            c.innerHTML += `<div class="flex gap-4 ${isUser?'justify-end':''}">${isUser?'':`<div class="w-10 h-10 rounded-full bg-black dark:bg-white flex items-center justify-center shrink-0"><i class="fa-solid fa-wand-magic-sparkles text-white dark:text-black"></i></div>`}<div class="${isUser?'chat-user':'chat-ai border border-black/5 dark:border-white/5'} p-4 text-sm md:text-base leading-relaxed max-w-[85%] md:max-w-[75%]">${msg.replace(/\n/g,'<br>')}${exec?'<div class="mt-2 text-xs font-bold text-accent"><i class="fa-solid fa-check"></i> Ação Executada</div>':''}</div></div>`;
+            c.scrollTop = c.scrollHeight;
+        }
+
     </script>
 </body>
 </html>
