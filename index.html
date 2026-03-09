@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="pt-PT" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>OrganizaEdu</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#050505',
+                        surface: '#1C1C1E',
+                        primary: '#0A84FF',
+                        accent: '#B14AE2',
+                        success: '#32D74B',
+                        danger: '#FF3B30',
+                        warning: '#xFFFF00'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: white; overflow-x: hidden; }
+        
+        /* Ocultar scrollbar mas manter funcionalidade */
+        ::-webkit-scrollbar { width: 0px; background: transparent; }
+        
+        /* Glassmorphism */
+        .glass {
+            background: rgba(28, 28, 30, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .screen { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .screen.active { display: flex; flex-direction: column; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Chat Bubbles */
+        .chat-bubble-user { background: linear-gradient(135deg, #B14AE2, #6A0DAD); border-radius: 20px 20px 4px 20px; }
+        .chat-bubble-ai { background: #1C1C1E; border-radius: 20px 20px 20px 4px; }
+        
+        /* Bottom Nav Fix */
+        .pb-nav { padding-bottom: 90px; }
+    </style>
+</head>
+<body class="antialiased h-screen w-screen relative">
+
+    <!-- 1. ECRÃ DE LOADING -->
+    <div id="screen-loading" class="screen active h-full w-full justify-center items-center absolute top-0 left-0 z-50 bg-background">
+        <div class="text-center animate-pulse">
+            <i class="fa-solid fa-graduation-cap text-6xl text-accent mb-4"></i>
+            <h1 class="text-3xl font-extrabold tracking-tight">OrganizaEdu</h1>
+        </div>
+    </div>
+
+    <!-- 2. ECRÃ DE LOGIN -->
+    <div id="screen-login" class="screen h-full w-full absolute top-0 left-0 z-40 bg-background relative overflow-hidden">
+        <!-- Luzes de Fundo -->
+        <div class="absolute -top-20 -left-20 w-72 h-72 bg-accent opacity-20 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-20 -right-20 w-80 h-80 bg-primary opacity-20 rounded-full blur-3xl"></div>
+        
+        <div class="flex-1 flex flex-col justify-center items-center px-8 z-10">
+            <i class="fa-solid fa-graduation-cap text-7xl text-white mb-8"></i>
+            <h1 class="text-4xl font-extrabold mb-4">Bem-vindo</h1>
+            <p class="text-center text-gray-400 text-lg">A sua vida académica organizada<br>de forma incrivelmente simples.</p>
+        </div>
+        
+        <div class="p-8 z-10">
+            <button id="btn-google-login" class="w-full bg-white text-black font-bold text-lg py-4 rounded-2xl flex justify-center items-center gap-3 hover:bg-gray-200 transition">
+                <i class="fa-brands fa-google text-xl"></i>
+                Continuar com o Google
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. APP PRINCIPAL (SHELL) -->
+    <div id="screen-app" class="screen h-full w-full bg-background relative">
+        
+        <!-- Header Fixo -->
+        <header id="app-header" class="w-full px-6 pt-12 pb-4 flex justify-between items-center bg-background z-20">
+            <div>
+                <h2 class="text-2xl font-bold" id="user-greeting">Olá, Estudante</h2>
+            </div>
+            <img id="user-avatar" src="https://ui-avatars.com/api/?name=User&background=1C1C1E&color=fff" class="w-12 h-12 rounded-full border border-gray-800 cursor-pointer object-cover">
+        </header>
+
+        <!-- Views Container -->
+        <main class="flex-1 overflow-y-auto pb-nav relative" id="main-content">
+            
+            <!-- VIEW: HOME -->
+            <div id="view-home" class="view-section px-6 flex flex-col gap-6 active block">
+                <h1 class="text-3xl font-extrabold tracking-tight mt-2">O Teu Painel</h1>
+                
+                <!-- Widget Tarefas Simples -->
+                <div class="bg-surface rounded-[24px] p-5 cursor-pointer" onclick="navigate('tarefas')">
+                    <div class="flex items-center justify-between mb-4">
+                        <span class="text-[10px] font-extrabold text-primary tracking-widest">TAREFAS</span>
+                        <i class="fa-solid fa-check-circle text-gray-600"></i>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center">
+                            <i class="fa-solid fa-list-check text-primary text-2xl"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold" id="home-tasks-count">0 pendentes</h3>
+                            <p class="text-sm text-gray-400">Clica para gerir</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Widget Modo Foco -->
+                <div class="bg-surface rounded-[24px] p-5 cursor-pointer" onclick="navigate('foco')">
+                    <div class="flex items-center justify-between mb-2">
+                        <span class="text-[10px] font-extrabold text-[#00C7BE] tracking-widest">PRODUTIVIDADE</span>
+                        <i class="fa-solid fa-stopwatch text-gray-600"></i>
+                    </div>
+                    <h3 class="text-xl font-bold">Modo Foco</h3>
+                    <p class="text-sm text-gray-400">Inicia uma sessão de estudos</p>
+                </div>
+            </div>
+
+            <!-- VIEW: TAREFAS -->
+            <div id="view-tarefas" class="view-section px-6 hidden flex-col gap-4">
+                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-4">Tarefas</h1>
+                <div id="tasks-container" class="flex flex-col gap-4">
+                    <!-- Tasks injected here -->
+                </div>
+                
+                <button onclick="document.getElementById('modal-tarefa').classList.remove('hidden')" class="fixed bottom-24 right-6 w-16 h-16 bg-primary rounded-2xl flex items-center justify-center shadow-lg shadow-primary/30 z-30">
+                    <i class="fa-solid fa-plus text-white text-2xl"></i>
+                </button>
+            </div>
+
+            <!-- VIEW: IA -->
+            <div id="view-ia" class="view-section h-full flex flex-col hidden absolute top-0 left-0 w-full bg-background z-30">
+                <div class="px-6 pt-12 pb-4 border-b border-white/5 flex items-center gap-4 bg-background">
+                    <div class="w-10 h-10 rounded-full bg-white flex items-center justify-center">
+                        <i class="fa-solid fa-robot text-black text-xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-white">Organiza IA</h2>
+                        <p class="text-xs font-semibold text-accent" id="ia-status">Sempre online (Groq LLaMA 3)</p>
+                    </div>
+                </div>
+                
+                <div id="chat-container" class="flex-1 overflow-y-auto p-6 flex flex-col gap-4 pb-24">
+                    <!-- Chat History -->
+                    <div class="flex gap-3">
+                        <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0">
+                            <i class="fa-solid fa-robot text-black text-sm"></i>
+                        </div>
+                        <div class="chat-bubble-ai p-4 text-sm leading-relaxed max-w-[85%] text-white">
+                            Olá! Eu sou a Organiza IA ✨<br><br>Tenho poderes de administração. Podes pedir-me para criar tarefas, adicionar notas, ou perguntar-me dicas de estudo!
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-4 bg-surface absolute bottom-[80px] w-full">
+                    <div class="relative flex items-center">
+                        <input type="text" id="ia-input" placeholder="Pede algo à IA..." class="w-full bg-background rounded-full py-4 pl-6 pr-14 text-white focus:outline-none focus:ring-2 focus:ring-accent/50">
+                        <button id="btn-send-ia" class="absolute right-2 w-10 h-10 bg-accent rounded-full flex items-center justify-center">
+                            <i class="fa-solid fa-paper-plane text-white text-sm"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: FERRAMENTAS -->
+            <div id="view-ferramentas" class="view-section px-6 hidden flex-col gap-4">
+                <h1 class="text-3xl font-extrabold tracking-tight mt-2 mb-2">Menu de Extras</h1>
+                <p class="text-gray-400 text-sm mb-4">Tudo o que precisas para o teu dia a dia.</p>
+                
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="navigate('tarefas')">
+                        <div class="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center"><i class="fa-solid fa-check-double text-primary text-xl"></i></div>
+                        <span class="font-bold text-sm">Tarefas</span>
+                    </div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="navigate('foco')">
+                        <div class="w-12 h-12 rounded-full bg-[#00C7BE]/10 flex items-center justify-center"><i class="fa-solid fa-stopwatch text-[#00C7BE] text-xl"></i></div>
+                        <span class="font-bold text-sm">Modo Foco</span>
+                    </div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="navigate('ia')">
+                        <div class="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center"><i class="fa-solid fa-robot text-accent text-xl"></i></div>
+                        <span class="font-bold text-sm">Inteligência</span>
+                    </div>
+                    <div class="bg-surface rounded-3xl p-6 flex flex-col items-center justify-center gap-3 cursor-pointer" onclick="alert('Em breve na versão Web!')">
+                        <div class="w-12 h-12 rounded-full bg-success/10 flex items-center justify-center"><i class="fa-solid fa-dollar-sign text-success text-xl"></i></div>
+                        <span class="font-bold text-sm">Finanças</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VIEW: MODO FOCO -->
+            <div id="view-foco" class="view-section px-6 hidden flex-col items-center pt-10">
+                <h1 class="text-3xl font-extrabold tracking-tight mb-10 self-start">Modo Foco</h1>
+                
+                <div class="relative w-64 h-64 rounded-full border-[12px] border-surface flex items-center justify-center mb-12">
+                    <!-- Progress Bar Simulado -->
+                    <div class="absolute inset-0 rounded-full border-[12px] border-[#00C7BE] rounded-full" style="clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);"></div>
+                    <div class="flex flex-col items-center">
+                        <i class="fa-solid fa-stopwatch text-[#00C7BE] text-3xl mb-2"></i>
+                        <span id="timer-display" class="text-5xl font-light tracking-tighter">25:00</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-4 mb-12">
+                    <button class="px-6 py-2 rounded-xl bg-surface text-gray-300 font-bold hover:bg-[#00C7BE] hover:text-white" onclick="setTimer(5)">5 min</button>
+                    <button class="px-6 py-2 rounded-xl bg-[#00C7BE] text-white font-bold" onclick="setTimer(25)">25 min</button>
+                    <button class="px-6 py-2 rounded-xl bg-surface text-gray-300 font-bold hover:bg-[#00C7BE] hover:text-white" onclick="setTimer(50)">50 min</button>
+                </div>
+
+                <button id="btn-toggle-timer" class="w-20 h-20 bg-gradient-to-r from-[#00C7BE] to-[#00A29A] rounded-full flex items-center justify-center shadow-lg">
+                    <i id="icon-timer" class="fa-solid fa-play text-white text-3xl ml-1"></i>
+                </button>
+            </div>
+
+        </main>
+
+        <!-- Bottom Navigation (Glassmorphism) -->
+        <nav class="fixed bottom-6 left-1/2 transform -translate-x-1/2 w-[90%] glass rounded-[32px] flex justify-between items-center px-6 py-4 z-40 shadow-2xl">
+            <button onclick="navigate('home')" class="nav-btn text-white flex flex-col items-center gap-1 opacity-100" data-target="home">
+                <i class="fa-solid fa-border-all text-xl"></i>
+                <span class="text-[10px] font-bold">Início</span>
+            </button>
+            <button onclick="navigate('tarefas')" class="nav-btn text-gray-500 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition" data-target="tarefas">
+                <i class="fa-solid fa-list-check text-xl"></i>
+                <span class="text-[10px] font-bold">Tarefas</span>
+            </button>
+            <button onclick="navigate('ia')" class="nav-btn text-gray-500 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition" data-target="ia">
+                <i class="fa-solid fa-robot text-xl"></i>
+                <span class="text-[10px] font-bold">IA</span>
+            </button>
+            <button onclick="navigate('ferramentas')" class="nav-btn text-gray-500 flex flex-col items-center gap-1 opacity-50 hover:opacity-100 transition" data-target="ferramentas">
+                <i class="fa-solid fa-layer-group text-xl"></i>
+                <span class="text-[10px] font-bold">Menu</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- MODAL: ADD TAREFA -->
+    <div id="modal-tarefa" class="hidden fixed inset-0 bg-black/80 z-50 flex justify-center items-center p-6 backdrop-blur-sm">
+        <div class="bg-surface w-full max-w-md rounded-[32px] p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-xl font-bold">Criar Tarefa</h3>
+                <button onclick="document.getElementById('modal-tarefa').classList.add('hidden')" class="w-8 h-8 bg-white/10 rounded-full flex items-center justify-center"><i class="fa-solid fa-times"></i></button>
+            </div>
+            <input type="text" id="input-task-title" placeholder="O que precisa de ser feito?" class="w-full bg-background rounded-2xl p-4 mb-4 outline-none border border-white/5 focus:border-primary">
+            <select id="select-task-priority" class="w-full bg-background rounded-2xl p-4 mb-6 outline-none border border-white/5 appearance-none">
+                <option value="Baixa">Prioridade: Baixa</option>
+                <option value="Média" selected>Prioridade: Média</option>
+                <option value="Alta">Prioridade: Alta</option>
+            </select>
+            <button id="btn-save-task" class="w-full bg-primary text-white font-bold py-4 rounded-2xl">Guardar Tarefa</button>
+        </div>
+    </div>
+
+    <!-- SCRIPT PRINCIPAL: FIREBASE + LÓGICA -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+        import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+        import { getFirestore, collection, onSnapshot, addDoc, updateDoc, deleteDoc, doc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+
+        // Firebase Config (Fornecida por ti)
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3g9gmFn-Uc_SoLHsVhH7eIwgzMOYmIAQ",
+            authDomain: "organizaedu.firebaseapp.com",
+            projectId: "organizaedu",
+            storageBucket: "organizaedu.firebasestorage.app",
+            messagingSenderId: "300213242364",
+            appId: "1:300213242364:web:76019e1dc63cb89f034a79",
+            measurementId: "G-N1GS8DXP4Q"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        let currentUser = null;
+
+        // Estado Global
+        const state = {
+            tarefas: []
+        };
+
+        // --- SISTEMA DE NAVEGAÇÃO ---
+        window.navigate = function(viewId) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active', 'flex');
+                el.classList.add('hidden');
+            });
+            const target = document.getElementById('view-' + viewId);
+            target.classList.remove('hidden');
+            target.classList.add('active', viewId === 'ia' ? 'flex' : 'block');
+
+            // Header dinâmico (Ocultar na IA)
+            document.getElementById('app-header').style.display = viewId === 'ia' ? 'none' : 'flex';
+
+            // Atualizar Opacidade dos Ícones da Nav
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if(btn.dataset.target === viewId) {
+                    btn.classList.remove('text-gray-500', 'opacity-50');
+                    btn.classList.add('text-white', 'opacity-100');
+                } else {
+                    btn.classList.add('text-gray-500', 'opacity-50');
+                    btn.classList.remove('text-white', 'opacity-100');
+                }
+            });
+        };
+
+        // --- CONTROLO DE ECRÃS (Splash -> Login -> App) ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(el => el.classList.remove('active'));
+            document.getElementById('screen-' + screenId).classList.add('active');
+        }
+
+        // --- AUTENTICAÇÃO ---
+        onAuthStateChanged(auth, (user) => {
+            setTimeout(() => {
+                if (user) {
+                    currentUser = user;
+                    document.getElementById('user-greeting').innerText = `Olá, ${user.displayName.split(' ')[0]}`;
+                    document.getElementById('user-avatar').src = user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName}&background=1C1C1E&color=fff`;
+                    showScreen('app');
+                    loadData();
+                } else {
+                    showScreen('login');
+                }
+            }, 1500); // Fake delay for splash screen aesthetics
+        });
+
+        document.getElementById('btn-google-login').addEventListener('click', () => {
+            const provider = new GoogleAuthProvider();
+            signInWithPopup(auth, provider).catch(err => alert("Erro no Login: " + err.message));
+        });
+
+        document.getElementById('user-avatar').addEventListener('click', () => {
+            if(confirm("Deseja terminar a sessão?")) signOut(auth);
+        });
+
+        // --- CARREGAMENTO DE DADOS (FIRESTORE) ---
+        function loadData() {
+            if(!currentUser) return;
+            
+            const tarefasRef = collection(db, "users", currentUser.uid, "tarefas");
+            const q = query(tarefasRef, orderBy("timestamp", "desc"));
+            
+            onSnapshot(q, (snapshot) => {
+                state.tarefas = [];
+                snapshot.forEach((doc) => state.tarefas.push({ id: doc.id, ...doc.data() }));
+                renderTarefas();
+            });
+        }
+
+        function renderTarefas() {
+            const container = document.getElementById('tasks-container');
+            const homeCount = document.getElementById('home-tasks-count');
+            
+            container.innerHTML = '';
+            let pendentes = 0;
+
+            state.tarefas.forEach(t => {
+                if(!t.concluida) pendentes++;
+                
+                const color = t.prioridade === 'Alta' ? '#FF3B30' : (t.prioridade === 'Média' ? '#FF9F0A' : '#32D74B');
+                const icon = t.concluida ? `<i class="fa-solid fa-check-circle text-success text-2xl"></i>` : `<i class="fa-regular fa-circle text-gray-500 text-2xl"></i>`;
+                const textStyle = t.concluida ? 'text-gray-500 line-through' : 'text-white';
+                
+                container.innerHTML += `
+                    <div class="bg-surface rounded-2xl p-4 flex items-center gap-4 cursor-pointer hover:bg-gray-800 transition" onclick="toggleTask('${t.id}', ${t.concluida})">
+                        ${icon}
+                        <div class="flex-1">
+                            <h4 class="font-bold ${textStyle}">${t.titulo}</h4>
+                            <span class="text-xs px-2 py-1 rounded bg-black/30 font-bold" style="color: ${color}">${t.prioridade}</span>
+                        </div>
+                        <button onclick="event.stopPropagation(); deleteTask('${t.id}')" class="text-gray-600 hover:text-danger p-2"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+
+            if(state.tarefas.length === 0) {
+                container.innerHTML = `<p class="text-gray-500 text-center mt-10">Nenhuma tarefa pendente. Estás livre!</p>`;
+            }
+
+            homeCount.innerText = pendentes === 0 ? "Tudo em dia!" : `${pendentes} pendentes`;
+        }
+
+        // Ações Tarefas
+        document.getElementById('btn-save-task').addEventListener('click', async () => {
+            const titulo = document.getElementById('input-task-title').value;
+            const prioridade = document.getElementById('select-task-priority').value;
+            
+            if(titulo.trim() === '') return;
+
+            try {
+                await addDoc(collection(db, "users", currentUser.uid, "tarefas"), {
+                    titulo, prioridade, concluida: false, timestamp: Date.now()
+                });
+                document.getElementById('input-task-title').value = '';
+                document.getElementById('modal-tarefa').classList.add('hidden');
+            } catch(e) { alert(e.message); }
+        });
+
+        window.toggleTask = async (id, currentStatus) => {
+            await updateDoc(doc(db, "users", currentUser.uid, "tarefas", id), { concluida: !currentStatus });
+        }
+        window.deleteTask = async (id) => {
+            await deleteDoc(doc(db, "users", currentUser.uid, "tarefas", id));
+        }
+
+        // --- MODO FOCO (TIMER) ---
+        let timerInterval;
+        let timeLeft = 25 * 60;
+        let isRunning = false;
+
+        window.setTimer = (mins) => {
+            clearInterval(timerInterval);
+            isRunning = false;
+            timeLeft = mins * 60;
+            updateTimerDisplay();
+            document.getElementById('icon-timer').classList.replace('fa-pause', 'fa-play');
+            document.getElementById('icon-timer').classList.replace('ml-0', 'ml-1');
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(timeLeft / 60).toString().padStart(2, '0');
+            const s = (timeLeft % 60).toString().padStart(2, '0');
+            document.getElementById('timer-display').innerText = `${m}:${s}`;
+        }
+
+        document.getElementById('btn-toggle-timer').addEventListener('click', () => {
+            const icon = document.getElementById('icon-timer');
+            if(isRunning) {
+                clearInterval(timerInterval);
+                icon.classList.replace('fa-pause', 'fa-play');
+                icon.classList.replace('ml-0', 'ml-1');
+            } else {
+                icon.classList.replace('fa-play', 'fa-pause');
+                icon.classList.replace('ml-1', 'ml-0');
+                timerInterval = setInterval(() => {
+                    if(timeLeft > 0) { timeLeft--; updateTimerDisplay(); }
+                    else { clearInterval(timerInterval); alert("Sessão concluída!"); }
+                }, 1000);
+            }
+            isRunning = !isRunning;
+        });
+
+        // --- ORGANIZA IA (INTEGRAÇÃO GROQ) ---
+        document.getElementById('btn-send-ia').addEventListener('click', sendIAMessage);
+        document.getElementById('ia-input').addEventListener('keypress', (e) => { if(e.key === 'Enter') sendIAMessage(); });
+
+        async function sendIAMessage() {
+            const input = document.getElementById('ia-input');
+            const text = input.value.trim();
+            if(!text) return;
+            
+            input.value = '';
+            addChatMessage(text, true);
+            
+            // Requisita a chave API de Groq caso não esteja no Firebase
+            // NOTA: Em produção (Vercel), a API Key deve estar num Backend / Serverless Function.
+            // Como este é um ficheiro único front-end de demonstração, pedimos a chave ou usamos uma hardcoded se o cliente a providenciar no Firestore
+            
+            const statusEl = document.getElementById('ia-status');
+            statusEl.innerText = "A pensar...";
+            statusEl.style.color = "#B14AE2";
+
+            try {
+                // CHAVE DA API AQUI (Para teste no frontend - Em Vercel, criar endpoint /api/chat)
+                // Neste modelo estrito, vamos simular a resposta ou bater na API diretamente
+                // Simulação da chamada Groq Llama 3 para contornar a falta de chaves seguras no front
+                
+                const promptContext = `Utilizador: ${text}\n(Responde como Organiza IA, sê amigável, diz que podes criar tarefas e gerir a app.)`;
+                
+                // Simulação de atraso de rede
+                await new Promise(r => setTimeout(r, 1500));
+                
+                let iaResponse = "Ainda estou a ser ligada ao servidor Groq no Vercel! Por agora, sou apenas uma interface bonita. 🚀\nMas quando estiver pronta, vou poder gerir as tuas tarefas e anotações num piscar de olhos.";
+                
+                // Exemplo de ação simulada se pedir para criar tarefa
+                if(text.toLowerCase().includes("tarefa")) {
+                    iaResponse = "Claro! Posso adicionar essa tarefa se me deres permissão real no backend Groq.";
+                }
+
+                addChatMessage(iaResponse, false);
+
+            } catch (error) {
+                addChatMessage("Desculpa, ocorreu um erro de ligação.", false);
+            } finally {
+                statusEl.innerText = "Sempre online";
+                statusEl.style.color = "#32D74B";
+            }
+        }
+
+        function addChatMessage(text, isUser) {
+            const container = document.getElementById('chat-container');
+            const alignClass = isUser ? 'justify-end' : 'justify-start';
+            const bubbleClass = isUser ? 'chat-bubble-user text-white' : 'chat-bubble-ai text-white';
+            const iconHtml = isUser ? '' : `<div class="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0"><i class="fa-solid fa-robot text-black text-sm"></i></div>`;
+            
+            container.innerHTML += `
+                <div class="flex gap-3 ${alignClass}">
+                    ${iconHtml}
+                    <div class="${bubbleClass} p-4 text-sm leading-relaxed max-w-[85%] shadow-lg">
+                        ${text.replace(/\n/g, '<br>')}
+                    </div>
+                </div>
+            `;
+            container.scrollTop = container.scrollHeight;
+        }
+
+    </script>
+</body>
+</html>
