@@ -252,15 +252,22 @@
 
         /* --- TELA DE DETALHES E TEMPORADAS --- */
         #details-view { min-height: 100vh; background-size: cover; background-position: top center; background-attachment: fixed; position: relative; padding-bottom: 40px; }
-        .details-overlay { position: absolute; inset: 0; background: linear-gradient(to right, var(--bg-color) 0%, rgba(5,5,5,0.7) 50%, transparent 100%), linear-gradient(to top, var(--bg-color) 0%, transparent 60%); z-index: 1; pointer-events: none; }
-        .details-content { position: relative; z-index: 2; padding: 100px 60px 40px; max-width: 800px; display: flex; flex-direction: column; align-items: flex-start; }
-        .btn-back { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; width: fit-content; margin-bottom: 30px; backdrop-filter: blur(10px); transition: background 0.3s; font-size: 14px; font-weight: 600;}
-        .btn-back:hover { background: rgba(255,255,255,0.2); }
-        .details-logo { max-width: 350px; max-height: 120px; object-fit: contain; margin-bottom: 24px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
-        .details-title { font-size: clamp(32px, 5vw, 48px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
-        .meta-info { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; margin-bottom: 20px; flex-wrap: wrap; color: #e2e8f0; }
+        .details-overlay { position: absolute; inset: 0; background: linear-gradient(to right, #050505 0%, rgba(5,5,5,0.8) 40%, transparent 100%), linear-gradient(to top, #050505 0%, transparent 60%); z-index: 1; pointer-events: none; }
+        .details-content { position: relative; z-index: 2; padding: 120px 60px 60px; max-width: 900px; display: flex; flex-direction: column; align-items: flex-start; min-height: 100vh; justify-content: center; }
+        .btn-back-icon { width: 44px; height: 44px; border-radius: 50%; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.3s; color: white; margin-bottom: 30px; }
+        .btn-back-icon:hover { background: rgba(255,255,255,0.2); }
+        .details-logo { max-width: 500px; max-height: 200px; object-fit: contain; object-position: left bottom; margin-bottom: 24px; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); }
+        .details-title { font-size: clamp(36px, 5vw, 64px); font-weight: 900; letter-spacing: -2px; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+        .meta-info { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 700; margin-bottom: 20px; flex-wrap: wrap; color: #d1d5db; }
+        .imdb-badge { background: #f5c518; color: black; padding: 2px 6px; border-radius: 4px; font-size: 11px; font-weight: 900; }
         .dot { color: var(--text-muted); font-size: 10px; }
-        .genre-tag { display: inline-block; border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 16px; border-radius: 20px; font-size: 12px; margin-bottom: 24px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); margin-right: 8px; font-weight: 600;}
+        .genre-tag { display: inline-block; border: 1px solid rgba(255, 255, 255, 0.15); padding: 6px 16px; border-radius: 30px; font-size: 13px; margin-bottom: 10px; background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(5px); margin-right: 10px; font-weight: 500; color: #ccc;}
+
+        #det-actions { display: flex; gap: 12px; margin-bottom: 60px; align-items: center; }
+        #det-actions .btn-play { background: white; color: black; border-radius: 8px; font-weight: 800; font-size: 16px; padding: 12px 28px; cursor: pointer; border: none; display: flex; align-items: center; gap: 10px; transition: background 0.2s;}
+        #det-actions .btn-play:hover { background: #e6e6e6; }
+        #det-actions .btn-icon { width: 44px; height: 44px; border-radius: 12px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.1); font-size: 16px; color: white; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; }
+        #det-actions .btn-icon:hover { background: rgba(255,255,255,0.2); }
 
         /* Menu de Temporadas App Style */
         #tv-seasons-section { margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--glass-border); width: 100%; }
@@ -910,18 +917,14 @@
     <div id="details-view" class="view">
         <div class="details-overlay"></div>
         <div class="details-content">
-            <button onclick="goBack()" class="btn-back"><i class="fas fa-arrow-left" style="margin-right: 8px;"></i> Voltar</button>
+            <div class="btn-back-icon" onclick="goBack()"><i class="fas fa-arrow-left"></i></div>
 
             <div id="det-header"></div>
             
-            <div class="meta-info">
-                <span id="det-rating-container"></span><span class="dot">•</span>
-                <span id="det-year"></span><span class="dot">•</span>
-                <span id="det-duration"></span>
-            </div>
+            <div class="meta-info" id="det-meta"></div>
             
-            <p class="hero-desc" id="det-desc"></p>
-            <div id="det-genres"></div>
+            <p class="hero-desc" id="det-desc" style="-webkit-line-clamp: unset; color: #E2E8F0; max-width: 700px; text-align: left; font-size: 16px; line-height: 1.6; font-weight: 500;"></p>
+            <div id="det-genres" style="display: flex; flex-wrap: wrap; margin-bottom: 30px;"></div>
             
             <div class="hero-actions" id="det-actions"></div>
 
@@ -2016,7 +2019,8 @@
             const detBtn = document.getElementById('det-fav-btn');
             if (detBtn) {
                 detBtn.innerHTML = isFav ? '<i class="fas fa-check"></i>' : '<i class="fas fa-plus"></i>';
-                detBtn.style.backgroundColor = isFav ? 'var(--mango-brand)' : 'rgba(255,255,255,0.1)';
+                detBtn.style.backgroundColor = isFav ? 'var(--mango-brand)' : 'rgba(255,255,255,0.08)';
+                detBtn.style.color = isFav ? 'black' : 'white';
             }
         }
 
@@ -2184,9 +2188,18 @@
             let headerHtml = data.logo ? `<img src="${data.logo}" class="details-logo" alt="${data.title}">` : `<h1 class="details-title">${data.title}</h1>`;
             document.getElementById('det-header').innerHTML = headerHtml;
 
-            document.getElementById('det-rating-container').innerHTML = getAgeRatingHtml(data.ageRating);
-            document.getElementById('det-year').innerText = data.year || '';
-            document.getElementById('det-duration').innerText = data.type === 'movie' ? 'Filme' : 'Série';
+            let metaHtml = getAgeRatingHtml(data.ageRating);
+            metaHtml += `<span class="dot">•</span><span class="imdb-badge">IMDb</span> <span>8.4</span>`;
+            if (data.year) metaHtml += `<span class="dot">•</span><span>${data.year}</span>`;
+            
+            if (data.type === 'tv') {
+                 const seasonsCount = [...new Set(data.episodes.map(e => e.seasonNumber))].length;
+                 metaHtml += `<span class="dot">•</span><span>${seasonsCount} temporada${seasonsCount > 1 ? 's' : ''}</span>`;
+            } else {
+                 metaHtml += `<span class="dot">•</span><span>Filme</span>`;
+            }
+            document.getElementById('det-meta').innerHTML = metaHtml;
+
             document.getElementById('det-desc').innerText = data.synopsis || "Descrição indisponível.";
 
             const genresContainer = document.getElementById('det-genres');
@@ -2197,16 +2210,24 @@
             actions.innerHTML = '';
 
             let mainPlayFn = '';
-            if (data.type === 'movie' && (data.url || data.altUrl)) { mainPlayFn = `playContent('${data.id}')`; } 
-            else if (data.type === 'tv' && data.episodes.length > 0) { mainPlayFn = `playContent('${data.id}', '${data.episodes[0].id}')`; }
+            let btnText = 'Assistir';
+            if (data.type === 'movie' && (data.url || data.altUrl)) { 
+                mainPlayFn = `playContent('${data.id}')`; 
+            } else if (data.type === 'tv' && data.episodes.length > 0) { 
+                mainPlayFn = `playContent('${data.id}', '${data.episodes[0].id}')`; 
+                btnText = `Assistir T${data.episodes[0].seasonNumber}-E${data.episodes[0].epNumber}`;
+            }
 
-            if (mainPlayFn) { actions.innerHTML += `<button class="btn btn-play" onclick="${mainPlayFn}"><i class="fas fa-play"></i> Assistir</button>`; } 
-            else { actions.innerHTML += `<button class="btn btn-play" disabled style="background:#555; color:#aaa;"><i class="fas fa-ban"></i> Indisponível</button>`; }
+            if (mainPlayFn) { 
+                actions.innerHTML += `<button class="btn btn-play" onclick="${mainPlayFn}"><i class="fas fa-play"></i> <span>${btnText}</span></button>`; 
+            } else { 
+                actions.innerHTML += `<button class="btn btn-play" disabled style="background:#555; color:#aaa;"><i class="fas fa-ban"></i> Indisponível</button>`; 
+            }
             
             actions.innerHTML += `<button class="btn-icon" id="det-fav-btn" title="Minha Lista" onclick="toggleFavorite('${data.id}')"><i class="fas fa-plus"></i></button>`;
-            
-            // Botão Comentários (Abre Modal estilo TikTok)
-            actions.innerHTML += `<button class="btn-icon" title="Comentários" onclick="openCommentsModal()"><i class="fas fa-comment-dots"></i></button>`;
+            actions.innerHTML += `<button class="btn-icon" title="Gostar" onclick="showToast('Marcado como Gostei!')"><i class="far fa-thumbs-up"></i></button>`;
+            actions.innerHTML += `<button class="btn-icon" title="Compartilhar" onclick="showToast('Link copiado!')"><i class="fas fa-share-alt"></i></button>`;
+            actions.innerHTML += `<button class="btn-icon" title="Comentários" onclick="document.getElementById('comments-section').scrollIntoView({behavior: 'smooth'})"><i class="far fa-comment"></i></button>`;
 
             const seasonsSection = document.getElementById('tv-seasons-section');
             if (data.type === 'tv' && data.episodes.length > 0) {
