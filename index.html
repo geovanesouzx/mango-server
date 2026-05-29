@@ -251,19 +251,19 @@
         .qv-btn-secondary:hover { background: rgba(255,255,255,0.2); }
 
         /* --- TELA DE DETALHES E TEMPORADAS --- */
-        #details-view { min-height: 100vh; background-size: cover; background-position: center top; background-attachment: fixed; position: relative; padding-bottom: 40px; }
-        .details-overlay { position: absolute; inset: 0; background: linear-gradient(to right, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.7) 50%, rgba(0,0,0,0.3) 100%), linear-gradient(to top, rgba(0,0,0,1) 0%, transparent 80%); z-index: 1; pointer-events: none; }
-        .details-content { position: relative; z-index: 2; padding: 120px 60px 20px; max-width: 1200px; }
-        .btn-back { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 12px 24px; border-radius: 30px; cursor: pointer; width: fit-content; margin-bottom: 30px; backdrop-filter: blur(10px); transition: background 0.3s; font-size: 16px; font-weight: bold;}
+        #details-view { min-height: 100vh; background-size: cover; background-position: top center; background-attachment: fixed; position: relative; padding-bottom: 40px; }
+        .details-overlay { position: absolute; inset: 0; background: linear-gradient(to right, var(--bg-color) 0%, rgba(5,5,5,0.7) 50%, transparent 100%), linear-gradient(to top, var(--bg-color) 0%, transparent 60%); z-index: 1; pointer-events: none; }
+        .details-content { position: relative; z-index: 2; padding: 100px 60px 40px; max-width: 800px; display: flex; flex-direction: column; align-items: flex-start; }
+        .btn-back { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 10px 20px; border-radius: 30px; cursor: pointer; width: fit-content; margin-bottom: 30px; backdrop-filter: blur(10px); transition: background 0.3s; font-size: 14px; font-weight: 600;}
         .btn-back:hover { background: rgba(255,255,255,0.2); }
-        .details-logo { max-width: 60%; max-height: 160px; object-fit: contain; margin-bottom: 20px; }
-        .details-title { font-size: 64px; font-weight: 800; letter-spacing: -2px; line-height: 1.1; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.5); }
-        .meta-info { display: flex; align-items: center; gap: 16px; font-size: 16px; font-weight: 600; margin-bottom: 24px; flex-wrap: wrap; }
+        .details-logo { max-width: 350px; max-height: 120px; object-fit: contain; margin-bottom: 24px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5)); }
+        .details-title { font-size: clamp(32px, 5vw, 48px); font-weight: 900; letter-spacing: -1.5px; line-height: 1.1; margin-bottom: 16px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+        .meta-info { display: flex; align-items: center; gap: 12px; font-size: 14px; font-weight: 600; margin-bottom: 20px; flex-wrap: wrap; color: #e2e8f0; }
         .dot { color: var(--text-muted); font-size: 10px; }
-        .genre-tag { display: inline-block; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 20px; border-radius: 20px; font-size: 14px; margin-bottom: 30px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); margin-right: 10px; font-weight: 600;}
+        .genre-tag { display: inline-block; border: 1px solid rgba(255, 255, 255, 0.2); padding: 6px 16px; border-radius: 20px; font-size: 12px; margin-bottom: 24px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(5px); margin-right: 8px; font-weight: 600;}
 
         /* Menu de Temporadas App Style */
-        #tv-seasons-section { margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--glass-border); }
+        #tv-seasons-section { margin-top: 60px; padding-top: 40px; border-top: 1px solid var(--glass-border); width: 100%; }
         .season-header { margin-bottom: 24px; }
         .season-selector-btn {
             display: inline-flex; align-items: center; gap: 12px;
@@ -341,7 +341,7 @@
         
         .comment-input-row { display: flex; gap: 12px; align-items: center; }
         .comment-avatar-box { width: 44px; height: 44px; position: relative; flex-shrink: 0; cursor: pointer; }
-        .comment-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #1A1A1A; }
+        .comment-avatar { width: 100%; height: 100%; border-radius: 50%; object-fit: cover; background: #1A1A1A; border: 2px solid transparent;}
         .comment-input-frame { position: absolute; width: 140%; height: 140%; top: 50%; left: 50%; transform: translate(-50%, -50%); object-fit: contain; pointer-events: none; z-index: 2; }
         
         .comment-input {
@@ -382,7 +382,7 @@
         .comment-text { color: #E2E8F0; font-size: 15px; line-height: 1.5; margin-bottom: 8px; word-break: break-word; }
         .mention { color: var(--mango-brand); font-weight: 600; cursor: pointer; }
         
-        .comment-sticker { width: 120px; height: 120px; border-radius: 12px; object-fit: cover; background: var(--glass-bg); border: 1px solid var(--glass-border); margin-bottom: 8px; }
+        .comment-sticker { max-width: 120px; max-height: 120px; border-radius: 12px; object-fit: cover; background: var(--glass-bg); border: 1px solid var(--glass-border); margin-bottom: 8px; }
         
         .comment-actions { display: flex; gap: 20px; align-items: center; }
         .comment-action-btn { display: flex; align-items: center; gap: 6px; color: var(--text-muted); font-size: 13px; font-weight: 600; cursor: pointer; transition: color 0.2s; }
@@ -406,7 +406,7 @@
         
         .bottom-sheet {
             position: fixed; bottom: -100%; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 600px; background: #121212; border-top-left-radius: 24px;
+            width: 100%; max-width: 700px; background: #121212; border-top-left-radius: 24px;
             border-top-right-radius: 24px; z-index: 9999; padding: 24px;
             transition: bottom 0.3s cubic-bezier(0.175, 0.885, 0.32, 1);
             border-top: 1px solid rgba(255,255,255,0.1); border-left: 1px solid rgba(255,255,255,0.1); border-right: 1px solid rgba(255,255,255,0.1);
@@ -773,7 +773,7 @@
                 </div>
 
                 <div style="display: flex; gap: 20px; margin-top: 40px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 30px;">
-                    <button class="btn" style="background: white; color: black; flex: 1; height: 56px;" onclick="saveProfile()">Salvar Perfil</button>
+                    <button id="save-profile-btn" class="btn" style="background: white; color: black; flex: 1; height: 56px;" onclick="saveProfile(event)">Salvar Perfil</button>
                     <button class="btn" style="background: var(--surface-card); color: white; flex: 1; height: 56px;" onclick="showView('profiles')">Cancelar</button>
                 </div>
             </div>
@@ -920,7 +920,7 @@
                 <span id="det-duration"></span>
             </div>
             
-            <p class="hero-desc" id="det-desc" style="-webkit-line-clamp: unset; color: #E2E8F0; max-width: 800px; text-align: justify; font-size: 18px; line-height: 1.6;"></p>
+            <p class="hero-desc" id="det-desc"></p>
             <div id="det-genres"></div>
             
             <div class="hero-actions" id="det-actions"></div>
@@ -1100,7 +1100,7 @@
     <!-- SCRIPT PRINCIPAL -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, getDocs, doc, getDoc, setDoc, addDoc, updateDoc, deleteDoc, onSnapshot, query, where, orderBy, arrayUnion, arrayRemove, writeBatch } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
         // Configuração do Firebase
@@ -1135,7 +1135,7 @@
         let profilesUnsubscribe = null;
 
         // Estado Seleção de Assets
-        let profileDraft = { id: null, name: '', username: '', bio: '', pin: '', avatarUrl: '', frameUrl: '', horizontalBgUrl: '' };
+        let profileDraft = { id: null, name: '', username: '', oldUsername: '', bio: '', pin: '', avatarUrl: '', frameUrl: '', horizontalBgUrl: '' };
         let currentAssetSelectionMode = ''; // 'avatar', 'frame', 'horizontalBg'
         let currentAssetGroups = [];
         let activeAssetGroup = null;
@@ -1151,12 +1151,20 @@
         let currentContentTitleForComments = null;
         let selectedStickerUrlForComment = null;
         let activeCommentForOptions = null; // para o Modal
+        let realTimeProfilesMap = {};
+        let profileListeners = {};
 
         function getVerifiedHtml(sizeClass = '14px') {
             return `<span class="verified-badge" title="Verificado" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: ${sizeClass}; height: ${sizeClass}; margin-left: 4px; vertical-align: middle;">
                 <i class="fas fa-certificate" style="color: var(--mango-brand); font-size: ${sizeClass};"></i>
                 <i class="fas fa-check" style="color: var(--bg-color); font-size: calc(${sizeClass} * 0.55); position: absolute; margin-top: 1px;"></i>
             </span>`;
+        }
+
+        function clearProfileListeners() {
+            Object.values(profileListeners).forEach(unsub => unsub());
+            profileListeners = {};
+            realTimeProfilesMap = {};
         }
 
         // --- EXPOSIÇÃO GLOBAL DE FUNÇÕES PARA OS ONCLICK DO HTML ---
@@ -1215,6 +1223,7 @@
             if (viewName !== 'details' && commentsUnsubscribeDetailed) {
                 commentsUnsubscribeDetailed();
                 commentsUnsubscribeDetailed = null;
+                clearProfileListeners();
             }
         };
 
@@ -1511,6 +1520,7 @@
                 id: p ? p.id : null,
                 name: p ? p.name : "",
                 username: p ? p.username : "",
+                oldUsername: p ? p.username : "",
                 bio: p ? (p.bio||"") : "",
                 pin: p ? (p.pin||"") : "",
                 avatarUrl: p ? p.avatarUrl : "",
@@ -1688,34 +1698,108 @@
             showView('manage-profile');
         };
 
-        window.saveProfile = async function() {
+        window.saveProfile = async function(event) {
             profileDraft.name = document.getElementById('edit-profile-name').value.trim();
-            profileDraft.username = document.getElementById('edit-profile-username').value.trim();
+            const rawUsername = document.getElementById('edit-profile-username').value.trim();
+            const finalUsername = rawUsername.toLowerCase().replace(/[^a-z0-9_]/g, '');
+            profileDraft.username = finalUsername;
             profileDraft.bio = document.getElementById('edit-profile-bio').value.trim();
             profileDraft.pin = document.getElementById('edit-profile-pin').value.trim();
 
             if (!profileDraft.name || !profileDraft.username) { showToast("O Nome e o Nome de Utilizador são obrigatórios."); return; }
             if (profileDraft.username.length < 3) { showToast("O utilizador deve ter pelo menos 3 caracteres."); return; }
 
-            const profileData = { 
-                name: profileDraft.name, username: profileDraft.username, bio: profileDraft.bio, pin: profileDraft.pin,
-                avatarUrl: profileDraft.avatarUrl, frameUrl: profileDraft.frameUrl, horizontalBgUrl: profileDraft.horizontalBgUrl
-            };
-            
+            const oldUsername = profileDraft.oldUsername || "";
+
+            const btn = event.currentTarget || document.getElementById('save-profile-btn');
+            const originalText = btn.innerText;
+            btn.innerText = "A guardar...";
+            btn.disabled = true;
+
             try {
-                if (profileDraft.id) {
-                    await updateDoc(doc(db, 'users', currentUser.uid, 'profiles', profileDraft.id), profileData);
+                let profileId = profileDraft.id;
+                let isNew = false;
+                if (!profileId) {
+                    const newDocRef = doc(collection(db, 'users', currentUser.uid, 'profiles'));
+                    profileId = newDocRef.id;
+                    profileDraft.id = profileId;
+                    isNew = true;
+                }
+
+                // Check username uniqueness
+                const usernameRef = doc(db, 'usernames', finalUsername);
+                const usernameSnap = await getDoc(usernameRef);
+                
+                if (usernameSnap.exists()) {
+                    const ownerUid = usernameSnap.data().uid;
+                    const ownerProfileId = usernameSnap.data().profileId;
+                    
+                    const isTaken = (ownerProfileId && ownerProfileId !== profileId) || (!ownerProfileId && ownerUid !== currentUser.uid);
+                    if (isTaken) {
+                        showToast("Este nome de utilizador já está a ser utilizado.");
+                        btn.innerText = originalText; 
+                        btn.disabled = false;
+                        return;
+                    }
+                }
+
+                // Delete old username if it was changed
+                if (oldUsername && oldUsername !== finalUsername) {
+                    await deleteDoc(doc(db, 'usernames', oldUsername));
+                }
+
+                // Reserve new username
+                await setDoc(usernameRef, {
+                    uid: currentUser.uid,
+                    profileId: profileId,
+                    name: profileDraft.name,
+                    avatarUrl: profileDraft.avatarUrl
+                });
+
+                // Update Profile
+                const profileRef = doc(db, 'users', currentUser.uid, 'profiles', profileId);
+                const profileData = { 
+                    name: profileDraft.name, username: profileDraft.username, bio: profileDraft.bio, pin: profileDraft.pin,
+                    avatarUrl: profileDraft.avatarUrl, frameUrl: profileDraft.frameUrl, horizontalBgUrl: profileDraft.horizontalBgUrl
+                };
+
+                if (!isNew) {
+                    await updateDoc(profileRef, profileData);
                 } else {
                     profileData.favorites = [];
                     profileData.stickers = [];
                     profileData.createdAt = Date.now();
-                    await addDoc(collection(db, 'users', currentUser.uid, 'profiles'), profileData);
+                    await setDoc(profileRef, profileData);
                 }
+
+                // Update older comments authored by this user
+                const q = query(collection(db, 'comments'), where('uid', '==', currentUser.uid));
+                const snap = await getDocs(q);
+                const batch = writeBatch(db);
+                let count = 0;
+                snap.docs.filter(d => d.data().profileId === profileId).forEach(d => {
+                    batch.update(d.ref, {
+                        authorName: profileDraft.name,
+                        authorUsername: profileDraft.username,
+                        authorAvatar: profileDraft.avatarUrl,
+                        authorFrame: profileDraft.frameUrl
+                    });
+                    count++;
+                });
+                if (count > 0) {
+                    await batch.commit();
+                }
+
                 showView('profiles');
                 showToast("Perfil guardado com sucesso.");
             } catch (e) {
                 console.error("Erro ao guardar", e);
                 showToast("Erro ao guardar o perfil.");
+            } finally {
+                if (btn) {
+                    btn.innerText = originalText;
+                    btn.disabled = false;
+                }
             }
         };
 
@@ -1723,6 +1807,11 @@
             if (userProfiles.length <= 1 || !profileDraft.id) return;
             try {
                 await deleteDoc(doc(db, 'users', currentUser.uid, 'profiles', profileDraft.id));
+                
+                if (profileDraft.username) {
+                    await deleteDoc(doc(db, 'usernames', profileDraft.username));
+                }
+
                 showView('profiles');
                 showToast("Perfil apagado.");
             } catch (e) {
@@ -2265,6 +2354,7 @@
             if (commentsUnsubscribeDetailed) {
                 commentsUnsubscribeDetailed();
                 commentsUnsubscribeDetailed = null;
+                clearProfileListeners();
             }
 
             const q = query(collection(db, 'comments'), where('contentId', '==', contentId));
@@ -2276,6 +2366,22 @@
                 }).sort((a, b) => b.timestamp - a.timestamp); // Mais recentes primeiro
 
                 document.getElementById('comments-count').innerText = currentComments.length;
+
+                // Sync live profiles of comment authors
+                const uniqueAuthors = [...new Set(currentComments.map(c => `${c.uid}|${c.profileId}`))];
+                uniqueAuthors.forEach(authorKey => {
+                    if (!profileListeners[authorKey]) {
+                        const [uid, pId] = authorKey.split('|');
+                        const pRef = doc(db, 'users', uid, 'profiles', pId);
+                        profileListeners[authorKey] = onSnapshot(pRef, (snap) => {
+                            if (snap.exists()) {
+                                realTimeProfilesMap[authorKey] = snap.data();
+                                renderCommentsList();
+                            }
+                        });
+                    }
+                });
+
                 renderCommentsList();
             });
         }
@@ -2288,6 +2394,7 @@
         window.closeCommentsModal = function() {
             document.getElementById('comments-modal-overlay').classList.remove('show');
             document.getElementById('comments-modal').classList.remove('show');
+            clearProfileListeners();
         }
 
         function renderCommentsList() {
@@ -2346,17 +2453,24 @@
         }
 
         function buildCommentHtml(c, isReply, rootParentId = null) {
-            // Nota: Se for reply numa sub-resposta, o rootParentId deve ser mantido
+            const authorKey = `${c.uid}|${c.profileId}`;
+            const rtProfile = realTimeProfilesMap[authorKey];
+
             const actualParentId = rootParentId || c.id; 
             const likerKey = currentProfile ? `${currentUser.uid}|${currentProfile.id}` : null;
             const hasLiked = likerKey && (c.likes || []).includes(likerKey);
             
-            const fallbackName = encodeURIComponent(c.authorName || 'User');
+            const name = (rtProfile && rtProfile.name) ? rtProfile.name : (c.authorName || 'User');
+            const username = (rtProfile && rtProfile.username) ? rtProfile.username : (c.authorUsername || 'User');
+            const fallbackName = encodeURIComponent(name);
             const fallbackAvatar = `https://ui-avatars.com/api/?name=${fallbackName}&background=151C2C&color=F8FAFC&size=200`;
-            const avatar = c.authorAvatar || fallbackAvatar;
-            const frameHtml = c.authorFrame ? `<img src="${c.authorFrame}" class="comment-input-frame">` : '';
             
-            let verifiedHtml = c.isAuthorVerified ? getVerifiedHtml('14px') : '';
+            const avatar = (rtProfile && rtProfile.avatarUrl) ? rtProfile.avatarUrl : (c.authorAvatar || fallbackAvatar);
+            const frameUrl = (rtProfile && rtProfile.frameUrl !== undefined) ? rtProfile.frameUrl : c.authorFrame;
+            const frameHtml = frameUrl ? `<img src="${frameUrl}" class="comment-input-frame">` : '';
+            
+            const isVerified = (rtProfile && rtProfile.isVerified !== undefined) ? rtProfile.isVerified : c.isAuthorVerified;
+            let verifiedHtml = isVerified ? getVerifiedHtml('14px') : '';
             let stickerHtml = c.stickerUrl ? `<img src="${c.stickerUrl}" class="comment-sticker">` : '';
 
             // Construir o onclick para o modal de opções passando JSON (escapado)
@@ -2364,21 +2478,21 @@
 
             return `
                 <div class="comment-item" id="comment-${c.id}" oncontextmenu="openCommentOptions('${commentJson}'); return false;">
-                    <div class="comment-avatar-box" onclick="showToast('Ver perfil: @${c.authorUsername}')">
+                    <div class="comment-avatar-box" onclick="showToast('Ver perfil: @${username}')">
                         <img src="${avatar}" class="comment-avatar" onerror="this.onerror=null; this.src='${fallbackAvatar}';">
                         ${frameHtml}
                     </div>
                     <div class="comment-content-area">
                         <div class="comment-header">
-                            <span class="comment-author">${c.authorName}${verifiedHtml}</span>
-                            <span class="comment-username">@${c.authorUsername}</span>
+                            <span class="comment-author">${name}${verifiedHtml}</span>
+                            <span class="comment-username">@${username}</span>
                             <span class="dot">•</span>
                             <span class="comment-time">${formatTimeAgo(c.timestamp)}</span>
                         </div>
                         ${c.text ? `<div class="comment-text">${formatCommentText(c.text)}</div>` : ''}
                         ${stickerHtml}
                         <div class="comment-actions">
-                            <div class="comment-action-btn" onclick="prepareReply('${actualParentId}', '${c.authorUsername}')">
+                            <div class="comment-action-btn" onclick="prepareReply('${actualParentId}', '${username}')">
                                 <i class="fas fa-reply"></i> Responder
                             </div>
                             <div class="comment-action-btn ${hasLiked ? 'liked' : ''}" onclick="toggleLikeComment('${c.id}')">
